@@ -5,11 +5,13 @@
  * to ensure consistency across the application.
  */
 
+import { SCREENS } from "../services/NavigationContext";
+
 export const COLORS = {
     background: '#F9F7F2', // Warm Parchment / Soft Beige
-    primary: '#E65100',    // Heritage Orange
+    primary: '#EB6A00',    // Heritage Orange
     text: '#1A1A1A',       // Dark Charcoal
-    secondaryText: '#666666', // Calm Gray
+    secondaryText: '#000000ff', // Calm Gray
     cardAnimation: '#FFFFFF', // White for cards
     border: '#E0E0E0',
     success: '#4CAF50',
@@ -17,8 +19,10 @@ export const COLORS = {
     white: '#FFFFFF',
     black: '#000000',
     gold: '#FFD700',       // For special icons
-    splashGradientStart: '#FFF8E1', // Warm yellow
-    splashGradientEnd: '#F9F7F2',   // Soft parchment
+    splashGradientStart: '#FFD166', // Warm yellow
+    splashGradientEnd: '#FFF9FB',   // Soft parchment
+    loading: '#ffffffff',
+    screen: "#FAF7F2"
 };
 
 export const SPACING = {

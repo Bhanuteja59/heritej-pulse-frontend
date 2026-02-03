@@ -17,12 +17,6 @@ export const PROFILE_USER = {
     }
 };
 
-// Splash Screen Data
-export const SPLASH_CONTENT = {
-    title: "Heritage Pulse",
-    tagline: "Capturing the heartbeat of\nIndian Heritage & Traditions",
-    heroImage: require("../../assets/images/splash loading animation.gif")
-};
 
 // Chat Data
 export const INITIAL_CHAT_MESSAGES = [

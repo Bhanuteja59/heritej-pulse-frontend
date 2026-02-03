@@ -11,7 +11,11 @@ import ExploreScreen from './src/screens/ExploreScreen';
 import SavedScreen from './src/screens/SavedScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import ArticleDetailScreen from './src/screens/ArticleDetailScreen';
+import Register from './src/screens/Register';
 import BottomNavigation from './src/components/BottomNavigation';
+
+import Login from './src/screens/Login';
+import Signup from './src/screens/Signup';
 
 const ScreenRenderer = () => {
   const { currentScreen } = useNavigation();
@@ -29,6 +33,12 @@ const ScreenRenderer = () => {
       return <ProfileScreen />;
     case SCREENS.DETAIL:
       return <ArticleDetailScreen />;
+    case SCREENS.REGISTER:
+      return <Register />;
+    case SCREENS.LOGIN:
+      return <Login />;
+    case SCREENS.SIGNUP:
+      return <Signup />;
     default:
       return <HomeScreen />;
   }
@@ -38,7 +48,7 @@ const MainLayout = () => {
   const { currentScreen, isTabBarVisible } = useNavigation();
 
   // Optionally hide tabs for SPLASH or DETAIL via explicit check or rely on isTabBarVisible
-  const shouldShowTabs = isTabBarVisible && currentScreen !== SCREENS.SPLASH;
+  const shouldShowTabs = isTabBarVisible && currentScreen !== SCREENS.SPLASH && currentScreen !== SCREENS.REGISTER;
 
   return (
     <SafeAreaView style={styles.container}>

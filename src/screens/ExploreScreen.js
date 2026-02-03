@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import Header from '../components/Header';
 import { COLORS } from '../utils/theme';
 import { MockDataService, EXPLORE_CATEGORIES } from '../data/mockData';
 import { Ionicons } from '@expo/vector-icons';
@@ -43,8 +44,7 @@ const ExploreScreen = () => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.headerSpacer} />
-            <SearchBar />
+            <Header />
             <ScrollView style={styles.scrollView}>
                 <View style={styles.categoriesContainer}>
                     <FlatList
@@ -71,9 +71,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: COLORS.background,
-    },
-    headerSpacer: {
-        height: 60, // Space for status bar area since we don't have the main header here
     },
     scrollView: {
         flex: 1,
