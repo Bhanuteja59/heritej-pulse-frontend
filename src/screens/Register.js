@@ -1,13 +1,16 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from "../utils/theme";
+import { useNavigation, SCREENS } from "../services/NavigationContext";
 
 const Register = () => {
+
+    const { navigate } = useNavigation();
     return (
-        <LinearGradient
-            colors={[COLORS.splashGradientStart, COLORS.splashGradientEnd]}
+        <View
+            colors={[COLORS.screen]}
             style={styles.container}
         >
             <View style={styles.content}>
@@ -26,7 +29,7 @@ const Register = () => {
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity
                         style={[styles.button, styles.primaryButton]}
-                        onPress={() => console.log("Login Pressed")}
+                        onPress={() => navigate(SCREENS.LOGIN)}
                     >
                         <Ionicons name="log-in-outline" size={24} color={COLORS.white} style={styles.icon} />
                         <Text style={styles.buttonTextPrimary}>Login</Text>
@@ -34,14 +37,14 @@ const Register = () => {
 
                     <TouchableOpacity
                         style={[styles.button, styles.secondaryButton]}
-                        onPress={() => console.log("Sign Up Pressed")}
+                        onPress={() => navigate(SCREENS.SIGNUP)}
                     >
                         <Ionicons name="person-add-outline" size={24} color={COLORS.primary} style={styles.icon} />
                         <Text style={styles.buttonTextSecondary}>Sign Up</Text>
                     </TouchableOpacity>
                 </View>
             </View>
-        </LinearGradient>
+        </View>
     );
 };
 
@@ -67,22 +70,24 @@ const styles = StyleSheet.create({
         textShadowRadius: 10,
     },
     logo: {
-        width: 200,
-        height: 200,
-        marginBottom: 60,
+        width: 180, // Fixed reasonable size for consistency
+        height: 180,
+        marginBottom: 40, // Reduced margin
+        resizeMode: 'contain',
     },
     tagline: {
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: '600',
         textAlign: 'center',
-        marginBottom: 60,
+        marginBottom: 40, // Reduced margin
         color: COLORS.primary,
         letterSpacing: 0.5,
         lineHeight: 28,
-        textShadowColor: 'rgba(255, 170, 0, 0.1)',
+        textShadowColor: 'rgba(0, 0, 0, 0.1)',
         textShadowOffset: { width: 0, height: 2 },
         textShadowRadius: 4,
         opacity: 0.9,
+        paddingHorizontal: 20, // Ensure text doesn't touch edges
     },
     buttonContainer: {
         width: '100%',

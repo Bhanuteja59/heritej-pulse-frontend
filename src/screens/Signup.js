@@ -1,133 +1,360 @@
-import React from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from "react";
+import {
+    View,
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    Alert,
+    TextInput,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { COLORS } from "../utils/theme";
+import { useNavigation, SCREENS } from "../services/NavigationContext";
+import AuthLoading from "../components/AuthLoading";
+import OTPModal from "../components/OTPModal";
 
 const Signup = () => {
+    const { navigate } = useNavigation();
+
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [focusedInput, setFocusedInput] = useState(null);
+
+    // Password Visibility States
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
+
+    // Modal & Loading States
+    const [modalVisible, setModalVisible] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [showAuthLoading, setShowAuthLoading] = useState(false);
+
+    const handleSignup = () => {
+        if (!name || !email || !password || !confirmPassword) {
+            Alert.alert("Missing Fields", "Please fill in all details to sign up.");
+            return;
+        }
+        if (password !== confirmPassword) {
+            Alert.alert("Password Mismatch", "Passwords do not match.");
+            return;
+        }
+        // Show verification modal
+        setModalVisible(true);
+    };
+
+    const handleVerifyCode = (code) => {
+        if (code.length !== 4) {
+            Alert.alert("Invalid Code", "Please enter the full 4-digit verification code.");
+            return;
+        }
+
+        setIsLoading(true);
+        // Simulate network request / verification
+        setTimeout(() => {
+            setIsLoading(false);
+            setModalVisible(false); // Close OTP modal
+
+            console.log("Signup Verified!", { name, email, password, code });
+
+            // Show Authentication Loading Screen
+            setShowAuthLoading(true);
+            setTimeout(() => {
+                setShowAuthLoading(false);
+                navigate(SCREENS.HOME);
+            }, 4000);
+        }, 1500);
+    };
+
     return (
-        <LinearGradient
-            colors={[COLORS.splashGradientStart, COLORS.splashGradientEnd]}
-            style={styles.container}
-        >
-            <View style={styles.content}>
-                <Text style={styles.title}>Heritej Pulse</Text>
+        <View style={styles.container}>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                style={{ flex: 1 }}
+            >
+                <ScrollView
+                    contentContainerStyle={styles.scrollContent}
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                >
+                    <View style={styles.header}>
+                        <Text style={styles.title}> Welcome To Heritej Pulse👋 </Text>
+                        <Text style={styles.subtitle}>
+                            Hello, I guess you are new around here. You can start using the application after sign up.
+                        </Text>
+                    </View>
 
-                <Image
-                    source={require("../../assets/images/heritej-pulse-logo.png")}
-                    style={styles.logo}
-                    resizeMode="contain"
-                />
+                    <View style={styles.form}>
+                        {/* Name Input */}
+                        <View style={styles.inputs}>
+                            <Text style={styles.label}>Username</Text>
+                            <View style={styles.inputContainer}>
+                                <Ionicons
+                                    name="person-outline"
+                                    size={24}
+                                    style={[
+                                        styles.inputIcon,
+                                        focusedInput === "name" && styles.iconFocused,
+                                    ]}
+                                />
+                                <TextInput
+                                    placeholder="Enter Username"
+                                    value={name}
+                                    onChangeText={setName}
+                                    style={styles.input}
+                                    placeholderTextColor="#8E8E8E"
+                                    onFocus={() => setFocusedInput("name")}
+                                    onBlur={() => setFocusedInput(null)}
+                                />
+                            </View>
+                        </View>
 
-                <Text style={styles.tagline}>
-                    Capturing the heartbeat ofIndian Heritage & Traditions
-                </Text>
+                        {/* Email Input */}
+                        <View style={styles.inputs}>
+                            <Text style={styles.label}>Email / Mobile No</Text>
+                            <View style={styles.inputContainer}>
+                                <Ionicons
+                                    name="mail-outline"
+                                    size={24}
+                                    style={[
+                                        styles.inputIcon,
+                                        focusedInput === "email" && styles.iconFocused,
+                                    ]}
+                                />
+                                <TextInput
+                                    placeholder="Enter Email / Mobile No"
+                                    value={email}
+                                    onChangeText={setEmail}
+                                    style={styles.input}
+                                    placeholderTextColor="#8E8E8E"
+                                    onFocus={() => setFocusedInput("email")}
+                                    onBlur={() => setFocusedInput(null)}
+                                    keyboardType="email-address"
+                                    autoCapitalize="none"
+                                />
+                            </View>
+                        </View>
 
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                        style={[styles.button, styles.primaryButton]}
-                        onPress={() => console.log("Login Pressed")}
-                    >
-                        <Ionicons name="log-in-outline" size={24} color={COLORS.white} style={styles.icon} />
-                        <Text style={styles.buttonTextPrimary}>Login</Text>
-                    </TouchableOpacity>
+                        {/* Password Input */}
+                        <View style={styles.inputs}>
+                            <Text style={styles.label}>Password</Text>
+                            <View style={styles.inputContainer}>
+                                <Ionicons
+                                    name="lock-closed-outline"
+                                    size={24}
+                                    style={[
+                                        styles.inputIcon,
+                                        focusedInput === "password" && styles.iconFocused,
+                                    ]}
+                                />
+                                <TextInput
+                                    placeholder="Password"
+                                    value={password}
+                                    onChangeText={setPassword}
+                                    style={styles.input}
+                                    secureTextEntry={!isPasswordVisible}
+                                    placeholderTextColor="#8E8E8E"
+                                    onFocus={() => setFocusedInput("password")}
+                                    onBlur={() => setFocusedInput(null)}
+                                />
+                                <TouchableOpacity
+                                    onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                                    style={{ padding: 4 }}
+                                >
+                                    <Ionicons
+                                        name={isPasswordVisible ? "eye-outline" : "eye-off-outline"}
+                                        size={24}
+                                        color="#8E8E8E"
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
 
-                    <TouchableOpacity
-                        style={[styles.button, styles.secondaryButton]}
-                        onPress={() => console.log("Sign Up Pressed")}
-                    >
-                        <Ionicons name="person-add-outline" size={24} color={COLORS.primary} style={styles.icon} />
-                        <Text style={styles.buttonTextSecondary}>Sign Up</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-        </LinearGradient>
+                        {/* Confirm Password Input */}
+                        <View style={styles.inputs}>
+                            <Text style={styles.label}>Confirm Password</Text>
+                            <View style={styles.inputContainer}>
+                                <Ionicons
+                                    name="lock-closed-outline"
+                                    size={24}
+                                    style={[
+                                        styles.inputIcon,
+                                        focusedInput === "confirmPassword" && styles.iconFocused,
+                                    ]}
+                                />
+                                <TextInput
+                                    placeholder="Confirm Password"
+                                    value={confirmPassword}
+                                    onChangeText={setConfirmPassword}
+                                    style={styles.input}
+                                    secureTextEntry={!isConfirmPasswordVisible}
+                                    placeholderTextColor="#8E8E8E"
+                                    onFocus={() => setFocusedInput("confirmPassword")}
+                                    onBlur={() => setFocusedInput(null)}
+                                />
+                                <TouchableOpacity
+                                    onPress={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}
+                                    style={{ padding: 4 }}
+                                >
+                                    <Ionicons
+                                        name={isConfirmPasswordVisible ? "eye-outline" : "eye-off-outline"}
+                                        size={24}
+                                        color="#8E8E8E"
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
+                        <TouchableOpacity onPress={handleSignup} activeOpacity={0.8} >
+                            <LinearGradient
+                                colors={["#EB6A00", "#FF8D28"]}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                style={styles.signupButton}
+                            >
+                                <Text style={styles.signupButtonText}> Sign Up </Text>
+                            </LinearGradient>
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.footer}>
+                        <Text style={styles.footerText}> Already have an account? </Text>
+                        <TouchableOpacity onPress={() => navigate(SCREENS.LOGIN)}>
+                            <Text style={styles.footerLink}> Sign In </Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Verification Modal Component */}
+                    <OTPModal
+                        visible={modalVisible}
+                        onClose={() => setModalVisible(false)}
+                        onVerify={handleVerifyCode}
+                        isLoading={isLoading}
+                    />
+
+                    {/* Full Screen Auth Loading */}
+                    <AuthLoading visible={showAuthLoading} />
+
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </View>
     );
 };
+
+export default Signup;
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: COLORS.screen,
     },
-    content: {
-        flex: 1,
+    scrollContent: {
+        flexGrow: 1,
         justifyContent: "center",
-        alignItems: "center",
-        paddingHorizontal: 24,
+        paddingHorizontal: 20,
+        paddingBottom: 40,
+    },
+    header: {
+        alignItems: "flex-start",
+        marginBottom: 30,
+        marginTop: 40,
+        width: "100%",
     },
     title: {
-        fontSize: 36,
-        fontWeight: '800',
-        textAlign: 'center',
-        marginBottom: 80,
+        fontSize: 24,
+        fontWeight: "800",
         color: COLORS.primary,
-        letterSpacing: 1.5,
-        textShadowColor: 'rgba(140, 60, 17, 0.3)', // Primary color shadow with low opacity
-        textShadowOffset: { width: 0, height: 4 },
-        textShadowRadius: 10,
-    },
-    logo: {
-        width: 200,
-        height: 200,
-        marginBottom: 60,
-    },
-    tagline: {
-        fontSize: 18,
-        fontWeight: '600',
-        textAlign: 'center',
-        marginBottom: 60,
-        color: COLORS.primary,
+        marginBottom: 10,
         letterSpacing: 0.5,
-        lineHeight: 28,
-        textShadowColor: 'rgba(255, 170, 0, 0.1)',
-        textShadowOffset: { width: 0, height: 2 },
-        textShadowRadius: 4,
-        opacity: 0.9,
     },
-    buttonContainer: {
+    subtitle: {
+        fontSize: 16,
+        letterSpacing: 0.5,
+        color: COLORS.secondaryText,
+        lineHeight: 24,
+    },
+    form: {
+        width: "100%",
+        gap: 20,
+        marginLeft: 20,
+        marginRight: 20,
+    },
+    inputs: {
+        gap: 10,
+    },
+    label: {
+        fontSize: 20,
+        fontWeight: "bold",
+        color: COLORS.secondaryText,
+    },
+    inputContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        borderColor: COLORS.primary,
+        borderWidth: 1.5,
+        backgroundColor: "#F5F5F5",
+        borderRadius: 12,
+        paddingHorizontal: 14,
+        paddingVertical: 10,
+        elevation: 2,
+        shadowColor: "#000",
+        shadowOffset: { width: 2, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        marginRight: 40,
+    },
+    inputIcon: {
+        marginRight: 12,
+        color: "#818181ff",
+    },
+    iconFocused: {
+        color: COLORS.primary,
+    },
+    input: {
+        flex: 1,
+        fontSize: 16,
+        color: COLORS.text,
+    },
+    buttonWrapper: {
         width: '100%',
-        gap: 16,
-        alignItems: 'center', // Fix: Centers the 80% width buttons
-    },
-    button: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 16,
-        borderRadius: 10,
-        width: '80%',
+        marginTop: 20,
+        borderRadius: 12,
         elevation: 4,
         shadowColor: COLORS.primary,
-        textShadowColor: 'rgba(255, 167, 167, 0.1)',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
+        shadowOpacity: 0.3,
         shadowRadius: 8,
+        backgroundColor: 'transparent',
     },
-    primaryButton: {
-        backgroundColor: COLORS.primary,
+    signupButton: {
+        alignItems: "center",
+        justifyContent: "center",
+        marginRight: 45,
+        borderRadius: 12,
+        paddingVertical: 16,
     },
-    secondaryButton: {
-        backgroundColor: COLORS.white,
-        borderWidth: 2,
-        borderColor: COLORS.primary,
-        elevation: 0, // Less shadow for secondary
-        shadowOpacity: 0.1,
-    },
-    buttonTextPrimary: {
+    signupButtonText: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontWeight: "bold",
         color: COLORS.white,
-        letterSpacing: 0.5,
     },
-    buttonTextSecondary: {
-        fontSize: 18,
-        fontWeight: 'bold',
+    footer: {
+        flexDirection: "row",
+        justifyContent: "center",
+        marginTop: 40,
+    },
+    footerText: {
+        fontSize: 16,
+        color: COLORS.text,
+    },
+    footerLink: {
+        fontSize: 16,
+        fontWeight: "bold",
         color: COLORS.primary,
-        letterSpacing: 0.5,
-    },
-    icon: {
-        marginRight: 12,
     },
 });
-
-export default Signup;  

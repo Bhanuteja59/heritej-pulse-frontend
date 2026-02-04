@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Switch, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { COLORS } from '../utils/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, SCREENS } from '../services/NavigationContext';
 
 const SettingItem = ({ icon, label, hasSwitch, value }) => (
     <View style={styles.settingItem}>
@@ -24,6 +25,7 @@ const SettingItem = ({ icon, label, hasSwitch, value }) => (
 );
 
 const ProfileScreen = () => {
+    const { navigate } = useNavigation();
     return (
         <ScrollView style={styles.container}>
             <View style={styles.header}>
@@ -62,7 +64,7 @@ const ProfileScreen = () => {
                 <Text style={styles.sectionTitle}>Account</Text>
                 <SettingItem icon="key-outline" label="Change Password" />
                 <TouchableOpacity style={styles.signOutBtn}>
-                    <Text style={styles.signOutText}>Sign Out</Text>
+                    <Text style={styles.signOutText} onPress={() => { navigate(SCREENS.REGISTER) }}>Sign Out</Text>
                 </TouchableOpacity>
             </View>
 
