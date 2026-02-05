@@ -19,6 +19,8 @@ export const SCREENS = {
     REGISTER: 'REGISTER',
     LOGIN: 'LOGIN',
     SIGNUP: 'SIGNUP',
+    FORGOT_PASSWORD: 'FORGOT_PASSWORD',
+    NOTIFICATIONS: 'NOTIFICATIONS',
 };
 
 export const NavigationProvider = ({ children }) => {

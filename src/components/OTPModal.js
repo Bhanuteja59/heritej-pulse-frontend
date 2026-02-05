@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Modal, ActivityIndicator, Styl
 import { LinearGradient } from 'expo-linear-gradient'; // Keep using LinearGradient as per original design
 import { COLORS } from '../utils/theme';
 
-const OTPModal = ({ visible, onClose, onVerify, isLoading }) => {
+const OTPModal = ({ visible, onClose, onVerify, isLoading, sentTo }) => {
     const [verificationCode, setVerificationCode] = useState("");
     const inputRef = useRef(null);
 
@@ -35,7 +35,8 @@ const OTPModal = ({ visible, onClose, onVerify, isLoading }) => {
                     <View style={styles.modalContent}>
                         <Text style={styles.modalTitle}>Verification Code ✅</Text>
                         <Text style={styles.modalSubtitle}>
-                            You need to enter 4-digit code we send to your email address.
+                            You need to enter 4-digit code we send to : {"\n"}
+                            <Text style={{ fontWeight: 'bold', color: COLORS.primary }}>{sentTo}</Text>
                         </Text>
 
                         {/* Wrapper to ensure touches focus the input */}

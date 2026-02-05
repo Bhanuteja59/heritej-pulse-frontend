@@ -1,36 +1,63 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { MockDataService } from '../data/mockData';
 import { COLORS } from '../utils/theme';
 import { useNavigation, SCREENS } from '../services/NavigationContext';
 
-const NewsCard = ({ item, onPress }) => (
-    <TouchableOpacity style={styles.cardContainer} onPress={() => onPress(item)} activeOpacity={0.8}>
-        <Image source={{ uri: item.image }} style={styles.thumbnail} />
-        <View style={styles.contentContainer}>
-            <View style={styles.headerRow}>
-                <Text style={styles.category}>{item.category}</Text>
-                <TouchableOpacity>
-                    <Ionicons name="bookmark-outline" size={20} color={COLORS.text} />
-                </TouchableOpacity>
-            </View>
-            <Text style={styles.headline} numberOfLines={2}>{item.title}</Text>
-            <View style={styles.footerRow}>
-                <View style={styles.publisherInfo}>
-                    <View style={styles.publisherLogo} />
-                    <Text style={styles.publisherName}>{item.publisher}</Text>
-                </View>
-                <View style={styles.timeInfo}>
-                    <Ionicons name="time-outline" size={14} color={COLORS.secondaryText} style={styles.clockIcon} />
-                    <Text style={styles.timestamp}>{item.timestamp}</Text>
-                </View>
-            </View>
-        </View>
-    </TouchableOpacity>
-);
+const NewsCard = ({ item, onPress, onShowToast }) => {
+    const [bookmarked, setBookmarked] = useState(false);
 
-const LatestNewsSection = () => {
+    const handleBookmark = () => {
+        const newState = !bookmarked;
+        setBookmarked(newState);
+        if (newState) {
+            onShowToast("Successfully saved the article");
+        }
+    };
+
+    return (
+        <Pressable
+            onPress={() => onPress(item)}
+            style={({ pressed }) => [
+                styles.cardContainer,
+                {
+                    borderLeftColor: pressed ? COLORS.primary : 'transparent',
+                    backgroundColor: pressed ? '#FAFAFA' : COLORS.white,
+                    boxShadow: pressed ? '0 2px 4px rgba(0, 0, 0, 0.1)' : 'none',
+                    borderRadius: pressed ? 12 : 10,
+                }
+            ]}
+        >
+            <Image source={{ uri: item.image }} style={styles.thumbnail} />
+            <View style={styles.contentContainer}>
+                <View style={styles.headerRow}>
+                    <Text style={styles.category}>{item.category}</Text>
+                    <TouchableOpacity onPress={handleBookmark}>
+                        <Ionicons
+                            name={bookmarked ? "bookmark" : "bookmark-outline"}
+                            size={20}
+                            color={COLORS.text}
+                        />
+                    </TouchableOpacity>
+                </View>
+                <Text style={styles.headline} numberOfLines={2}>{item.title}</Text>
+                <View style={styles.footerRow}>
+                    <View style={styles.publisherInfo}>
+                        <View style={styles.publisherLogo} />
+                        <Text style={styles.publisherName}>{item.publisher}</Text>
+                    </View>
+                    <View style={styles.timeInfo}>
+                        <Ionicons name="time-outline" size={14} color={COLORS.secondaryText} style={styles.clockIcon} />
+                        <Text style={styles.timestamp}>{item.timestamp}</Text>
+                    </View>
+                </View>
+            </View>
+        </Pressable>
+    );
+};
+
+const LatestNewsSection = ({ onShowToast }) => {
     const data = MockDataService.getLatestNews();
     const { navigate } = useNavigation();
 
@@ -41,14 +68,19 @@ const LatestNewsSection = () => {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.sectionTitle}>Latest</Text>
+                <Text style={styles.sectionTitle}> 🔶 Latest</Text>
                 <TouchableOpacity>
-                    <Text style={styles.seeAll}>See all</Text>
+                    <Text style={[styles.seeAll, { color: COLORS.primary }]}>See all {'>'} </Text>
                 </TouchableOpacity>
             </View>
             <View style={styles.list}>
                 {data.map(item => (
-                    <NewsCard key={item.id} item={item} onPress={handlePress} />
+                    <NewsCard
+                        key={item.id}
+                        item={item}
+                        onPress={handlePress}
+                        onShowToast={onShowToast}
+                    />
                 ))}
             </View>
         </View>
@@ -90,6 +122,8 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 2,
         alignItems: 'center',
+        borderLeftWidth: 4,
+        borderLeftColor: 'transparent',
     },
     thumbnail: {
         width: 96,

@@ -106,7 +106,7 @@ const Login = () => {
                     </View>
                 </View>
 
-                <TouchableOpacity style={styles.forgotPassword}>
+                <TouchableOpacity style={styles.forgotPassword} onPress={() => navigate(SCREENS.FORGOT_PASSWORD)}>
                     <Text style={styles.forgotPasswordText}> Forgot Password? </Text>
                 </TouchableOpacity>
 

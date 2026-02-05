@@ -76,11 +76,23 @@ export const FALLBACK_HOME_DATA = {
     trending: [
         { id: "t1", title: "The Majestic Mysore Dasara", category: "Festivals", imageKeyword: "mysore palace", subtitle: "A Royal Celebration", keywords: ["#Mysore", "#Dasara", "#Royal"] },
         { id: "t2", title: "Chola Temples: Granite Wonders", category: "History", imageKeyword: "temple", subtitle: "Living Chola Temples", keywords: ["#Chola", "#Architecture", "#History"] },
-        { id: "t3", title: "Reviving Ancient Weaves", category: "Art", imageKeyword: "loom", subtitle: "Handloom Heritage", keywords: ["#Handloom", "#Craft", "#Weaves"] }
+        { id: "t3", title: "Reviving Ancient Weaves", category: "Art", imageKeyword: "loom", subtitle: "Handloom Heritage", keywords: ["#Handloom", "#Craft", "#Weaves"] },
+        { id: "t4", title: "Classical Dances of India", category: "Dance", imageKeyword: "kathakali", subtitle: "Poetry in Motion", keywords: ["#ClassicalDance", "#Kathakali", "#Art"] },
+        { id: "t5", title: "Spices of the Malabar Coast", category: "Food", imageKeyword: "spices", subtitle: "The Flavor of History", keywords: ["#Kerala", "#Spices", "#Cuisine"] },
+        { id: "t6", title: "Yoga: An Eternal Legacy", category: "Heritage", imageKeyword: "yoga", subtitle: "Ancient Wellness", keywords: ["#Yoga", "#Wellness", "#Spirituality"] },
+
     ],
     latest: [
         { id: "l1", title: "New Excavations at Keezhadi", category: "History", imageKeyword: "excavation", publisher: "ASI News", timeAgo: "2h ago", subtitle: "Unearthing the Past", keywords: ["#Keezhadi", "#TamilNadu", "#Excavation"] },
-        { id: "l2", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] }
+        { id: "l2", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] },
+        { id: "l3", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] },
+        { id: "l4", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] },
+        { id: "l5", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] },
+        { id: "l6", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] },
+        { id: "l7", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] },
+        { id: "l8", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] },
+        { id: "l9", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] },
+        { id: "l10", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] },
     ]
 };
 
@@ -142,13 +154,26 @@ const ALL_ITEMS = [
 
 let savedArticleIds = FALLBACK_SAVED_DATA.map(i => i.id);
 
+// Mutable state for data
+let currentTrending = [...FALLBACK_HOME_DATA.trending];
+let currentLatest = [...FALLBACK_HOME_DATA.latest];
+
+// Simple shuffle function
+const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+};
+
 export const MockDataService = {
     getTrendingArticles: () => {
-        return FALLBACK_HOME_DATA.trending.map(mapItemToArticle);
+        return currentTrending.map(mapItemToArticle);
     },
 
     getLatestNews: () => {
-        return FALLBACK_HOME_DATA.latest.map(mapItemToArticle);
+        return currentLatest.map(mapItemToArticle);
     },
 
     getAllArticles: () => {
@@ -195,5 +220,10 @@ export const MockDataService = {
 
     getUserProfile: () => PROFILE_USER,
 
-    getSplashContent: () => SPLASH_CONTENT,
+    refreshData: () => {
+        // Shuffle the arrays to simulate new content
+        currentTrending = shuffleArray([...FALLBACK_HOME_DATA.trending]);
+        currentLatest = shuffleArray([...FALLBACK_HOME_DATA.latest]);
+        return true;
+    },
 };

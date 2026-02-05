@@ -235,6 +235,7 @@ const Signup = () => {
                         onClose={() => setModalVisible(false)}
                         onVerify={handleVerifyCode}
                         isLoading={isLoading}
+                        sentTo={email}
                     />
 
                     {/* Full Screen Auth Loading */}

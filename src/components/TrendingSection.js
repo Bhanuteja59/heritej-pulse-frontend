@@ -1,47 +1,102 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, ImageBackground, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, FlatList, ImageBackground, TouchableOpacity, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { MockDataService } from '../data/mockData';
 import { COLORS } from '../utils/theme';
+import { useNavigation, SCREENS } from '../services/NavigationContext';
 
-const TrendingCard = ({ item }) => (
-    <View style={styles.cardContainer}>
-        <ImageBackground source={{ uri: item.image }} style={styles.cardImage} imageStyle={styles.imageStyle}>
-            <LinearGradient
-                colors={['transparent', 'rgba(0,0,0,0.8)']}
-                style={styles.gradient}
-            >
-                <View style={styles.cardContent}>
-                    <View style={styles.topRow}>
-                        <View style={styles.badge}>
-                            <Text style={styles.badgeText}>{item.category}</Text>
+const TrendingCard = ({ item, onPress, onShowToast }) => {
+    const [bookmarked, setBookmarked] = useState(false);
+
+    const handleBookmark = () => {
+        const newState = !bookmarked;
+        setBookmarked(newState);
+        if (newState) {
+            onShowToast("Successfully saved the article");
+        }
+    };
+
+    return (
+        <Pressable
+            onPress={() => onPress(item)}
+            style={({ pressed }) => [
+                styles.cardContainer,
+                {
+                    borderRadius: pressed ? 20 : 10,
+                    elevation: pressed ? 12 : 0,
+                    shadowOpacity: pressed ? 0.4 : 0,
+                    transform: [{ scale: pressed ? 0.97 : 1 }],
+                }
+            ]}
+        >
+            {({ pressed }) => (
+                <ImageBackground
+                    source={{ uri: item.image }}
+                    style={styles.cardImage}
+                    imageStyle={[styles.imageStyle, { borderRadius: pressed ? 20 : 10 }]}
+                >
+                    <LinearGradient
+                        colors={['transparent', 'rgba(0,0,0,0.8)']}
+                        style={[styles.gradient, { borderRadius: pressed ? 20 : 10 }]}
+                    >
+                        <View style={styles.cardContent}>
+                            <View style={styles.topRow}>
+                                <View style={styles.badge}>
+                                    <Text style={styles.badgeText}> 🔥 Trending</Text>
+                                </View>
+                                <TouchableOpacity
+                                    style={styles.bookmarkButton}
+                                    onPress={handleBookmark}
+                                    activeOpacity={0.7}
+                                >
+                                    <Ionicons
+                                        name={bookmarked ? "bookmark" : "bookmark-outline"}
+                                        size={24}
+                                        color={COLORS.white}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                            <View>
+                                <Text style={styles.categoryText}>{item.category}</Text>
+                                <Text style={styles.cardTitle}>{item.title}</Text>
+                            </View>
                         </View>
-                        <TouchableOpacity>
-                            <Ionicons name="bookmark-outline" size={24} color={COLORS.white} />
-                        </TouchableOpacity>
-                    </View>
-                    <Text style={styles.cardTitle}>{item.title}</Text>
-                </View>
-            </LinearGradient>
-        </ImageBackground>
-    </View>
-);
+                    </LinearGradient>
+                </ImageBackground>
+            )}
+        </Pressable>
+    );
+};
 
-const TrendingSection = () => {
+const TrendingSection = ({ onShowToast }) => {
     const data = MockDataService.getTrendingArticles();
+    const { navigate } = useNavigation();
+
+    const handlePress = (item) => {
+        navigate(SCREENS.DETAIL, { articleId: item.id });
+    };
 
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.sectionTitle}>Trending</Text>
+                <View style={styles.titleContainer}>
+                    <Ionicons name="trending-up" size={24} color={COLORS.primary} style={styles.icon} />
+                    <Text style={styles.sectionTitle}>Trending</Text>
+                </View>
                 <TouchableOpacity>
-                    <Text style={styles.seeAll}>See all</Text>
+                    <Text style={[styles.seeAll, { color: COLORS.primary }]}>See all {'>'} </Text>
                 </TouchableOpacity>
             </View>
             <FlatList
                 data={data}
-                renderItem={({ item }) => <TrendingCard item={item} />}
+                renderItem={({ item }) => (
+                    <TrendingCard
+                        item={item}
+                        onPress={handlePress}
+                        onShowToast={onShowToast}
+                    />
+                )}
                 keyExtractor={item => item.id}
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -64,6 +119,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         marginBottom: 12,
     },
+    titleContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    icon: {
+        marginRight: 8,
+    },
     sectionTitle: {
         fontSize: 20,
         fontWeight: 'bold',
@@ -81,17 +143,19 @@ const styles = StyleSheet.create({
         width: 252,
         height: 256,
         marginRight: 16,
+        borderRadius: 10,
+        overflow: 'hidden',
     },
     cardImage: {
         flex: 1,
         justifyContent: 'flex-end',
     },
     imageStyle: {
-        borderRadius: 16,
+        borderRadius: 10,
     },
     gradient: {
         flex: 1,
-        borderRadius: 16,
+        borderRadius: 10,
         justifyContent: 'space-between',
         padding: 16,
     },
@@ -101,25 +165,37 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
     },
     badge: {
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-        paddingHorizontal: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(126, 126, 126, 0.6)', // Darker for contrast
+        paddingHorizontal: 10,
         paddingVertical: 6,
         borderRadius: 20,
     },
     badgeText: {
-        color: COLORS.white,
-        fontWeight: '600',
+        color: '#ffffffff', // Gold color for "Trending"
+        fontWeight: '400',
         fontSize: 12,
+        textTransform: 'uppercase',
     },
     cardContent: {
         flex: 1,
         justifyContent: 'space-between',
     },
+    categoryText: {
+        color: '#E0E0E0',
+        fontSize: 11,
+        fontWeight: '600',
+        marginBottom: 4,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+    },
     cardTitle: {
         color: COLORS.white,
-        fontSize: 18,
+        fontSize: 15,
         fontWeight: 'bold',
         marginBottom: 8,
+        lineHeight: 24,
     },
 });
 
