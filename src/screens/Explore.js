@@ -1,10 +1,9 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
-  TextInput,
   Pressable,
   Platform,
   SafeAreaView,
@@ -13,6 +12,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, SCREENS } from "../services/NavigationContext";
 import { MockDataService } from "../data/mockData";
+import Header from "../components/Header";
 
 /**
  * Explore Screen (Touch-scroll only)
@@ -27,7 +27,6 @@ const CARD_GAP = 16;
 const SNAP_INTERVAL = CARD_WIDTH + CARD_GAP;
 
 const Explore = () => {
-  const [search, setSearch] = useState("");
   const { navigate } = useNavigation();
 
   // --- DATA (replace later with API) ---
@@ -46,10 +45,6 @@ const Explore = () => {
   const topNews = useMemo(() => MockDataService.getExploreSection("topNews"), []);
   const culturalEvents = useMemo(() => MockDataService.getExploreSection("culturalEvents"), []);
   const museums = useMemo(() => MockDataService.getExploreSection("museums"), []);
-
-  const onRefresh = () => {
-    // optional: later refresh API
-  };
 
   const onOpenDetail = (item) => {
     navigate(SCREENS.DETAIL, { articleId: item?.id });
@@ -84,42 +79,12 @@ const Explore = () => {
 
   return (
     <SafeAreaView style={styles.safe}>
+      <Header />
       <ScrollView
         style={styles.screen}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View style={styles.headerRow}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.h1}>Explore</Text>
-            <Text style={styles.sub}>Discover stories by topic</Text>
-          </View>
-
-          <Pressable onPress={onRefresh} hitSlop={10} style={styles.refreshBtn}>
-            <Ionicons name="refresh" size={18} color={stylesVars.orange} />
-          </Pressable>
-        </View>
-
-        {/* Search */}
-        <View style={styles.searchWrap}>
-          <Ionicons
-            name="search"
-            size={18}
-            color={stylesVars.grayText}
-            style={{ marginRight: 10 }}
-          />
-          <TextInput
-            value={search}
-            onChangeText={setSearch}
-            placeholder="Search for Heritage"
-            placeholderTextColor={stylesVars.grayText}
-            style={styles.searchInput}
-            returnKeyType="search"
-          />
-          <Ionicons name="sparkles" size={18} color={stylesVars.orange} />
-        </View>
-
         {/* Browse by category */}
         <Text style={styles.sectionKicker}>BROWSE BY CATEGORY</Text>
 
@@ -275,35 +240,6 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: stylesVars.bg },
   content: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 24 },
 
-  headerRow: { flexDirection: "row", alignItems: "center", gap: 12, paddingTop: 4 },
-  h1: { fontSize: 28, fontWeight: "700", color: stylesVars.darkText },
-  sub: { marginTop: 4, fontSize: 14, color: stylesVars.grayText },
-
-  refreshBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  searchWrap: {
-    marginTop: 14,
-    height: 52,
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: stylesVars.white,
-    borderWidth: 2,
-    borderColor: stylesVars.orange,
-    shadowColor: "#000",
-    shadowOpacity: Platform.OS === "ios" ? 0.08 : 0,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 3,
-  },
-  searchInput: { flex: 1, fontSize: 14, color: stylesVars.darkText, paddingVertical: 0 },
 
   sectionKicker: { marginTop: 18, fontSize: 12, letterSpacing: 0.8, color: stylesVars.grayText, fontWeight: "600" },
 

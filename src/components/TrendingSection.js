@@ -6,31 +6,76 @@ import { MockDataService } from '../data/mockData';
 import { COLORS } from '../utils/theme';
 import { useNavigation, SCREENS } from '../services/NavigationContext';
 
-const TrendingCard = ({ item }) => (
-    <View style={styles.cardContainer}>
-        <ImageBackground source={{ uri: item.image }} style={styles.cardImage} imageStyle={styles.imageStyle}>
-            <LinearGradient
-                colors={['transparent', 'rgba(0,0,0,0.8)']}
-                style={styles.gradient}
-            >
-                <View style={styles.cardContent}>
-                    <View style={styles.topRow}>
-                        <View style={styles.badge}>
-                            <Text style={styles.badgeText}>{item.category}</Text>
+const TrendingCard = ({ item, onPress, onShowToast }) => {
+    const [bookmarked, setBookmarked] = useState(false);
+
+    const handleBookmark = () => {
+        const newState = !bookmarked;
+        setBookmarked(newState);
+        if (newState) {
+            onShowToast("Successfully saved the article");
+        }
+    };
+
+    return (
+        <Pressable
+            onPress={() => onPress(item)}
+            style={({ pressed }) => [
+                styles.cardContainer,
+                {
+                    borderRadius: pressed ? 20 : 10,
+                    elevation: pressed ? 12 : 0,
+                    shadowOpacity: pressed ? 0.4 : 0,
+                    transform: [{ scale: pressed ? 0.97 : 1 }],
+                }
+            ]}
+        >
+            {({ pressed }) => (
+                <ImageBackground
+                    source={{ uri: item.image }}
+                    style={styles.cardImage}
+                    imageStyle={[styles.imageStyle, { borderRadius: pressed ? 20 : 10 }]}
+                >
+                    <LinearGradient
+                        colors={['transparent', 'rgba(0,0,0,0.8)']}
+                        style={[styles.gradient, { borderRadius: pressed ? 20 : 10 }]}
+                    >
+                        <View style={styles.cardContent}>
+                            <View style={styles.topRow}>
+                                <View style={styles.badge}>
+                                    <Text style={styles.badgeText}> 🔥 Trending</Text>
+                                </View>
+                                <TouchableOpacity
+                                    style={styles.bookmarkButton}
+                                    onPress={handleBookmark}
+                                    activeOpacity={0.7}
+                                >
+                                    <Ionicons
+                                        name={bookmarked ? "bookmark" : "bookmark-outline"}
+                                        size={24}
+                                        color={COLORS.white}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                            <View>
+                                <Text style={styles.categoryText}>{item.category}</Text>
+                                <Text style={styles.cardTitle}>{item.title}</Text>
+                            </View>
                         </View>
-                        <TouchableOpacity>
-                            <Ionicons name="bookmark-outline" size={24} color={COLORS.white} />
-                        </TouchableOpacity>
-                    </View>
-                    <Text style={styles.cardTitle}>{item.title}</Text>
-                </View>
-            </LinearGradient>
-        </ImageBackground>
-    </View>
-);
+                    </LinearGradient>
+                </ImageBackground>
+            )}
+        </Pressable>
+    );
+};
 
 const TrendingSection = ({ onShowToast }) => {
     const data = MockDataService.getTrendingArticles();
+    const { navigate } = useNavigation();
+
+    const handlePress = (item) => {
+        navigate(SCREENS.DETAIL, { articleId: item.id });
+    };
 
     return (
         <View style={styles.container}>
@@ -45,7 +90,13 @@ const TrendingSection = ({ onShowToast }) => {
             </View>
             <FlatList
                 data={data}
-                renderItem={({ item }) => <TrendingCard item={item} />}
+                renderItem={({ item }) => (
+                    <TrendingCard
+                        item={item}
+                        onPress={handlePress}
+                        onShowToast={onShowToast}
+                    />
+                )}
                 keyExtractor={item => item.id}
                 horizontal
                 showsHorizontalScrollIndicator={false}
