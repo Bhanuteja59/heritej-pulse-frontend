@@ -1,5 +1,4 @@
 import React, { createContext, useState, useContext } from 'react';
-
 /**
  * Navigation Context
  * 
@@ -19,14 +18,19 @@ export const SCREENS = {
     REGISTER: 'REGISTER',
     LOGIN: 'LOGIN',
     SIGNUP: 'SIGNUP',
-};
+    EXPLORE_HERITAGE_NEWS: 'EXPLORE_HERITAGE_NEWS',
+    EXPLORE_SECTION_LIST: "EXPLORE_SECTION_LIST",
+    EXPLORE_SECTION_GRID: "EXPLORE_SECTION_GRID",
+ };
 
 export const NavigationProvider = ({ children }) => {
     const [currentScreen, setCurrentScreen] = useState(SCREENS.SPLASH);
+    const [previousScreen, setPreviousScreen] = useState(null);
     const [params, setParams] = useState({}); // To pass data like articleId
     const [isTabBarVisible, setIsTabBarVisible] = useState(true); // Global tab bar visibility
 
     const navigate = (screenName, newParams = {}) => {
+        setPreviousScreen(currentScreen);
         setParams(newParams);
         setCurrentScreen(screenName);
         // Reset tab bar visibility on navigation (optional, but safer)
@@ -34,10 +38,18 @@ export const NavigationProvider = ({ children }) => {
     };
 
     const goBack = () => {
-        // Simple back logic: if in Detail, go back to Home (or previous). 
-        // For a complex app, we'd use a stack, but for this constraint we keep it simple.
+        if (previousScreen) {
+            setCurrentScreen(previousScreen);
+            setPreviousScreen(null);
+            setIsTabBarVisible(true);
+            return;
+        }
+        // Fallbacks if no previous screen is tracked
         if (currentScreen === SCREENS.DETAIL) {
-            setCurrentScreen(SCREENS.HOME); // Default back to Home
+            setCurrentScreen(SCREENS.HOME);
+            setIsTabBarVisible(true);
+        } else if (currentScreen === SCREENS.EXPLORE_SECTION_LIST || currentScreen === SCREENS.EXPLORE_SECTION_GRID) {
+            setCurrentScreen(SCREENS.EXPLORE);
             setIsTabBarVisible(true);
         }
     };

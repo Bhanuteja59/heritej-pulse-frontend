@@ -4,9 +4,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { MockDataService } from '../data/mockData';
 import { COLORS } from '../utils/theme';
+import { useNavigation, SCREENS } from '../services/NavigationContext';
 
-const TrendingCard = ({ item }) => (
-    <View style={styles.cardContainer}>
+const TrendingCard = ({ item, onPress }) => (
+    <TouchableOpacity style={styles.cardContainer} onPress={() => onPress(item)} activeOpacity={0.85}>
         <ImageBackground source={{ uri: item.image }} style={styles.cardImage} imageStyle={styles.imageStyle}>
             <LinearGradient
                 colors={['transparent', 'rgba(0,0,0,0.8)']}
@@ -25,11 +26,16 @@ const TrendingCard = ({ item }) => (
                 </View>
             </LinearGradient>
         </ImageBackground>
-    </View>
+    </TouchableOpacity>
 );
 
 const TrendingSection = () => {
     const data = MockDataService.getTrendingArticles();
+    const { navigate } = useNavigation();
+
+    const handlePress = (item) => {
+        navigate(SCREENS.DETAIL, { articleId: item.id, item });
+    };
 
     return (
         <View style={styles.container}>
@@ -41,7 +47,7 @@ const TrendingSection = () => {
             </View>
             <FlatList
                 data={data}
-                renderItem={({ item }) => <TrendingCard item={item} />}
+                renderItem={({ item }) => <TrendingCard item={item} onPress={handlePress} />}
                 keyExtractor={item => item.id}
                 horizontal
                 showsHorizontalScrollIndicator={false}
