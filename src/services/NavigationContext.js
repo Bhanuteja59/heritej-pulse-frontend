@@ -18,10 +18,7 @@ export const SCREENS = {
     REGISTER: 'REGISTER',
     LOGIN: 'LOGIN',
     SIGNUP: 'SIGNUP',
-    EXPLORE_HERITAGE_NEWS: 'EXPLORE_HERITAGE_NEWS',
-    EXPLORE_SECTION_LIST: "EXPLORE_SECTION_LIST",
-    EXPLORE_SECTION_GRID: "EXPLORE_SECTION_GRID",
- };
+};
 
 export const NavigationProvider = ({ children }) => {
     const [currentScreen, setCurrentScreen] = useState(SCREENS.SPLASH);

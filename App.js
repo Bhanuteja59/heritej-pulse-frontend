@@ -12,14 +12,13 @@ import SavedScreen from './src/screens/SavedScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import ArticleDetailScreen from './src/screens/ArticleDetailScreen';
 import Register from './src/screens/Register';
+import ForgotPassword from './src/screens/ForgotPassword';
 import BottomNavigation from './src/components/BottomNavigation';
 import ExploreSectionList from './src/screens/Explore-heritage-news';
 import ExploreSectionGrid from './src/screens/ExploreSectionGrid';
 
 import Login from './src/screens/Login';
 import Signup from './src/screens/Signup';
-import "react-native-gesture-handler";
-
 
 const { width } = Dimensions.get('window');
 
@@ -40,11 +39,19 @@ const ScreenRenderer = () => {
       startValue = width;
     } else if (prevScreen === SCREENS.SIGNUP && currentScreen === SCREENS.LOGIN) {
       startValue = -width;
+    } else if (prevScreen === SCREENS.REGISTER && (currentScreen === SCREENS.LOGIN || currentScreen === SCREENS.SIGNUP)) {
+      startValue = width;
+    } else if (currentScreen === SCREENS.DETAIL) {
+      // Moving to Detail: Slide in from Right
+      startValue = width;
+    } else if (prevScreen === SCREENS.DETAIL) {
+      // Moving back from Detail: Slide in from Left
+      startValue = -width;
     } else {
       // For other screens, maybe just a fade or no slide? 
       // Let's stick to a simple fade/slide for everything for consistency, or reset.
       // Minimal movement for others to avoid dizziness
-      startValue = 20;
+      startValue = 0; // Changed to 0 to avoid jitter on tabs
     }
 
     if (prevScreen !== currentScreen) {
@@ -82,6 +89,10 @@ const ScreenRenderer = () => {
         return <Login />;
       case SCREENS.SIGNUP:
         return <Signup />;
+      case SCREENS.FORGOT_PASSWORD:
+        return <ForgotPassword />;
+      case SCREENS.NOTIFICATIONS:
+        return <Notifications />;
       default:
         return <HomeScreen />;
     }
@@ -107,7 +118,8 @@ const MainLayout = () => {
     currentScreen !== SCREENS.SPLASH &&
     currentScreen !== SCREENS.REGISTER &&
     currentScreen !== SCREENS.LOGIN &&
-    currentScreen !== SCREENS.SIGNUP;
+    currentScreen !== SCREENS.SIGNUP &&
+    currentScreen !== SCREENS.FORGOT_PASSWORD;
 
   return (
     <SafeAreaView style={styles.container}>

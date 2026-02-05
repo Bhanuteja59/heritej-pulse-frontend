@@ -1,13 +1,13 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, ImageBackground, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, FlatList, ImageBackground, TouchableOpacity, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { MockDataService } from '../data/mockData';
 import { COLORS } from '../utils/theme';
 import { useNavigation, SCREENS } from '../services/NavigationContext';
 
-const TrendingCard = ({ item, onPress }) => (
-    <TouchableOpacity style={styles.cardContainer} onPress={() => onPress(item)} activeOpacity={0.85}>
+const TrendingCard = ({ item }) => (
+    <View style={styles.cardContainer}>
         <ImageBackground source={{ uri: item.image }} style={styles.cardImage} imageStyle={styles.imageStyle}>
             <LinearGradient
                 colors={['transparent', 'rgba(0,0,0,0.8)']}
@@ -26,28 +26,26 @@ const TrendingCard = ({ item, onPress }) => (
                 </View>
             </LinearGradient>
         </ImageBackground>
-    </TouchableOpacity>
+    </View>
 );
 
-const TrendingSection = () => {
+const TrendingSection = ({ onShowToast }) => {
     const data = MockDataService.getTrendingArticles();
-    const { navigate } = useNavigation();
-
-    const handlePress = (item) => {
-        navigate(SCREENS.DETAIL, { articleId: item.id, item });
-    };
 
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.sectionTitle}>Trending</Text>
+                <View style={styles.titleContainer}>
+                    <Ionicons name="trending-up" size={24} color={COLORS.primary} style={styles.icon} />
+                    <Text style={styles.sectionTitle}>Trending</Text>
+                </View>
                 <TouchableOpacity>
-                    <Text style={styles.seeAll}>See all</Text>
+                    <Text style={[styles.seeAll, { color: COLORS.primary }]}>See all {'>'} </Text>
                 </TouchableOpacity>
             </View>
             <FlatList
                 data={data}
-                renderItem={({ item }) => <TrendingCard item={item} onPress={handlePress} />}
+                renderItem={({ item }) => <TrendingCard item={item} />}
                 keyExtractor={item => item.id}
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -70,6 +68,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         marginBottom: 12,
     },
+    titleContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    icon: {
+        marginRight: 8,
+    },
     sectionTitle: {
         fontSize: 20,
         fontWeight: 'bold',
@@ -87,17 +92,19 @@ const styles = StyleSheet.create({
         width: 252,
         height: 256,
         marginRight: 16,
+        borderRadius: 10,
+        overflow: 'hidden',
     },
     cardImage: {
         flex: 1,
         justifyContent: 'flex-end',
     },
     imageStyle: {
-        borderRadius: 16,
+        borderRadius: 10,
     },
     gradient: {
         flex: 1,
-        borderRadius: 16,
+        borderRadius: 10,
         justifyContent: 'space-between',
         padding: 16,
     },
@@ -107,25 +114,37 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
     },
     badge: {
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-        paddingHorizontal: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(126, 126, 126, 0.6)', // Darker for contrast
+        paddingHorizontal: 10,
         paddingVertical: 6,
         borderRadius: 20,
     },
     badgeText: {
-        color: COLORS.white,
-        fontWeight: '600',
+        color: '#ffffffff', // Gold color for "Trending"
+        fontWeight: '400',
         fontSize: 12,
+        textTransform: 'uppercase',
     },
     cardContent: {
         flex: 1,
         justifyContent: 'space-between',
     },
+    categoryText: {
+        color: '#E0E0E0',
+        fontSize: 11,
+        fontWeight: '600',
+        marginBottom: 4,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+    },
     cardTitle: {
         color: COLORS.white,
-        fontSize: 18,
+        fontSize: 15,
         fontWeight: 'bold',
         marginBottom: 8,
+        lineHeight: 24,
     },
 });
 
