@@ -7,17 +7,18 @@ import { COLORS } from './src/utils/theme';
 // Screens
 import SplashScreen from './src/screens/SplashScreen';
 import HomeScreen from './src/screens/HomeScreen';
-import ExploreScreen from './src/screens/ExploreScreen';
+import ExploreScreen from './src/screens/Explore';
 import SavedScreen from './src/screens/SavedScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import ArticleDetailScreen from './src/screens/ArticleDetailScreen';
 import Register from './src/screens/Register';
 import ForgotPassword from './src/screens/ForgotPassword';
 import BottomNavigation from './src/components/BottomNavigation';
+import ExploreSectionList from './src/screens/Explore-heritage-news';
+import ExploreSectionGrid from './src/screens/ExploreSectionGrid';
 
 import Login from './src/screens/Login';
 import Signup from './src/screens/Signup';
-import Notifications from './src/screens/notifications/Notifications';
 
 const { width } = Dimensions.get('window');
 
@@ -72,6 +73,10 @@ const ScreenRenderer = () => {
         return <HomeScreen />;
       case SCREENS.EXPLORE:
         return <ExploreScreen />;
+      case SCREENS.EXPLORE_SECTION_LIST:
+        return <ExploreSectionList />;
+      case SCREENS.EXPLORE_SECTION_GRID:
+        return <ExploreSectionGrid />;
       case SCREENS.SAVED:
         return <SavedScreen />;
       case SCREENS.PROFILE:

@@ -18,7 +18,7 @@ const SavedScreen = () => {
     const renderItem = ({ item }) => (
         <TouchableOpacity
             style={styles.card}
-            onPress={() => navigate(SCREENS.DETAIL, { articleId: item.id })}
+            onPress={() => navigate(SCREENS.DETAIL, { articleId: item.id, item })}
         >
             <View style={styles.cardContent}>
                 <Text style={styles.category}>{item.category}</Text>

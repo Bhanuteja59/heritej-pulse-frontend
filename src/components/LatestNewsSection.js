@@ -62,7 +62,7 @@ const LatestNewsSection = ({ onShowToast }) => {
     const { navigate } = useNavigation();
 
     const handlePress = (item) => {
-        navigate(SCREENS.DETAIL, { articleId: item.id });
+        navigate(SCREENS.DETAIL, { articleId: item.id, item });
     };
 
     return (
