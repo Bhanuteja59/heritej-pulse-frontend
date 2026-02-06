@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { SafeAreaView, StyleSheet, Platform, StatusBar as RNStatusBar, Animated, Dimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationProvider, useNavigation, SCREENS } from './src/services/NavigationContext';
+import { LanguageProvider } from './src/services/LanguageContext';
 import { COLORS } from './src/utils/theme';
 
 // Screens
@@ -16,6 +17,9 @@ import ForgotPassword from './src/screens/ForgotPassword';
 import BottomNavigation from './src/components/BottomNavigation';
 import ExploreSectionList from './src/screens/Explore-heritage-news';
 import ExploreSectionGrid from './src/screens/ExploreSectionGrid';
+import Notifications from './src/screens/notifications/Notifications';
+import PrivacyScreen from './src/screens/PrivacyScreen';
+import LanguageScreen from './src/screens/LanguageScreen';
 
 import Login from './src/screens/Login';
 import Signup from './src/screens/Signup';
@@ -93,6 +97,10 @@ const ScreenRenderer = () => {
         return <ForgotPassword />;
       case SCREENS.NOTIFICATIONS:
         return <Notifications />;
+      case SCREENS.PRIVACY:
+        return <PrivacyScreen />;
+      case SCREENS.LANGUAGE:
+        return <LanguageScreen />;
       default:
         return <HomeScreen />;
     }
@@ -132,9 +140,11 @@ const MainLayout = () => {
 
 export default function App() {
   return (
-    <NavigationProvider>
-      <MainLayout />
-    </NavigationProvider>
+    <LanguageProvider>
+      <NavigationProvider>
+        <MainLayout />
+      </NavigationProvider>
+    </LanguageProvider>
   );
 }
 

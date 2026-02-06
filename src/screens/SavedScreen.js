@@ -4,16 +4,18 @@ import { COLORS } from '../utils/theme';
 import { MockDataService } from '../data/mockData';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, SCREENS } from '../services/NavigationContext';
+import { useLanguage } from '../services/LanguageContext';
 
 const SavedScreen = () => {
     const [savedArticles, setSavedArticles] = useState([]);
     const { navigate } = useNavigation();
+    const { language, t } = useLanguage();
 
     useEffect(() => {
         // In a real app, we'd subscribe to store updates.
         // Here we just fetch on mount.
-        setSavedArticles(MockDataService.getSavedArticles());
-    }, []);
+        setSavedArticles(MockDataService.getSavedArticles(language));
+    }, [language]);
 
     const renderItem = ({ item }) => (
         <TouchableOpacity
@@ -34,14 +36,14 @@ const SavedScreen = () => {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>Saved Articles</Text>
+                <Text style={styles.headerTitle}>{t("saved_title")}</Text>
             </View>
 
             {savedArticles.length === 0 ? (
                 <View style={styles.emptyState}>
                     <Ionicons name="bookmark-outline" size={64} color="#ccc" />
-                    <Text style={styles.emptyText}>No saved articles yet.</Text>
-                    <Text style={styles.emptySubtext}>Bookmark stories to read them later.</Text>
+                    <Text style={styles.emptyText}>{t("saved_empty_title")}</Text>
+                    <Text style={styles.emptySubtext}>{t("saved_empty_subtitle")}</Text>
                 </View>
             ) : (
                 <FlatList

@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../utils/theme';
 import { useNavigation, SCREENS } from '../services/NavigationContext';
+import { useLanguage } from '../services/LanguageContext';
 
 const Header = () => {
     const { navigate } = useNavigation();
+    const { t } = useLanguage();
     const [placeholder, setPlaceholder] = useState('');
     const [index, setIndex] = useState(0);
     const [subIndex, setSubIndex] = useState(0);
@@ -14,7 +16,15 @@ const Header = () => {
     const [searchText, setSearchText] = useState('');
     const [isFocused, setIsFocused] = useState(false);
 
-    const phrases = ["  Search traditions...", "  Search articles...", "  Search history...", "  Search culture..."];
+    const phrases = useMemo(
+        () => [
+            t("header_phrase_traditions"),
+            t("header_phrase_articles"),
+            t("header_phrase_history"),
+            t("header_phrase_culture"),
+        ],
+        [t]
+    );
 
     useEffect(() => {
         if (index === phrases.length) { // Loop back
@@ -58,8 +68,8 @@ const Header = () => {
         <View style={styles.container}>
             <View style={styles.headerContainer}>
                 <View>
-                    <Text style={styles.title}>Heritage Pulse</Text>
-                    <Text style={styles.subtitle}>Discover the heartbeat of India</Text>
+                    <Text style={styles.title}>{t("header_title")}</Text>
+                    <Text style={styles.subtitle}>{t("header_subtitle")}</Text>
                 </View>
                 <TouchableOpacity activeOpacity={0.7} style={styles.notificationButton} onPress={() => navigate(SCREENS.NOTIFICATIONS)}>
 
@@ -170,7 +180,7 @@ const styles = StyleSheet.create({
     placeholderText: {
         position: 'absolute',
         left: 0,
-        top: 15,
+        top: 0,
         fontSize: 16,
         color: '#999',
         fontWeight: '500',

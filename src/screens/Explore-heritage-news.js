@@ -3,15 +3,17 @@ import { View, Text, StyleSheet, FlatList, Pressable, SafeAreaView, Image } from
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, SCREENS } from "../services/NavigationContext";
 import { MockDataService } from "../data/mockData";
+import { useLanguage } from "../services/LanguageContext";
 
 const ExploreSectionList = () => {
   const { params, navigate } = useNavigation();
   const { sectionKey, title, subtitle } = params || {};
+  const { language, t } = useLanguage();
 
   const data = useMemo(() => {
     if (!sectionKey) return [];
-    return MockDataService.getExploreSection(sectionKey);
-  }, [sectionKey]);
+    return MockDataService.getExploreSection(sectionKey, language);
+  }, [sectionKey, language]);
 
   const onBack = () => {
     navigate(SCREENS.EXPLORE);
@@ -24,7 +26,7 @@ const ExploreSectionList = () => {
           <Ionicons name="chevron-back" size={20} color={stylesVars.darkText} />
         </Pressable>
         <View style={{ flex: 1 }}>
-          <Text style={styles.title}>{title || "Explore"}</Text>
+          <Text style={styles.title}>{title || t("explore_title")}</Text>
           {!!subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
         </View>
       </View>

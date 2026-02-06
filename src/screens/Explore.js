@@ -13,6 +13,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, SCREENS } from "../services/NavigationContext";
 import { MockDataService } from "../data/mockData";
+import { useLanguage } from "../services/LanguageContext";
 
 /**
  * Explore Screen (Touch-scroll only)
@@ -29,23 +30,24 @@ const SNAP_INTERVAL = CARD_WIDTH + CARD_GAP;
 const Explore = () => {
   const [search, setSearch] = useState("");
   const { navigate } = useNavigation();
+  const { t, language } = useLanguage();
 
   // --- DATA (replace later with API) ---
   const categories = useMemo(
     () => [
-      { id: "heritage-1", label: "Heritage", icon: require("../../assets/images/heritej-pulse-logo.png") },
-      { id: "dance-1", label: "Dance", icon: require("../../assets/images/heritej-pulse-logo.png") },
-      { id: "history-1", label: "History", icon: require("../../assets/images/heritej-pulse-logo.png") },
-      { id: "heritage-2", label: "Heritage", icon: require("../../assets/images/heritej-pulse-logo.png") },
-      { id: "dance-2", label: "Dance", icon: require("../../assets/images/heritej-pulse-logo.png") },
-      { id: "history-2", label: "History", icon: require("../../assets/images/heritej-pulse-logo.png") },
+      { id: "heritage-1", key: "heritage", label: t("cat_heritage"), icon: require("../../assets/images/heritej-pulse-logo.png") },
+      { id: "dance-1", key: "dance", label: t("cat_dance"), icon: require("../../assets/images/heritej-pulse-logo.png") },
+      { id: "history-1", key: "history", label: t("cat_history"), icon: require("../../assets/images/heritej-pulse-logo.png") },
+      { id: "events-1", key: "events", label: t("cat_events"), icon: require("../../assets/images/heritej-pulse-logo.png") },
+      { id: "culture-1", key: "culture", label: t("cat_culture"), icon: require("../../assets/images/heritej-pulse-logo.png") },
+      { id: "food-1", key: "food", label: t("cat_food"), icon: require("../../assets/images/heritej-pulse-logo.png") },
     ],
-    []
+    [t]
   );
 
-  const topNews = useMemo(() => MockDataService.getExploreSection("topNews"), []);
-  const culturalEvents = useMemo(() => MockDataService.getExploreSection("culturalEvents"), []);
-  const museums = useMemo(() => MockDataService.getExploreSection("museums"), []);
+  const topNews = useMemo(() => MockDataService.getExploreSection("topNews", language), [language]);
+  const culturalEvents = useMemo(() => MockDataService.getExploreSection("culturalEvents", language), [language]);
+  const museums = useMemo(() => MockDataService.getExploreSection("museums", language), [language]);
 
   const onRefresh = () => {
     // optional: later refresh API
@@ -55,12 +57,52 @@ const Explore = () => {
     navigate(SCREENS.DETAIL, { articleId: item?.id });
   };
 
+  const categoryBaseMap = {
+    heritage: "Heritage",
+    dance: "Dance",
+    history: "History",
+    events: "Events",
+    culture: "Culture",
+    food: "Food",
+  };
+
+  const onOpenCategory = (key) => {
+    const allItems = [...topNews, ...culturalEvents, ...museums];
+    const base = categoryBaseMap[key];
+    const normalized = String(base).toLowerCase();
+
+    const filtered = allItems.filter((item) => {
+      const category = (item?.category || "").toLowerCase();
+      const badge = (item?.categoryBadge || item?.badge || "").toLowerCase();
+      const tags = (item?.tags || []).map((t) => String(t).toLowerCase());
+
+      return (
+        category === normalized ||
+        badge.includes(normalized) ||
+        tags.includes(normalized)
+      );
+    });
+
+    const label = t(`cat_${key}`);
+    navigate(SCREENS.EXPLORE_SECTION_GRID, {
+      sectionKey: `category-${normalized}`,
+      titleKey: `cat_${key}`,
+      subtitleKey: "explore_category_subtitle",
+      title: label,
+      subtitle: t("explore_category_subtitle", { category: label }),
+      subtitleVars: { category: label },
+      items: filtered,
+    });
+  };
+
   // ✅ SEE ALL handlers (open reusable list screen)
   const onSeeAllTop = () => {
     navigate(SCREENS.EXPLORE_SECTION_GRID, {
       sectionKey: "topNews",
-      title: "Top Heritage News searched",
-      subtitle: "Popular Heritage News",
+      titleKey: "explore_top_news_title",
+      subtitleKey: "explore_top_news_subtitle",
+      title: t("explore_top_news_title"),
+      subtitle: t("explore_top_news_subtitle"),
       items: topNews, // ✅ PASS DATA
     });
   };
@@ -68,8 +110,10 @@ const Explore = () => {
   const onSeeAllTrending = () => {
     navigate(SCREENS.EXPLORE_SECTION_GRID, {
       sectionKey: "culturalEvents",
-      title: "Trending Cultural Events",
-      subtitle: "Don't miss these happening now",
+      titleKey: "explore_trending_title",
+      subtitleKey: "explore_trending_subtitle",
+      title: t("explore_trending_title"),
+      subtitle: t("explore_trending_subtitle"),
       items: culturalEvents, // ✅ PASS DATA
     });
   };
@@ -77,8 +121,12 @@ const Explore = () => {
   const onSeeAllMuseums = () => {
     navigate(SCREENS.EXPLORE_SECTION_GRID, {
       sectionKey: "museums",
-      title: "Museums & Art Galleries",
-      subtitle: "Explore art, history and culture",
+      titleKey: "explore_museums_title",
+      subtitleKey: "explore_museums_subtitle",
+      title: t("explore_museums_title"),
+      subtitle: t("explore_museums_subtitle"),
+      items: museums, // ✅ PASS DATA
+      columns: 2, // ✅ 2-column grid for museums
     });
   };
 
@@ -92,8 +140,8 @@ const Explore = () => {
         {/* Header */}
         <View style={styles.headerRow}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.h1}>Explore</Text>
-            <Text style={styles.sub}>Discover stories by topic</Text>
+            <Text style={styles.h1}>{t("explore_title")}</Text>
+            <Text style={styles.sub}>{t("explore_subtitle")}</Text>
           </View>
 
           <Pressable onPress={onRefresh} hitSlop={10} style={styles.refreshBtn}>
@@ -112,7 +160,7 @@ const Explore = () => {
           <TextInput
             value={search}
             onChangeText={setSearch}
-            placeholder="Search for Heritage"
+            placeholder={t("explore_search_placeholder")}
             placeholderTextColor={stylesVars.grayText}
             style={styles.searchInput}
             returnKeyType="search"
@@ -121,7 +169,7 @@ const Explore = () => {
         </View>
 
         {/* Browse by category */}
-        <Text style={styles.sectionKicker}>BROWSE BY CATEGORY</Text>
+        <Text style={styles.sectionKicker}>{t("explore_browse_by_category")}</Text>
 
         <ScrollView
           horizontal
@@ -129,7 +177,7 @@ const Explore = () => {
           contentContainerStyle={styles.categoryRow}
         >
           {categories.map((c) => (
-            <Pressable key={c.id} style={styles.categoryItem}>
+            <Pressable key={c.id} style={styles.categoryItem} onPress={() => onOpenCategory(c.key)}>
               <View style={styles.categoryImgWrap}>
                 <Image source={c.icon} style={styles.categoryImg} resizeMode="cover" />
               </View>
@@ -139,7 +187,7 @@ const Explore = () => {
         </ScrollView>
 
         {/* 1) Top Heritage News */}
-        <SectionTitle title="Top Heritage News searched" subtitle="Popular Heritage News" />
+        <SectionTitle title={t("explore_top_news_title")} subtitle={t("explore_top_news_subtitle")} />
 
         <SnapCarousel
           data={topNews}
@@ -147,12 +195,12 @@ const Explore = () => {
         />
 
         <Pressable style={styles.seeAllBtn} onPress={onSeeAllTop}>
-          <Text style={styles.seeAllText}>See All</Text>
+          <Text style={styles.seeAllText}>{t("explore_see_all")}</Text>
           <Ionicons name="chevron-forward" size={16} color={stylesVars.darkText} />
         </Pressable>
 
         {/* 2) Trending */}
-        <SectionTitle title="Trending Cultural Events" subtitle="Don't miss these happening now" />
+        <SectionTitle title={t("explore_trending_title")} subtitle={t("explore_trending_subtitle")} />
 
         <SnapCarousel
           data={culturalEvents}
@@ -160,12 +208,12 @@ const Explore = () => {
         />
 
         <Pressable style={styles.seeAllBtn} onPress={onSeeAllTrending}>
-          <Text style={styles.seeAllText}>See All</Text>
+          <Text style={styles.seeAllText}>{t("explore_see_all")}</Text>
           <Ionicons name="chevron-forward" size={16} color={stylesVars.darkText} />
         </Pressable>
 
         {/* 3) Museums */}
-        <SectionTitle title="Museums & Art Galleries" subtitle="Explore art, history and culture" />
+        <SectionTitle title={t("explore_museums_title")} subtitle={t("explore_museums_subtitle")} />
 
         <SnapCarousel
           data={museums}
@@ -173,7 +221,7 @@ const Explore = () => {
         />
 
         <Pressable style={styles.seeAllBtn} onPress={onSeeAllMuseums}>
-          <Text style={styles.seeAllText}>See All</Text>
+          <Text style={styles.seeAllText}>{t("explore_see_all")}</Text>
           <Ionicons name="chevron-forward" size={16} color={stylesVars.darkText} />
         </Pressable>
 

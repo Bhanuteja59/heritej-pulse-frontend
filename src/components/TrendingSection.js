@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { MockDataService } from '../data/mockData';
 import { COLORS } from '../utils/theme';
 import { useNavigation, SCREENS } from '../services/NavigationContext';
+import { useLanguage } from '../services/LanguageContext';
 
 const TrendingCard = ({ item }) => (
     <View style={styles.cardContainer}>
@@ -30,17 +31,18 @@ const TrendingCard = ({ item }) => (
 );
 
 const TrendingSection = ({ onShowToast }) => {
-    const data = MockDataService.getTrendingArticles();
+    const { language, t } = useLanguage();
+    const data = MockDataService.getTrendingArticles(language);
 
     return (
         <View style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.titleContainer}>
                     <Ionicons name="trending-up" size={24} color={COLORS.primary} style={styles.icon} />
-                    <Text style={styles.sectionTitle}>Trending</Text>
+                    <Text style={styles.sectionTitle}>{t("home_trending")}</Text>
                 </View>
                 <TouchableOpacity>
-                    <Text style={[styles.seeAll, { color: COLORS.primary }]}>See all {'>'} </Text>
+                    <Text style={[styles.seeAll, { color: COLORS.primary }]}>{t("home_see_all")}</Text>
                 </TouchableOpacity>
             </View>
             <FlatList
