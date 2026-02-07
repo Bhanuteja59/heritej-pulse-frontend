@@ -71,7 +71,7 @@ const Header = () => {
             <TouchableOpacity activeOpacity={1} style={styles.searchContainer}>
                 {/* <Ionicons name="search-outline" size={20} color={COLORS.secondaryText} style={styles.iconLeft} /> */}
 
-                <View style={{ flex: 1, justifyContent: 'center' }}>
+                <View style={{ flex: 1, justifyContent: 'center', height: '100%' }}>
                     <TextInput
                         style={styles.input}
                         value={searchText}
@@ -81,7 +81,7 @@ const Header = () => {
                         selectionColor={COLORS.primary}
                     />
                     {searchText.length === 0 && !isFocused && (
-                        <View style={StyleSheet.absoluteFill} pointerEvents="none">
+                        <View style={[StyleSheet.absoluteFill, { justifyContent: 'center' }]} pointerEvents="none">
                             <Text style={styles.placeholderText}>
                                 {placeholder}
                                 <Text style={{ color: showCursor ? COLORS.primary : 'transparent' }}>|</Text>
@@ -99,87 +99,99 @@ const Header = () => {
 
 const styles = StyleSheet.create({
     container: {
-        paddingHorizontal: 20,
-        paddingBottom: 10,
-        paddingTop: 10,
+        paddingHorizontal: 16,
+        paddingTop: 12,
+        paddingBottom: 16,
         backgroundColor: COLORS.background,
-        borderBottomColor: COLORS.primary,
-        borderBottomWidth: 0.5,
-        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+        borderBottomColor: 'rgba(0,0,0,0.05)',
+        borderBottomWidth: 1,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
     },
     headerContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 16,
     },
     title: {
-        fontSize: 28,
-        fontWeight: '900',
+        fontSize: 26,
+        fontWeight: '800',
         color: COLORS.primary,
         letterSpacing: -0.5,
     },
     subtitle: {
-        fontSize: 14,
+        fontSize: 13,
         color: COLORS.secondaryText,
-        marginTop: 2,
         fontWeight: '500',
+        marginTop: 2,
     },
     notificationButton: {
-        padding: 8,
+        width: 44,
+        height: 44,
         backgroundColor: COLORS.white,
         borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 5,
-        elevation: 2,
-        position: 'relative',
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
+        elevation: 3,
     },
     notificationDot: {
         position: 'absolute',
         top: 10,
         right: 12,
-        width: 8,
-        height: 8,
+        width: 10,
+        height: 10,
         backgroundColor: '#FF3B30',
-        borderRadius: 4,
-        borderWidth: 1.5,
+        borderRadius: 5,
+        borderWidth: 2,
         borderColor: COLORS.white,
     },
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F5F5F5',
-        borderRadius: 50,
-        height: 54,
+        backgroundColor: '#F8F9FA',
+        borderRadius: 16,
+        height: 52,
         paddingHorizontal: 16,
-        borderWidth: 2,
-        borderColor: COLORS.primary,
+        borderWidth: 1.5,
+        borderColor: COLORS.primary, // Softer border by default
     },
     iconLeft: {
-        marginRight: 12,
+        marginRight: 10,
     },
     input: {
         flex: 1,
-        fontSize: 16,
+        fontSize: 15,
         color: COLORS.text,
         fontWeight: '500',
-        height: '80%',
+        height: '100%', // Take full height
+        paddingVertical: 0, // Reset padding
     },
     placeholderText: {
-        position: 'absolute',
-        left: 0,
-        top: 15,
-        fontSize: 16,
-        color: '#999',
+        fontSize: 15,
+        color: '#9CA3AF',
         fontWeight: '500',
     },
     filterButton: {
-        padding: 8,
+        width: 36,
+        height: 36,
         backgroundColor: COLORS.white,
         borderRadius: 10,
         marginLeft: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+        elevation: 1,
     },
 });
 
