@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, SCREENS } from '../services/NavigationContext';
 import { COLORS } from '../utils/theme';
+import { useLanguage } from '../services/LanguageContext';
 
 const TabItem = ({ icon, label, screenName, active, onPress }) => (
     <TouchableOpacity style={styles.tabItem} onPress={() => onPress(screenName)} activeOpacity={0.7}>
@@ -22,6 +23,7 @@ const TabItem = ({ icon, label, screenName, active, onPress }) => (
 
 const BottomNavigation = () => {
     const { currentScreen, navigate } = useNavigation();
+    const { t } = useLanguage();
 
     // Don't show bottom nav on Splash
     if (currentScreen === SCREENS.SPLASH) return null;
@@ -33,28 +35,28 @@ const BottomNavigation = () => {
         <View style={styles.container}>
             <TabItem
                 icon="home"
-                label="Home"
+                label={t("tab_home")}
                 screenName={SCREENS.HOME}
                 active={getActive(SCREENS.HOME) || getActive(SCREENS.DETAIL)}
                 onPress={navigate}
             />
             <TabItem
                 icon="compass"
-                label="Explore"
+                label={t("tab_explore")}
                 screenName={SCREENS.EXPLORE}
                 active={getActive(SCREENS.EXPLORE)}
                 onPress={navigate}
             />
             <TabItem
                 icon="bookmark"
-                label="Saved"
+                label={t("tab_saved")}
                 screenName={SCREENS.SAVED}
                 active={getActive(SCREENS.SAVED)}
                 onPress={navigate}
             />
             <TabItem
                 icon="person"
-                label="Profile"
+                label={t("tab_profile")}
                 screenName={SCREENS.PROFILE}
                 active={getActive(SCREENS.PROFILE)}
                 onPress={navigate}

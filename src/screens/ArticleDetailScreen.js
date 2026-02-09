@@ -14,6 +14,7 @@ import { useNavigation } from "../services/NavigationContext";
 import { MockDataService } from "../data/mockData";
 import { COLORS } from "../utils/theme";
 import ShareBottomSheet from "../components/ShareBottomSheet";
+import { useLanguage } from "../services/LanguageContext";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 const HERO_H = SCREEN_HEIGHT * 0.46;
@@ -30,8 +31,8 @@ const RADIUS_EXPANDED = 28;
 
 export default function ArticleDetailScreen() {
   const { params, goBack, setIsTabBarVisible } = useNavigation();
-
-  const data = useMemo(() => MockDataService.getAllArticles(), []);
+  const { language, t } = useLanguage();
+  const data = useMemo(() => MockDataService.getAllArticles(language), [language]);
   const [isShareOpen, setIsShareOpen] = useState(false);
 
   const scrollY = useSharedValue(0);
@@ -108,6 +109,7 @@ export default function ArticleDetailScreen() {
             onToggleExpand={toggleExpandedFor}
             onOpenShare={openShare}
             total={data.length}
+            t={t}
           />
         )}
         pagingEnabled
@@ -132,7 +134,7 @@ export default function ArticleDetailScreen() {
   );
 }
 
-function ArticleCardPage({ item, index, scrollY, expandedIndex, onToggleExpand, onOpenShare, total }) {
+function ArticleCardPage({ item, index, scrollY, expandedIndex, onToggleExpand, onOpenShare, total, t }) {
   const imageSource = typeof item?.image === "string" ? { uri: item.image } : item?.image;
   const content = Array.isArray(item?.content) ? item.content : [];
 
@@ -253,7 +255,7 @@ function ArticleCardPage({ item, index, scrollY, expandedIndex, onToggleExpand, 
           {/* Collapsed pills */}
           <Animated.View style={[styles.trendingPill, trendingPillStyle]}>
             <Ionicons name="flame" size={14} color="#FF7A00" />
-            <Text style={styles.pillText}>Trending</Text>
+            <Text style={styles.pillText}>{t("detail_trending")}</Text>
           </Animated.View>
 
           <Animated.View style={[styles.viewsPill, viewsPillStyle]}>
@@ -284,22 +286,19 @@ function ArticleCardPage({ item, index, scrollY, expandedIndex, onToggleExpand, 
                   </Text>
                 ))
               ) : (
-                <Text>
-                  This story explores India’s cultural legacy, its traditions, and the people who keep them alive across
-                  generations.
-                </Text>
+                <Text>{t("detail_fallback")}</Text>
               )}
             </Text>
 
-            <Text style={styles.timeText}>{item?.timestamp || "Just now"}</Text>
+            <Text style={styles.timeText}>{item?.timestamp || t("detail_just_now")}</Text>
           </Animated.View>
         </Pressable>
 
         {/* Social bar overlay (expanded only) */}
         <Animated.View style={[styles.socialBar, socialBarStyle]} pointerEvents="box-none">
           <SocialBtn icon="heart-outline" label={item?.likes || "0"} onPress={() => {}} />
-          <SocialBtn icon="bookmark-outline" label="Save" onPress={() => {}} />
-          <SocialBtn icon="share-social-outline" label="Share" onPress={onOpenShare} />
+          <SocialBtn icon="bookmark-outline" label={t("detail_save")} onPress={() => {}} />
+          <SocialBtn icon="share-social-outline" label={t("detail_share")} onPress={onOpenShare} />
           <SocialBtn icon="chatbubble-ellipses-outline" label={item?.comments || "0"} onPress={() => {}} />
         </Animated.View>
       </Animated.View>

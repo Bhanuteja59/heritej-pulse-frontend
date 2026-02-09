@@ -13,20 +13,28 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, SCREENS } from "../services/NavigationContext";
 import { MockDataService } from "../data/mockData";
+import { useLanguage } from "../services/LanguageContext";
 
 export default function ExploreSectionGrid() {
-  const { params, navigate } = useNavigation();
+  const { params, navigate, goBack } = useNavigation();
   const [search, setSearch] = useState("");
+  const { t, language } = useLanguage();
 
   const sectionKey = params?.sectionKey || "topNews";
-  const title = params?.title || "Top Heritage News searched";
-  const subtitle = params?.subtitle || "Popular Heritage News";
+  const title = params?.titleKey ? t(params.titleKey, params?.titleVars || {}) : params?.title || t("explore_top_news_title");
+  const subtitle = params?.subtitleKey
+    ? t(params.subtitleKey, params?.subtitleVars || {})
+    : params?.subtitle || t("explore_top_news_subtitle");
   const columns = params?.columns === 2 ? 2 : 1; // ✅ default 1 (single column)
 
-  const items =
-    (Array.isArray(params?.items) && params.items.length > 0
-      ? params.items
-      : MockDataService.getExploreSection(sectionKey)) || [];
+  const items = useMemo(() => {
+    if (Array.isArray(params?.items) && params.items.length > 0) {
+      return params.items
+        .map((it) => MockDataService.getArticleById(it.id, language))
+        .filter(Boolean);
+    }
+    return MockDataService.getExploreSection(sectionKey, language);
+  }, [params?.items, sectionKey, language]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -52,11 +60,11 @@ export default function ExploreSectionGrid() {
         {/* Header */}
         <View style={styles.headerRow}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.h1}>Explore</Text>
-            <Text style={styles.sub}>Discover stories by topic</Text>
+            <Text style={styles.h1}>{t("explore_title")}</Text>
+            <Text style={styles.sub}>{t("explore_subtitle")}</Text>
           </View>
 
-          <Pressable onPress={() => navigate(SCREENS.EXPLORE)} hitSlop={10} style={styles.backBtn}>
+          <Pressable onPress={goBack} hitSlop={10} style={styles.backBtn}>
             <Ionicons name="chevron-back" size={22} color={stylesVars.orange} />
           </Pressable>
         </View>
@@ -67,9 +75,10 @@ export default function ExploreSectionGrid() {
           <TextInput
             value={search}
             onChangeText={setSearch}
-            placeholder="Search for Heritage"
+            placeholder={t("explore_search_placeholder")}
             placeholderTextColor={stylesVars.grayText}
             style={styles.searchInput}
+            returnKeyType="search"
           />
           <Ionicons name="sparkles" size={18} color={stylesVars.orange} />
         </View>
@@ -209,7 +218,7 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: stylesVars.bg },
   content: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 24 },
 
-  headerRow: { flexDirection: "row", alignItems: "center", paddingTop: 4 },
+  headerRow: { flexDirection: "row", alignItems: "center", gap: 12, paddingTop: 4 },
   h1: { fontSize: 28, fontWeight: "700", color: stylesVars.darkText },
   sub: { marginTop: 4, fontSize: 14, color: stylesVars.grayText },
   backBtn: { width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },

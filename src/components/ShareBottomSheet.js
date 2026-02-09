@@ -2,11 +2,13 @@ import React, { useEffect, useRef } from "react";
 import { View, Text, StyleSheet, Pressable, Animated, Dimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../utils/theme";
+import { useLanguage } from "../services/LanguageContext";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 const SHEET_HEIGHT = Math.round(SCREEN_HEIGHT * 0.36);
 
 const ShareBottomSheet = ({ visible, onClose }) => {
+  const { t } = useLanguage();
   const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
   const overlayOpacity = useRef(new Animated.Value(0)).current;
 
@@ -34,25 +36,25 @@ const ShareBottomSheet = ({ visible, onClose }) => {
 
       <Animated.View style={[styles.sheet, { transform: [{ translateY }] }]}>
         <View style={styles.handle} />
-        <Text style={styles.title}>Share this story</Text>
+        <Text style={styles.title}>{t("share_title")}</Text>
 
         <View style={styles.actions}>
           <Pressable style={styles.actionBtn} onPress={onClose}>
             <Ionicons name="share-social-outline" size={22} color={COLORS.text} />
-            <Text style={styles.actionText}>Share</Text>
+            <Text style={styles.actionText}>{t("share_share")}</Text>
           </Pressable>
           <Pressable style={styles.actionBtn} onPress={onClose}>
             <Ionicons name="copy-outline" size={22} color={COLORS.text} />
-            <Text style={styles.actionText}>Copy link</Text>
+            <Text style={styles.actionText}>{t("share_copy")}</Text>
           </Pressable>
           <Pressable style={styles.actionBtn} onPress={onClose}>
             <Ionicons name="bookmark-outline" size={22} color={COLORS.text} />
-            <Text style={styles.actionText}>Save</Text>
+            <Text style={styles.actionText}>{t("share_save")}</Text>
           </Pressable>
         </View>
 
         <Pressable style={styles.closeBtn} onPress={onClose}>
-          <Text style={styles.closeText}>Close</Text>
+          <Text style={styles.closeText}>{t("share_close")}</Text>
         </Pressable>
       </Animated.View>
     </View>

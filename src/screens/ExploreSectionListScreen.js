@@ -12,120 +12,31 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, SCREENS } from "../services/NavigationContext";
+import { useLanguage } from "../services/LanguageContext";
+import { MockDataService } from "../data/mockData";
 
 export default function ExploreSectionListScreen({ route }) {
   const { goBack, navigate } = useNavigation();
   const [search, setSearch] = useState("");
+  const { t, language } = useLanguage();
 
   // ✅ MUST MATCH Explore.js params
   const sectionKey = route?.params?.sectionKey || "topNews";
-  const title = route?.params?.title || "Top Heritage News searched";
-  const subtitle = route?.params?.subtitle || "Popular Heritage News";
+  const title = route?.params?.titleKey
+    ? t(route?.params?.titleKey, route?.params?.titleVars || {})
+    : route?.params?.title || t("explore_top_news_title");
+  const subtitle = route?.params?.subtitleKey
+    ? t(route?.params?.subtitleKey, route?.params?.subtitleVars || {})
+    : route?.params?.subtitle || t("explore_top_news_subtitle");
 
-  // ✅ SAME DEMO DATA (later replace with API)
-  const dataBySection = useMemo(() => {
-    const topNews = [
-      {
-        id: "1",
-        badge: "Heritage Places",
-        image: require("../../assets/images/heritej-pulse-logo.png"),
-        title: "Indian Dharma and Culture",
-        rating: "4.7",
-        reviews: "12.5k reviews",
-        tags: ["Monument", "Photo Spot"],
-        location: "Delhi",
-        time: "15 mins",
-      },
-      {
-        id: "2",
-        badge: "Heritage Places",
-        image: require("../../assets/images/heritej-pulse-logo.png"),
-        title: "Indian History",
-        rating: "4.7",
-        reviews: "12.5k reviews",
-        tags: ["Monument", "Photo Spot"],
-        location: "Delhi",
-        time: "15 mins",
-      },
-      {
-        id: "3",
-        badge: "Heritage Places",
-        image: require("../../assets/images/heritej-pulse-logo.png"),
-        title: "Top Rated place in India",
-        rating: "4.7",
-        reviews: "12.5k reviews",
-        tags: ["Monument", "Photo Spot"],
-        location: "Delhi",
-        time: "15 mins",
-      },
-    ];
-
-    const trending = [
-      {
-        id: "t1",
-        badge: "Heritage Places",
-        image: require("../../assets/images/heritej-pulse-logo.png"),
-        title: "Telangana Cultural Events",
-        rating: "4.7",
-        reviews: "12.5k reviews",
-        tags: ["Monument", "Photo Spot"],
-        location: "Delhi",
-        time: "15 mins",
-      },
-      {
-        id: "t2",
-        badge: "Heritage Places",
-        image: require("../../assets/images/heritej-pulse-logo.png"),
-        title: "Cultural Events",
-        rating: "4.7",
-        reviews: "12.5k reviews",
-        tags: ["Monument", "Photo Spot"],
-        location: "Delhi",
-        time: "15 mins",
-      },
-      {
-        id: "t3",
-        badge: "Heritage Places",
-        image: require("../../assets/images/heritej-pulse-logo.png"),
-        title: "Way to the Cultural days",
-        rating: "4.7",
-        reviews: "12.5k reviews",
-        tags: ["Monument", "Photo Spot"],
-        location: "Delhi",
-        time: "15 mins",
-      },
-    ];
-
-    const museums = [
-      {
-        id: "m1",
-        badge: "Heritage Places",
-        image: require("../../assets/images/heritej-pulse-logo.png"),
-        title: "Historical Museums",
-        rating: "4.7",
-        reviews: "12.5k reviews",
-        tags: ["Monument", "Photo Spot"],
-        location: "Delhi",
-        time: "15 mins",
-      },
-      {
-        id: "m2",
-        badge: "Heritage Places",
-        image: require("../../assets/images/heritej-pulse-logo.png"),
-        title: "Museum of Indian Art",
-        rating: "4.7",
-        reviews: "12.5k reviews",
-        tags: ["Monument", "Photo Spot"],
-        location: "Delhi",
-        time: "15 mins",
-      },
-    ];
-
-    return { topNews, trending, museums };
-  }, []);
-
-  // ✅ IMPORTANT: keys must match EXACTLY what you pass
-  const list = dataBySection[sectionKey] || [];
+  const list = useMemo(() => {
+    if (Array.isArray(route?.params?.items) && route.params.items.length > 0) {
+      return route.params.items
+        .map((it) => MockDataService.getArticleById(it.id, language))
+        .filter(Boolean);
+    }
+    return MockDataService.getExploreSection(sectionKey, language);
+  }, [route?.params?.items, sectionKey, language]);
 
   // ✅ filter
   const filtered = useMemo(() => {
@@ -140,8 +51,8 @@ export default function ExploreSectionListScreen({ route }) {
         {/* Header (same as Explore) */}
         <View style={styles.headerRow}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.h1}>Explore</Text>
-            <Text style={styles.sub}>Discover stories by topic</Text>
+            <Text style={styles.h1}>{t("explore_title")}</Text>
+            <Text style={styles.sub}>{t("explore_subtitle")}</Text>
           </View>
 
           <Pressable onPress={goBack} hitSlop={10} style={styles.backBtn}>
@@ -155,7 +66,7 @@ export default function ExploreSectionListScreen({ route }) {
           <TextInput
             value={search}
             onChangeText={setSearch}
-            placeholder="Search for Heritage"
+            placeholder={t("explore_search_placeholder")}
             placeholderTextColor={stylesVars.grayText}
             style={styles.searchInput}
           />

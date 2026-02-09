@@ -4,15 +4,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { MockDataService } from '../data/mockData';
 import { COLORS } from '../utils/theme';
 import { useNavigation, SCREENS } from '../services/NavigationContext';
+import { useLanguage } from '../services/LanguageContext';
 
-const NewsCard = ({ item, onPress, onShowToast }) => {
+const NewsCard = ({ item, onPress, onShowToast, toastSavedText }) => {
     const [bookmarked, setBookmarked] = useState(false);
 
     const handleBookmark = () => {
         const newState = !bookmarked;
         setBookmarked(newState);
         if (newState) {
-            onShowToast("Successfully saved the article");
+            onShowToast(toastSavedText);
         }
     };
 
@@ -58,7 +59,8 @@ const NewsCard = ({ item, onPress, onShowToast }) => {
 };
 
 const LatestNewsSection = ({ onShowToast }) => {
-    const data = MockDataService.getLatestNews();
+    const { language, t } = useLanguage();
+    const data = MockDataService.getLatestNews(language);
     const { navigate } = useNavigation();
 
     const handlePress = (item) => {
@@ -68,9 +70,9 @@ const LatestNewsSection = ({ onShowToast }) => {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.sectionTitle}> 🔶 Latest</Text>
+                <Text style={styles.sectionTitle}> 🔶 {t("home_latest")}</Text>
                 <TouchableOpacity>
-                    <Text style={[styles.seeAll, { color: COLORS.primary }]}>See all {'>'} </Text>
+                    <Text style={[styles.seeAll, { color: COLORS.primary }]}>{t("home_see_all")}</Text>
                 </TouchableOpacity>
             </View>
             <View style={styles.list}>
@@ -80,6 +82,7 @@ const LatestNewsSection = ({ onShowToast }) => {
                         item={item}
                         onPress={handlePress}
                         onShowToast={onShowToast}
+                        toastSavedText={t("toast_saved")}
                     />
                 ))}
             </View>
