@@ -1,11 +1,12 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList, ImageBackground, TouchableOpacity, Pressable } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ImageBackground, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { MockDataService } from '../data/mockData';
-import { useTheme } from '../services/ThemeContext';
-import { useNavigation, SCREENS } from '../services/NavigationContext';
-import { useLanguage } from '../services/LanguageContext';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation, SCREENS } from '../../services/NavigationContext';
+import { useLanguage } from '../../services/LanguageContext';
+import { useTheme } from '../../services/ThemeContext';
+import { MockDataService } from '../../data/mockData';
+import { truncateText } from '../../utils/textUtils';
 
 const TrendingCard = ({ item, onPress, onShowToast, colors, isDarkMode }) => {
     const [bookmarked, setBookmarked] = useState(false);
@@ -64,7 +65,9 @@ const TrendingCard = ({ item, onPress, onShowToast, colors, isDarkMode }) => {
                             </View>
                             <View>
                                 <Text style={styles.categoryText}>{item.category}</Text>
-                                <Text style={[styles.cardTitle, { color: colors.white }]}>{item.title}</Text>
+                                <Text style={[styles.cardTitle, { color: colors.white }]}>
+                                    {truncateText(item.title, 50)}
+                                </Text>
                             </View>
                         </View>
                     </LinearGradient>
@@ -75,12 +78,11 @@ const TrendingCard = ({ item, onPress, onShowToast, colors, isDarkMode }) => {
 };
 
 const TrendingSection = ({ onShowToast }) => {
-    const data = MockDataService.getTrendingArticles();
     const { navigate } = useNavigation();
     const { t, language } = useLanguage();
     const { colors, isDarkMode } = useTheme();
 
-    const culturalEvents = useMemo(() => MockDataService.getExploreSection("culturalEvents", language), [language]);
+    const data = useMemo(() => MockDataService.getExploreSection("culturalEvents", language), [language]);
 
     const handlePress = (item) => {
         navigate(SCREENS.DETAIL, { articleId: item.id });
@@ -93,7 +95,7 @@ const TrendingSection = ({ onShowToast }) => {
             subtitleKey: "explore_trending_subtitle",
             title: t("explore_trending_title"),
             subtitle: t("explore_trending_subtitle"),
-            items: culturalEvents,
+            items: data,
         });
     };
 

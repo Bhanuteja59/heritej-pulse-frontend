@@ -8,37 +8,34 @@ import {
   Platform,
   SafeAreaView,
   Image,
+  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation, SCREENS } from "../services/NavigationContext";
-import { MockDataService } from "../data/mockData";
-import Header from "../components/Header";
+import { useNavigation, SCREENS } from "../../services/NavigationContext";
+import { useLanguage } from "../../services/LanguageContext";
+import { useTheme } from "../../services/ThemeContext";
+import { MockDataService } from "../../data/mockData";
+import Header from "../../components/Header";
 
-/**
- * Explore Screen (Touch-scroll only)
- * ✅ Categories: horizontal touch scroll
- * ✅ Each section carousel: horizontal touch scroll + snap
- * ✅ No auto-scroll
- * ✅ "See All" opens one reusable list screen with params
- */
-
-const CARD_WIDTH = 288;
+const { width } = Dimensions.get('window');
+const CARD_WIDTH = width * 0.75; // 75% of screen width
 const CARD_GAP = 16;
 const SNAP_INTERVAL = CARD_WIDTH + CARD_GAP;
 
 const Explore = () => {
   const { navigate } = useNavigation();
   const { t, language } = useLanguage();
+  const { colors, isDarkMode } = useTheme();
 
   // --- DATA (replace later with API) ---
   const categories = useMemo(
     () => [
-      { id: "heritage-1", key: "heritage", label: t("cat_heritage"), icon: require("../../assets/images/heritej-pulse-logo.png") },
-      { id: "dance-1", key: "dance", label: t("cat_dance"), icon: require("../../assets/images/heritej-pulse-logo.png") },
-      { id: "history-1", key: "history", label: t("cat_history"), icon: require("../../assets/images/heritej-pulse-logo.png") },
-      { id: "events-1", key: "events", label: t("cat_events"), icon: require("../../assets/images/heritej-pulse-logo.png") },
-      { id: "culture-1", key: "culture", label: t("cat_culture"), icon: require("../../assets/images/heritej-pulse-logo.png") },
-      { id: "food-1", key: "food", label: t("cat_food"), icon: require("../../assets/images/heritej-pulse-logo.png") },
+      { id: "heritage-1", key: "heritage", label: t("cat_heritage"), icon: require("../../../assets/images/heritej-pulse-logo.png") },
+      { id: "dance-1", key: "dance", label: t("cat_dance"), icon: require("../../../assets/images/heritej-pulse-logo.png") },
+      { id: "history-1", key: "history", label: t("cat_history"), icon: require("../../../assets/images/heritej-pulse-logo.png") },
+      { id: "events-1", key: "events", label: t("cat_events"), icon: require("../../../assets/images/heritej-pulse-logo.png") },
+      { id: "culture-1", key: "culture", label: t("cat_culture"), icon: require("../../../assets/images/heritej-pulse-logo.png") },
+      { id: "food-1", key: "food", label: t("cat_food"), icon: require("../../../assets/images/heritej-pulse-logo.png") },
     ],
     [t]
   );
@@ -89,7 +86,6 @@ const Explore = () => {
     });
   };
 
-  // ✅ SEE ALL handlers (open reusable list screen)
   const onSeeAllTop = () => {
     navigate(SCREENS.EXPLORE_SECTION_GRID, {
       sectionKey: "topNews",
@@ -97,7 +93,7 @@ const Explore = () => {
       subtitleKey: "explore_top_news_subtitle",
       title: t("explore_top_news_title"),
       subtitle: t("explore_top_news_subtitle"),
-      items: topNews, // ✅ PASS DATA
+      items: topNews,
     });
   };
 
@@ -108,7 +104,7 @@ const Explore = () => {
       subtitleKey: "explore_trending_subtitle",
       title: t("explore_trending_title"),
       subtitle: t("explore_trending_subtitle"),
-      items: culturalEvents, // ✅ PASS DATA
+      items: culturalEvents,
     });
   };
 
@@ -119,21 +115,21 @@ const Explore = () => {
       subtitleKey: "explore_museums_subtitle",
       title: t("explore_museums_title"),
       subtitle: t("explore_museums_subtitle"),
-      items: museums, // ✅ PASS DATA
-      columns: 2, // ✅ 2-column grid for museums
+      items: museums,
+      columns: 2,
     });
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
       <Header />
       <ScrollView
-        style={styles.screen}
+        style={[styles.screen, { backgroundColor: colors.background }]}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
         {/* Browse by category */}
-        <Text style={styles.sectionKicker}>{t("explore_browse_by_category")}</Text>
+        <Text style={[styles.sectionKicker, { color: colors.secondaryText }]}>{t("explore_browse_by_category")}</Text>
 
         <ScrollView
           horizontal
@@ -142,51 +138,61 @@ const Explore = () => {
         >
           {categories.map((c) => (
             <Pressable key={c.id} style={styles.categoryItem} onPress={() => onOpenCategory(c.key)}>
-              <View style={styles.categoryImgWrap}>
+              <View
+                style={[
+                  styles.categoryImgWrap,
+                  {
+                    backgroundColor: colors.cardBg,
+                    shadowColor: colors.text,
+                    borderColor: isDarkMode ? colors.primary : 'transparent',
+                    borderWidth: isDarkMode ? 1 : 0
+                  }
+                ]}
+              >
                 <Image source={c.icon} style={styles.categoryImg} resizeMode="cover" />
               </View>
-              <Text style={styles.categoryLabel}>{c.label}</Text>
+              <Text style={[styles.categoryLabel, { color: colors.text }]}>{c.label}</Text>
             </Pressable>
           ))}
         </ScrollView>
 
         {/* 1) Top Heritage News */}
-        <SectionTitle title={t("explore_top_news_title")} subtitle={t("explore_top_news_subtitle")} />
+        <SectionTitle title={t("explore_top_news_title")} subtitle={t("explore_top_news_subtitle")} colors={colors} />
 
         <SnapCarousel
           data={topNews}
-          renderItem={(item) => <ExploreCard item={item} onPress={onOpenDetail} />}
+          renderItem={(item) => <ExploreCard item={item} onPress={onOpenDetail} colors={colors} isDarkMode={isDarkMode} />}
         />
 
-        <Pressable style={styles.seeAllBtn} onPress={onSeeAllTop}>
-          <Text style={styles.seeAllText}>{t("explore_see_all")}</Text>
-          <Ionicons name="chevron-forward" size={16} color={stylesVars.darkText} />
+        <Pressable style={[styles.seeAllBtn, { borderColor: colors.primary }]} onPress={onSeeAllTop}>
+          <Text style={[styles.seeAllText, { color: colors.text }]}>{t("explore_see_all")}</Text>
+          <Ionicons name="chevron-forward" size={16} color={colors.text} />
         </Pressable>
 
         {/* 2) Trending */}
-        <SectionTitle title={t("explore_trending_title")} subtitle={t("explore_trending_subtitle")} />
+        <SectionTitle title={t("explore_trending_title")} subtitle={t("explore_trending_subtitle")} colors={colors} />
 
         <SnapCarousel
           data={culturalEvents}
-          renderItem={(item) => <ExploreCard item={item} onPress={onOpenDetail} />}
+          renderItem={(item) => <ExploreCard item={item} onPress={onOpenDetail} colors={colors} isDarkMode={isDarkMode} />}
         />
 
-        <Pressable style={styles.seeAllBtn} onPress={onSeeAllTrending}>
-          <Text style={styles.seeAllText}>{t("explore_see_all")}</Text>
-          <Ionicons name="chevron-forward" size={16} color={stylesVars.darkText} />
+        <Pressable style={[styles.seeAllBtn, { borderColor: colors.primary }]} onPress={onSeeAllTrending}>
+          <Text style={[styles.seeAllText, { color: colors.text }]}>{t("explore_see_all")}</Text>
+          <Ionicons name="chevron-forward" size={16} color={colors.text} />
         </Pressable>
 
         {/* 3) Museums */}
-        <SectionTitle title={t("explore_museums_title")} subtitle={t("explore_museums_subtitle")} />
+        <SectionTitle title={t("explore_museums_title")} subtitle={t("explore_museums_subtitle")} colors={colors} />
 
         <SnapCarousel
           data={museums}
-          renderItem={(item) => <ExploreCard item={item} onPress={onOpenDetail} />}
+          renderItem={(item) => <ExploreCard item={item} onPress={onOpenDetail} colors={colors} isDarkMode={isDarkMode} />}
         />
 
-        <Pressable style={styles.seeAllBtn} onPress={onSeeAllMuseums}>
-          <Text style={styles.seeAllText}>{t("explore_see_all")}</Text>
-          <Ionicons name="chevron-forward" size={16} color={stylesVars.darkText} />
+        <Pressable style={[styles.seeAllBtn, { borderColor: colors.primary }]} onPress={onSeeAllMuseums}>
+          <Text style={[styles.seeAllText, { color: colors.text }]}>{t("explore_see_all")}</Text>
+          <Ionicons name="chevron-forward" size={16} color={colors.text} />
         </Pressable>
 
         <View style={{ height: 28 }} />
@@ -195,19 +201,13 @@ const Explore = () => {
   );
 };
 
-const SectionTitle = ({ title, subtitle }) => (
+const SectionTitle = ({ title, subtitle, colors }) => (
   <View style={styles.sectionHead}>
-    <Text style={styles.sectionTitle}>{title}</Text>
-    <Text style={styles.sectionSub}>{subtitle}</Text>
+    <Text style={[styles.sectionTitle, { color: colors.text }]}>{title}</Text>
+    <Text style={[styles.sectionSub, { color: colors.secondaryText }]}>{subtitle}</Text>
   </View>
 );
 
-/**
- * Touch-only Snap Carousel
- * ✅ drag left/right
- * ✅ snap to each card
- * ✅ no auto-scroll
- */
 const SnapCarousel = ({ data, renderItem }) => {
   return (
     <ScrollView
@@ -228,18 +228,29 @@ const SnapCarousel = ({ data, renderItem }) => {
   );
 };
 
-const ExploreCard = ({ item, onPress }) => (
-  <Pressable style={styles.card} onPress={() => onPress?.(item)}>
+const ExploreCard = ({ item, onPress, colors, isDarkMode }) => (
+  <Pressable
+    style={[
+      styles.card,
+      {
+        backgroundColor: colors.cardBg,
+        shadowColor: colors.text,
+        borderColor: isDarkMode ? colors.primary : 'transparent',
+        borderWidth: isDarkMode ? 1 : 0
+      }
+    ]}
+    onPress={() => onPress?.(item)}
+  >
     <View style={styles.cardImageWrap}>
       <Image source={item.image} style={styles.cardImage} resizeMode="cover" />
-      <View style={styles.badge}>
-        <Ionicons name="compass" size={14} color={stylesVars.orange} />
-        <Text style={styles.badgeText}>{item.badge}</Text>
+      <View style={[styles.badge, { backgroundColor: colors.background }]}>
+        <Ionicons name="compass" size={14} color={colors.primary} />
+        <Text style={[styles.badgeText, { color: colors.primary }]}>{item.badge}</Text>
       </View>
     </View>
 
     <View style={styles.cardBody}>
-      <Text style={styles.cardTitle} numberOfLines={2}>
+      <Text style={[styles.cardTitle, { color: colors.text }]} numberOfLines={2}>
         {item.title}
       </Text>
 
@@ -248,47 +259,38 @@ const ExploreCard = ({ item, onPress }) => (
           <Ionicons name="star" size={12} color="#fff" />
           <Text style={styles.ratingText}>{item.rating}</Text>
         </View>
-        <Text style={styles.reviewsText}>({item.reviews})</Text>
+        <Text style={[styles.reviewsText, { color: colors.secondaryText }]}>({item.reviews})</Text>
       </View>
 
       <View style={styles.tagsRow}>
         {item.tags.map((t) => (
-          <View key={t} style={styles.tagPill}>
-            <Text style={styles.tagText}>{t}</Text>
+          <View key={t} style={[styles.tagPill, { backgroundColor: colors.background }]}>
+            <Text style={[styles.tagText, { color: colors.text }]}>{t}</Text>
           </View>
         ))}
       </View>
 
-      <View style={styles.metaRow}>
+      <View style={[styles.metaRow, { borderTopColor: colors.border }]}>
         <View style={styles.metaItem}>
-          <Ionicons name="location-outline" size={14} color={stylesVars.grayText} />
-          <Text style={styles.metaText}>{item.location}</Text>
+          <Ionicons name="location-outline" size={14} color={colors.secondaryText} />
+          <Text style={[styles.metaText, { color: colors.secondaryText }]}>{item.location}</Text>
         </View>
 
         <View style={styles.metaItem}>
-          <Ionicons name="time-outline" size={14} color={stylesVars.grayText} />
-          <Text style={styles.metaText}>{item.time}</Text>
+          <Ionicons name="time-outline" size={14} color={colors.secondaryText} />
+          <Text style={[styles.metaText, { color: colors.secondaryText }]}>{item.time}</Text>
         </View>
       </View>
     </View>
   </Pressable>
 );
 
-const stylesVars = {
-  bg: "#FBF4EE",
-  white: "#FFFFFF",
-  orange: "#FF7A00",
-  darkText: "#2E2E2E",
-  grayText: "#6B6B6B",
-};
-
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: stylesVars.bg },
-  screen: { flex: 1, backgroundColor: stylesVars.bg },
+  safe: { flex: 1 },
+  screen: { flex: 1 },
   content: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 24 },
 
-
-  sectionKicker: { marginTop: 18, fontSize: 12, letterSpacing: 0.8, color: stylesVars.grayText, fontWeight: "600" },
+  sectionKicker: { marginTop: 18, fontSize: 12, letterSpacing: 0.8, fontWeight: "600" },
 
   categoryRow: { paddingTop: 14, paddingBottom: 8, gap: 22, paddingRight: 8 },
   categoryItem: { width: 96, alignItems: "center" },
@@ -296,34 +298,31 @@ const styles = StyleSheet.create({
     width: 86,
     height: 86,
     borderRadius: 43,
-    backgroundColor: stylesVars.white,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
     shadowOpacity: Platform.OS === "ios" ? 0.08 : 0,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 6 },
     elevation: 2,
   },
   categoryImg: { width: 78, height: 78, borderRadius: 39 },
-  categoryLabel: { marginTop: 10, fontSize: 12, color: stylesVars.darkText, fontWeight: "500" },
+  categoryLabel: { marginTop: 10, fontSize: 12, fontWeight: "500" },
 
   sectionHead: { marginTop: 18 },
-  sectionTitle: { fontSize: 20, lineHeight: 28, fontWeight: "700", color: stylesVars.darkText },
-  sectionSub: { marginTop: 4, fontSize: 14, color: stylesVars.grayText },
+  sectionTitle: { fontSize: 20, lineHeight: 28, fontWeight: "700" },
+  sectionSub: { marginTop: 4, fontSize: 14 },
 
   cardsRow: { paddingTop: 14, paddingBottom: 8, paddingRight: 8 },
 
   card: {
     width: CARD_WIDTH,
     borderRadius: 18,
-    backgroundColor: stylesVars.white,
     overflow: "hidden",
-    shadowColor: "#000",
     shadowOpacity: Platform.OS === "ios" ? 0.10 : 0,
     shadowRadius: 14,
     shadowOffset: { width: 0, height: 8 },
-    elevation: 3,
+    elevation: 4,
+    marginRight: 4, // Add some margin for elevation to show
   },
   cardImageWrap: { height: 155, backgroundColor: "#eee" },
   cardImage: { width: "100%", height: "100%" },
@@ -332,7 +331,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 12,
     bottom: 12,
-    backgroundColor: stylesVars.white,
     borderRadius: 16,
     paddingHorizontal: 12,
     height: 32,
@@ -341,10 +339,10 @@ const styles = StyleSheet.create({
     gap: 8,
     elevation: 2,
   },
-  badgeText: { fontSize: 12, fontWeight: "700", color: stylesVars.orange },
+  badgeText: { fontSize: 12, fontWeight: "700" },
 
   cardBody: { paddingHorizontal: 14, paddingTop: 12, paddingBottom: 14 },
-  cardTitle: { fontSize: 16, fontWeight: "700", color: stylesVars.darkText },
+  cardTitle: { fontSize: 16, fontWeight: "700" },
 
   ratingRow: { marginTop: 10, flexDirection: "row", alignItems: "center", gap: 8 },
   ratingPill: {
@@ -357,42 +355,39 @@ const styles = StyleSheet.create({
     height: 24,
   },
   ratingText: { color: "#fff", fontSize: 12, fontWeight: "700" },
-  reviewsText: { fontSize: 12, color: stylesVars.grayText },
+  reviewsText: { fontSize: 12 },
 
   tagsRow: { marginTop: 10, flexDirection: "row", gap: 8 },
   tagPill: {
-    backgroundColor: "#F2F2F2",
     borderRadius: 14,
     paddingHorizontal: 12,
     height: 26,
     alignItems: "center",
     justifyContent: "center",
   },
-  tagText: { fontSize: 12, color: stylesVars.darkText, fontWeight: "500" },
+  tagText: { fontSize: 12, fontWeight: "500" },
 
   metaRow: {
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: "#EFEFEF",
     flexDirection: "row",
     justifyContent: "space-between",
   },
   metaItem: { flexDirection: "row", alignItems: "center", gap: 6 },
-  metaText: { fontSize: 12, color: stylesVars.grayText, fontWeight: "500" },
+  metaText: { fontSize: 12, fontWeight: "500" },
 
   seeAllBtn: {
     marginTop: 10,
     height: 44,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: stylesVars.orange,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
   },
-  seeAllText: { fontSize: 14, fontWeight: "700", color: stylesVars.darkText },
+  seeAllText: { fontSize: 14, fontWeight: "700" },
 });
 
 export default Explore;

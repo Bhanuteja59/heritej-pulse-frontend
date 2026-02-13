@@ -24,6 +24,8 @@ export const SCREENS = {
     NOTIFICATIONS: 'NOTIFICATIONS',
     PRIVACY: 'PRIVACY',
     LANGUAGE: 'LANGUAGE',
+    CHANGE_PASSWORD: 'CHANGE_PASSWORD',
+    EDIT_PROFILE: 'EDIT_PROFILE',
 };
 
 export const NavigationProvider = ({ children }) => {

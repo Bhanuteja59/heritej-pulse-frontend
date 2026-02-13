@@ -9,6 +9,8 @@ export const getImageUrl = (keyword, id, width = 400, height = 300) => {
 // Profile Data
 export const PROFILE_USER = {
     name: "Priya Sharma",
+    email: "priya.sharma@example.com",
+    phone: "+91 9876543210",
     role: "Heritage Enthusiast",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop",
     stats: {
@@ -127,16 +129,16 @@ export const FALLBACK_HOME_DATA = {
 
     ],
     latest: [
-        { id: "l1", title: "New Excavations at Keezhadi", category: "History", imageKeyword: "excavation", publisher: "ASI News", timeAgo: "2h ago", subtitle: "Unearthing the Past", keywords: ["#Keezhadi", "#TamilNadu", "#Excavation"] },
-        { id: "l2", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] },
-        { id: "l3", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] },
-        { id: "l4", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] },
-        { id: "l5", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] },
-        { id: "l6", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] },
-        { id: "l7", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] },
-        { id: "l8", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] },
-        { id: "l9", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] },
-        { id: "l10", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] },
+        { id: "l1", title: "New Excavations at Keezhadi", category: "History", imageKeyword: "excavation", publisher: "ASI News", timeAgo: "2h ago", subtitle: "Unearthing ancient Tamil civilization artifacts from 400 BCE", keywords: ["#Keezhadi", "#TamilNadu", "#Excavation"] },
+        { id: "l2", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering on Earth", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] },
+        { id: "l3", title: "Bharatanatyam Revival Movement", category: "Dance", imageKeyword: "bharatanatyam", publisher: "Arts Weekly", timeAgo: "6h ago", subtitle: "Classical dance sees modern renaissance with youth participation", keywords: ["#Bharatanatyam", "#ClassicalArts"] },
+        { id: "l4", title: "Ajanta Caves Get 3D Mapping", category: "Heritage", imageKeyword: "ajanta", publisher: "Tech Heritage", timeAgo: "8h ago", subtitle: "Digital preservation brings ancient art to life with cutting-edge technology", keywords: ["#AjantaCaves", "#DigitalHeritage"] },
+        { id: "l5", title: "Sanskrit Day Celebrated", category: "Language", imageKeyword: "sanskrit", publisher: "Culture Times", timeAgo: "10h ago", subtitle: "Ancient language finds new speakers in modern India through revival programs", keywords: ["#Sanskrit", "#AncientLanguage"] },
+        { id: "l6", title: "Kathakali Workshop Series", category: "Dance", imageKeyword: "kathakali", publisher: "Arts Daily", timeAgo: "12h ago", subtitle: "Kerala's ancient dance form teaches storytelling through dramatic expressions", keywords: ["#Kathakali", "#Kerala"] },
+        { id: "l7", title: "Hampi UNESCO Recognition", category: "Heritage", imageKeyword: "hampi", publisher: "World Heritage", timeAgo: "14h ago", subtitle: "Vijayanagara ruins showcase architectural grandeur of medieval empire", keywords: ["#Hampi", "#UNESCO"] },
+        { id: "l8", title: "Traditional Crafts Fair Opens", category: "Art", imageKeyword: "handicrafts", publisher: "Craft News", timeAgo: "16h ago", subtitle: "Artisans display centuries-old techniques in handloom and pottery", keywords: ["#Handicrafts", "#Artisans"] },
+        { id: "l9", title: "Ancient Yoga Manuscripts Found", category: "Heritage", imageKeyword: "yoga", publisher: "Research Journal", timeAgo: "18h ago", subtitle: "Rare texts reveal forgotten Asanas from classical yoga traditions", keywords: ["#Yoga", "#Manuscripts"] },
+        { id: "l10", title: "Temple Architecture Study", category: "History", imageKeyword: "temple", publisher: "Heritage Monthly", timeAgo: "20h ago", subtitle: "Research uncovers engineering marvels in South Indian temple construction", keywords: ["#Temples", "#Architecture"] },
     ]
 };
 
@@ -361,6 +363,15 @@ export const MockDataService = {
     getUserProfile: (language = "en") => {
         const translated = PROFILE_TRANSLATIONS[language];
         return translated ? { ...PROFILE_USER, ...translated } : PROFILE_USER;
+    },
+
+    updateUserProfile: (updates) => {
+        // Update the PROFILE_USER object with new values
+        if (updates.avatar) PROFILE_USER.avatar = updates.avatar;
+        if (updates.name) PROFILE_USER.name = updates.name;
+        if (updates.email) PROFILE_USER.email = updates.email;
+        if (updates.phone) PROFILE_USER.phone = updates.phone;
+        return PROFILE_USER;
     },
 
     refreshData: () => {

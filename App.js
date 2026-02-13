@@ -1,28 +1,34 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { SafeAreaView, StyleSheet, Platform, StatusBar as RNStatusBar, Animated, Dimensions } from 'react-native';
+import { SafeAreaView, StyleSheet, Platform, StatusBar as RNStatusBar, Animated, Dimensions, Easing } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationProvider, useNavigation, SCREENS } from './src/services/NavigationContext';
 import { LanguageProvider } from './src/services/LanguageContext';
+import { ThemeProvider } from './src/services/ThemeContext';
 import { COLORS } from './src/utils/theme';
 
 // Screens
-import SplashScreen from './src/screens/SplashScreen';
-import HomeScreen from './src/screens/HomeScreen';
-import ExploreScreen from './src/screens/Explore';
-import SavedScreen from './src/screens/SavedScreen';
-import ProfileScreen from './src/screens/ProfileScreen';
-import ArticleDetailScreen from './src/screens/ArticleDetailScreen';
-import Register from './src/screens/Register';
-import ForgotPassword from './src/screens/ForgotPassword';
+// Screens
+import SplashScreen from './src/screens/splashScreen/SplashScreen';
+import HomeScreen from './src/screens/home/HomeScreen';
+import ExploreScreen from './src/screens/explore/Explore';
+import SavedScreen from './src/screens/saved/SavedScreen';
+import ProfileScreen from './src/screens/profile/ProfileScreen';
+import ArticleDetailScreen from './src/screens/articles/ArticleDetailScreen';
+import Register from './src/screens/register/Register';
+import ForgotPassword from './src/screens/register/ForgotPassword';
 import BottomNavigation from './src/components/BottomNavigation';
-import ExploreSectionList from './src/screens/Explore-heritage-news';
-import ExploreSectionGrid from './src/screens/ExploreSectionGrid';
-import Notifications from './src/screens/notifications/Notifications';
-import PrivacyScreen from './src/screens/PrivacyScreen';
-import LanguageScreen from './src/screens/LanguageScreen';
+import ExploreSectionList from './src/screens/explore/Explore-heritage-news';
+import ExploreSectionGrid from './src/screens/explore/ExploreSectionGrid';
+import Notifications from "./src/screens/profile/Notifications";
+import PrivacyScreen from './src/screens/profile/PrivacyScreen';
+import LanguageScreen from './src/screens/profile/LanguageScreen';
 
-import Login from './src/screens/Login';
-import Signup from './src/screens/Signup';
+import Login from './src/screens/register/Login';
+import Signup from './src/screens/register/Signup';
+import AutoScrollingScreen from './src/screens/profile/AutoScrolling';
+import ChangePasswordScreen from './src/screens/profile/ChangePassword';
+import EditProfileScreen from './src/screens/profile/EditProfile';
 
 const { width } = Dimensions.get('window');
 
@@ -31,40 +37,74 @@ const ScreenRenderer = () => {
   const slideAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity/translation
   const [prevScreen, setPrevScreen] = useState(SCREENS.SPLASH);
 
+  // Define tab order for smart transitions
+  const TAB_ORDER = {
+    [SCREENS.HOME]: 0,
+    [SCREENS.EXPLORE]: 1,
+    [SCREENS.SAVED]: 2,
+    [SCREENS.PROFILE]: 3,
+  };
+
   useEffect(() => {
-    // Determine direction
-    let startValue = width; // Default slide from right
+    let startValue = 0;
 
-    // Logic: Signup is "after" Login, so:
-    // Login -> Signup: Slide from Right (New screen enters from right)
-    // Signup -> Login: Slide from Left (New screen enters from left)
+    // 1. Tab switching logic (Realistic Left/Right slide)
+    const isTabSwitch =
+      Object.values(TAB_ORDER).includes(TAB_ORDER[currentScreen]) &&
+      Object.values(TAB_ORDER).includes(TAB_ORDER[prevScreen]);
 
-    if (prevScreen === SCREENS.LOGIN && currentScreen === SCREENS.SIGNUP) {
+    if (isTabSwitch) {
+      const currentOrder = TAB_ORDER[currentScreen];
+      const prevOrder = TAB_ORDER[prevScreen];
+
+      if (currentOrder > prevOrder) {
+        startValue = width; // Slide from Right (Push forward)
+      } else {
+        startValue = -width; // Slide from Left (Push backward)
+      }
+    }
+    // 2. Auth Flow
+    else if (prevScreen === SCREENS.LOGIN && currentScreen === SCREENS.SIGNUP) {
       startValue = width;
     } else if (prevScreen === SCREENS.SIGNUP && currentScreen === SCREENS.LOGIN) {
       startValue = -width;
     } else if (prevScreen === SCREENS.REGISTER && (currentScreen === SCREENS.LOGIN || currentScreen === SCREENS.SIGNUP)) {
       startValue = width;
-    } else if (currentScreen === SCREENS.DETAIL) {
-      // Moving to Detail: Slide in from Right
-      startValue = width;
-    } else if (prevScreen === SCREENS.DETAIL) {
-      // Moving back from Detail: Slide in from Left
-      startValue = -width;
-    } else {
-      // For other screens, maybe just a fade or no slide? 
-      // Let's stick to a simple fade/slide for everything for consistency, or reset.
-      // Minimal movement for others to avoid dizziness
-      startValue = 0; // Changed to 0 to avoid jitter on tabs
+    }
+    // 3. Drill-down navigation (Details, Section Grids, Privacy, etc.)
+    else if (
+      currentScreen === SCREENS.DETAIL ||
+      currentScreen === SCREENS.EXPLORE_SECTION_GRID ||
+      currentScreen === SCREENS.EXPLORE_SECTION_LIST ||
+      currentScreen === SCREENS.PRIVACY ||
+      currentScreen === SCREENS.LANGUAGE ||
+      currentScreen === SCREENS.NOTIFICATIONS
+    ) {
+      startValue = width; // Always slide in from Right for details
+    }
+    // 4. Back navigation (simplify assumption: if going back to a tab from a detail, it comes from left)
+    else if (
+      prevScreen === SCREENS.DETAIL ||
+      prevScreen === SCREENS.EXPLORE_SECTION_GRID ||
+      prevScreen === SCREENS.EXPLORE_SECTION_LIST ||
+      prevScreen === SCREENS.PRIVACY ||
+      prevScreen === SCREENS.LANGUAGE ||
+      prevScreen === SCREENS.NOTIFICATIONS
+    ) {
+      startValue = -width; // Slide from Left (Popping back)
     }
 
     if (prevScreen !== currentScreen) {
       slideAnim.setValue(startValue);
+
+      // Smooth timing animation with better easing for natural feel
       Animated.timing(slideAnim, {
         toValue: 0,
-        duration: 300,
+        duration: 400,  // Slightly longer for smoother perception
+        easing: Easing.bezier(0.25, 0.1, 0.25, 1),  // Custom bezier for smooth acceleration/deceleration
         useNativeDriver: true,
       }).start();
+
       setPrevScreen(currentScreen);
     }
   }, [currentScreen]);
@@ -101,6 +141,12 @@ const ScreenRenderer = () => {
         return <PrivacyScreen />;
       case SCREENS.LANGUAGE:
         return <LanguageScreen />;
+      case SCREENS.AUTO_SCROLLING:
+        return <AutoScrollingScreen />;
+      case SCREENS.CHANGE_PASSWORD:
+        return <ChangePasswordScreen />;
+      case SCREENS.EDIT_PROFILE:
+        return <EditProfileScreen />;
       default:
         return <HomeScreen />;
     }
@@ -140,11 +186,15 @@ const MainLayout = () => {
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <NavigationProvider>
-        <MainLayout />
-      </NavigationProvider>
-    </LanguageProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <LanguageProvider>
+        <ThemeProvider>
+          <NavigationProvider>
+            <MainLayout />
+          </NavigationProvider>
+        </ThemeProvider>
+      </LanguageProvider>
+    </GestureHandlerRootView>
   );
 }
 
