@@ -4,6 +4,7 @@ import { COLORS } from '../utils/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { MockDataService } from '../data/mockData';
 import { useNavigation } from '../services/NavigationContext';
+import { useTheme } from '../services/ThemeContext'; // Import useTheme
 
 const { width, height } = Dimensions.get('window');
 
@@ -22,7 +23,8 @@ const getPreviewText = (content) => {
 
 const ArticleCard = ({ article, isActive }) => {
     const { setIsTabBarVisible } = useNavigation();
-    const [isControlsVisible, setIsControlsVisible] = useState(true); // Default: Controls are visible
+    const { colors, isDarkMode } = useTheme(); // Use Theme Context
+    const [isControlsVisible, setIsControlsVisible] = useState(true);
     const [isBookmarked, setIsBookmarked] = useState(false);
 
     // Animation Value: 1 = Visible, 0 = Hidden
@@ -36,8 +38,6 @@ const ArticleCard = ({ article, isActive }) => {
             setIsControlsVisible(true);
             visibilityAnim.setValue(1);
         } else {
-            // Sync global tab bar: If controls (Likes) are visible, Tabs should be HIDDEN.
-            // Default: Controls True (Visible) -> Tabs False (Hidden).
             if (isControlsVisible) {
                 setIsTabBarVisible(false);
             }
@@ -47,24 +47,14 @@ const ArticleCard = ({ article, isActive }) => {
     const toggleControls = () => {
         const nextState = !isControlsVisible;
         setIsControlsVisible(nextState);
-
-        // Sync Tab Bar logic:
-        // If Controls (Action Bar) are becoming HIDDEN (nextState=false) -> Show Tabs (True)
-        // If Controls are becoming VISIBLE (nextState=true) -> Hide Tabs (False)
         setIsTabBarVisible(!nextState);
 
         Animated.timing(visibilityAnim, {
             toValue: nextState ? 1 : 0,
             duration: 300,
-            easing: Easing.bezier(0.25, 0.1, 0.25, 1), // IOS-like ease
+            easing: Easing.bezier(0.25, 0.1, 0.25, 1),
             useNativeDriver: true,
         }).start();
-    };
-
-    // Kept internal logic just in case, though button is removed from UI per user request
-    const handleBookmark = () => {
-        const newState = MockDataService.toggleBookmark(article.id);
-        setIsBookmarked(newState);
     };
 
     const handleShare = async () => {
@@ -80,17 +70,14 @@ const ArticleCard = ({ article, isActive }) => {
     };
 
     // --- Animations ---
-
-    // 1. Content Shift (Subtle breathing effect when toggling)
     const contentScale = visibilityAnim.interpolate({
         inputRange: [0, 1],
-        outputRange: [1.02, 1], // Slightly zoom in when immersive
+        outputRange: [1.02, 1],
     });
 
-    // 2. Action Bar Slide (Slide Down to Hide)
     const actionBarTranslateY = visibilityAnim.interpolate({
         inputRange: [0, 1],
-        outputRange: [100, 0], // Hide below screen
+        outputRange: [100, 0],
     });
 
     const actionBarOpacity = visibilityAnim.interpolate({
@@ -98,21 +85,16 @@ const ArticleCard = ({ article, isActive }) => {
         outputRange: [0, 0, 1],
     });
 
-    // Extract dynamic preview text
     const previewText = getPreviewText(article.content);
 
-    // Revert to White but keep fixed layout
-    const BAR_COLOR = '#FFFFFF';
-    const BAR_TEXT_COLOR = COLORS.text;
-
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
             {/* 1. Hero Image */}
             <View style={styles.imageContainer}>
                 <Image source={{ uri: article.image }} style={styles.image} resizeMode="cover" />
                 <Animated.View style={[styles.imageOverlay, { opacity: visibilityAnim }]} />
 
-                {/* 2. Source Badge (Bottom Right) */}
+                {/* 2. Source Badge */}
                 <Animated.View style={[styles.sourceBadge, { opacity: visibilityAnim }]}>
                     <View style={styles.sourceIcon}>
                         <Text style={styles.sourceInitial}>{article.publisher?.[0] || 'P'}</Text>
@@ -121,9 +103,9 @@ const ArticleCard = ({ article, isActive }) => {
                 </Animated.View>
             </View>
 
-            {/* 3. Content Card (Bottom Sheet) */}
+            {/* 3. Content Card */}
             <TouchableWithoutFeedback onPress={toggleControls}>
-                <View style={styles.contentCardWrapper}>
+                <View style={[styles.contentCardWrapper, { backgroundColor: colors.background }]}>
                     <Animated.View
                         style={[
                             styles.contentCard,
@@ -132,52 +114,50 @@ const ArticleCard = ({ article, isActive }) => {
                     >
                         {/* Meta Info */}
                         <View style={styles.metaRow}>
-                            <Text style={styles.category}>{article.category}</Text>
-                            <Text style={styles.timestamp}>{article.timestamp}</Text>
+                            <Text style={[styles.category, { color: colors.primary }]}>{article.category}</Text>
+                            <Text style={[styles.timestamp, { color: colors.secondaryText }]}>{article.timestamp}</Text>
                         </View>
 
                         {/* Title */}
-                        <Text style={styles.title} numberOfLines={3} ellipsizeMode="tail">
+                        <Text style={[styles.title, { color: colors.text }]} numberOfLines={3} ellipsizeMode="tail">
                             {article.title}
                         </Text>
 
-                        {/* Body Preview - DYNAMIC TEXT */}
-                        <Text style={styles.bodyPreview} numberOfLines={6} ellipsizeMode="tail">
+                        {/* Body Preview */}
+                        <Text style={[styles.bodyPreview, { color: colors.secondaryText }]} numberOfLines={6} ellipsizeMode="tail">
                             {article.subtitle} — {previewText}
                         </Text>
 
                         {/* Keywords */}
                         <View style={styles.keywordsRow}>
-                            <Text style={styles.keyword} onPress={() => console.log('Keyword clicked')}>#{article.category}</Text>
+                            <Text style={[styles.keyword, { color: colors.primary }]} onPress={() => console.log('Keyword clicked')}>#{article.category}</Text>
                         </View>
                     </Animated.View>
 
-                    {/* 4. Action Bar (FIXED BOTTOM BAR with Border/Shadow) */}
+                    {/* 4. Action Bar */}
                     <Animated.View
                         style={[
                             styles.actionBar,
-                            { backgroundColor: BAR_COLOR },
                             {
+                                backgroundColor: colors.cardBg,
+                                borderColor: colors.border,
                                 transform: [{ translateY: actionBarTranslateY }],
                                 opacity: actionBarOpacity
                             }
                         ]}
                     >
                         <TouchableOpacity style={styles.actionBtn} onPress={() => { }}>
-                            <Ionicons name="heart-outline" size={24} color={BAR_TEXT_COLOR} />
-                            {/* Dynamic Likes */}
-                            <Text style={[styles.actionText, { color: BAR_TEXT_COLOR }]}>{article.likes || '2.4k'}</Text>
+                            <Ionicons name="heart-outline" size={24} color={colors.text} />
+                            <Text style={[styles.actionText, { color: colors.text }]}>{article.likes || '2.4k'}</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.actionBtn} onPress={() => { }}>
-                            <Ionicons name="chatbubble-outline" size={24} color={BAR_TEXT_COLOR} />
-                            {/* Dynamic Comments */}
-                            <Text style={[styles.actionText, { color: BAR_TEXT_COLOR }]}>{article.comments || '86'}</Text>
+                            <Ionicons name="chatbubble-outline" size={24} color={colors.text} />
+                            <Text style={[styles.actionText, { color: colors.text }]}>{article.comments || '86'}</Text>
                         </TouchableOpacity>
 
-                        {/* Share Button */}
                         <TouchableOpacity style={styles.actionBtn} onPress={handleShare}>
-                            <Ionicons name="share-social-outline" size={24} color={BAR_TEXT_COLOR} />
+                            <Ionicons name="share-social-outline" size={24} color={colors.text} />
                         </TouchableOpacity>
                     </Animated.View>
                 </View>
@@ -190,10 +170,10 @@ const styles = StyleSheet.create({
     container: {
         width: width,
         height: height,
-        backgroundColor: COLORS.black,
+        backgroundColor: COLORS.black, // Fallback
     },
     imageContainer: {
-        height: '45%',
+        height: '45%', // Keep relative height
         width: '100%',
         position: 'relative',
     },
@@ -236,9 +216,8 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     contentCardWrapper: {
-        height: '55%',
+        height: '55%', // Keep relative height
         width: '100%',
-        backgroundColor: COLORS.background,
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
         marginTop: -32,
@@ -249,7 +228,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 24,
         paddingTop: 32,
-        paddingBottom: 110, // Extra padding for fixed bottom bar
+        paddingBottom: 110,
     },
     metaRow: {
         flexDirection: 'row',
@@ -257,26 +236,22 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     category: {
-        color: COLORS.primary,
         fontSize: 12,
         fontWeight: 'bold',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },
     timestamp: {
-        color: COLORS.secondaryText,
         fontSize: 12,
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: COLORS.text,
         marginBottom: 12,
         lineHeight: 30,
     },
     bodyPreview: {
         fontSize: 16,
-        color: COLORS.secondaryText,
         lineHeight: 24,
         marginBottom: 16,
     },
@@ -287,17 +262,15 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     keyword: {
-        color: COLORS.primary,
         fontSize: 14,
         fontWeight: '600',
     },
     actionBar: {
         position: 'absolute',
-        bottom: 0, // Docked at bottom
+        bottom: 0,
         left: 0,
         right: 0,
         height: 80,
-        backgroundColor: '#FFFFFF',
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         flexDirection: 'row',
@@ -305,17 +278,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 10,
         paddingBottom: 10,
-
-        // Revised Shadows (Prominent)
         shadowColor: '#000',
         shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.15, // Stronger opacity
-        shadowRadius: 16,    // Larger radius for "glow"
-        elevation: 20,       // Higher elevation for Android
-
-        // Border for definition
+        shadowOpacity: 0.15,
+        shadowRadius: 16,
+        elevation: 20,
         borderTopWidth: 1,
-        borderColor: '#EEEEEE',
     },
     actionBtn: {
         alignItems: 'center',
@@ -328,7 +296,6 @@ const styles = StyleSheet.create({
     actionText: {
         fontSize: 14,
         fontWeight: '600',
-        color: COLORS.text,
     },
 });
 

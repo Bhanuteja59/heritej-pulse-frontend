@@ -2,37 +2,53 @@ import React, { useState } from "react";
 import {
     View,
     Text,
-    TextInput,
     StyleSheet,
     TouchableOpacity,
     Alert,
     Platform,
     KeyboardAvoidingView,
     ScrollView,
+    SafeAreaView,
+    Dimensions
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { COLORS } from "../utils/theme";
-import { useNavigation, SCREENS } from "../services/NavigationContext";
-import AuthLoading from "../components/AuthLoading";
-import OTPModal from "../components/OTPModal";
+import { COLORS } from "../../utils/theme";
+import { useNavigation, SCREENS } from "../../services/NavigationContext";
+import AuthLoading from "../../components/loading/AuthLoading";
+import OTPModal from "../../components/OTPModal";
+import FloatingLabelInput from "../../components/inputs/FloatingLabelInput";
+import CustomAlert from "../../components/CustomAlert";
+
+const { width } = Dimensions.get('window');
 
 const ForgotPassword = () => {
-    const { navigate } = useNavigation();
+    const { navigate, goBack } = useNavigation();
 
     const [email, setEmail] = useState("");
-    const [focusedInput, setFocusedInput] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [modalVisible, setModalVisible] = useState(false); // Modal state
-    const [showAuthLoading, setShowAuthLoading] = useState(false); // Auth loading state
+    const [modalVisible, setModalVisible] = useState(false);
+    const [showAuthLoading, setShowAuthLoading] = useState(false);
+
+    // Alert State
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alertTitle, setAlertTitle] = useState("");
+    const [alertMessage, setAlertMessage] = useState("");
+    const [alertType, setAlertType] = useState("error");
+
+    const showAlert = (title, message, type = "error") => {
+        setAlertTitle(title);
+        setAlertMessage(message);
+        setAlertType(type);
+        setAlertVisible(true);
+    };
 
     const handleReset = () => {
         if (!email) {
-            Alert.alert("Missing Field", "Please enter your email or mobile number.");
+            showAlert("Missing Field", "Please enter your email or mobile number.");
             return;
         }
         console.log("Request email for:", { email });
-        // Open OTP Modal instead of immediate redirect
         setModalVisible(true);
     };
 
@@ -43,14 +59,12 @@ const ForgotPassword = () => {
         }
 
         setIsLoading(true);
-        // Simulate network request
         setTimeout(() => {
             setIsLoading(false);
             setModalVisible(false);
 
             console.log("OTP Verified for:", { email, code });
 
-            // Show Success Loading
             setShowAuthLoading(true);
             setTimeout(() => {
                 setShowAuthLoading(false);
@@ -60,11 +74,7 @@ const ForgotPassword = () => {
     };
 
     return (
-        <View style={styles.container}>
-            <View
-                colors={COLORS.screen}
-                style={StyleSheet.absoluteFillObject}
-            />
+        <SafeAreaView style={styles.safeArea}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={{ flex: 1 }}
@@ -75,6 +85,12 @@ const ForgotPassword = () => {
                     keyboardShouldPersistTaps="handled"
                 >
                     <View style={styles.header}>
+                        <TouchableOpacity
+                            onPress={() => goBack ? goBack() : navigate(SCREENS.LOGIN)}
+                            style={styles.backBtn}
+                        >
+                            <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
+                        </TouchableOpacity>
                         <Text style={styles.title}> Forgot Password? 🔒 </Text>
                         <Text style={styles.subtitle}>
                             Don't worry! It happens. Please enter the email or mobile number associated with your account.
@@ -82,33 +98,18 @@ const ForgotPassword = () => {
                     </View>
 
                     <View style={styles.form}>
-                        {/* Email Input */}
-                        <View style={styles.inputs}>
-                            <Text style={styles.label}>Enter Email / Mobile No : </Text>
-                            <View style={styles.inputContainer}>
-                                <Ionicons
-                                    name="mail-outline"
-                                    size={24}
-                                    style={[
-                                        styles.inputIcon,
-                                        focusedInput === "email" && styles.iconFocused,
-                                    ]}
-                                />
-                                <TextInput
-                                    placeholder="Enter Email / Mobile No"
-                                    value={email}
-                                    onChangeText={setEmail}
-                                    style={styles.input}
-                                    placeholderTextColor="#8E8E8E"
-                                    onFocus={() => setFocusedInput("email")}
-                                    onBlur={() => setFocusedInput(null)}
-                                />
-                            </View>
-                        </View>
+                        <FloatingLabelInput
+                            label="Enter Email / Mobile No"
+                            value={email}
+                            onChangeText={setEmail}
+                            iconName="mail-outline"
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                        />
 
-                        <TouchableOpacity onPress={handleReset} activeOpacity={0.8}>
+                        <TouchableOpacity onPress={handleReset} activeOpacity={0.8} style={styles.buttonContainer}>
                             <LinearGradient
-                                colors={["#EB6A00", "#FF8D28"]}
+                                colors={[COLORS.primary, COLORS.secondary]}
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 0 }}
                                 style={styles.resetButton}
@@ -137,91 +138,82 @@ const ForgotPassword = () => {
             />
 
             <AuthLoading visible={showAuthLoading} />
-        </View>
+
+            {/* Custom Alert */}
+            <CustomAlert
+                visible={alertVisible}
+                title={alertTitle}
+                message={alertMessage}
+                type={alertType}
+                onClose={() => setAlertVisible(false)}
+            />
+
+        </SafeAreaView>
     );
 };
 
-export default ForgotPassword;
-
 const styles = StyleSheet.create({
-    container: {
+    safeArea: {
         flex: 1,
-        backgroundColor: COLORS.screen,
+        backgroundColor: COLORS.background,
     },
     scrollContent: {
         flexGrow: 1,
         justifyContent: "center",
-        paddingHorizontal: 20,
+        paddingHorizontal: width * 0.05,
         paddingBottom: 40,
     },
     header: {
-        alignItems: "flex-start",
         marginBottom: 40,
-        marginTop: 60,
         width: "100%",
-        paddingHorizontal: 20,
+    },
+    backBtn: {
+        marginBottom: 20,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: COLORS.cardBg,
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 2,
+        shadowColor: "#000",
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 2 },
     },
     title: {
-        fontSize: 24,
+        fontSize: width * 0.07,
         fontWeight: "800",
         color: COLORS.primary,
         marginBottom: 10,
         letterSpacing: 0.5,
     },
     subtitle: {
-        fontSize: 16,
+        fontSize: width * 0.04,
         letterSpacing: 0.5,
         color: COLORS.secondaryText,
         lineHeight: 24,
     },
     form: {
         width: "100%",
-        gap: 20,
-        marginLeft: 20,
-        marginRight: 20,
+        gap: 24,
     },
-    label: {
-        fontSize: 20,
-        fontWeight: "bold",
-        color: COLORS.secondaryText,
-    },
-    inputs: {
-        gap: 10,
-    },
-    inputContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        borderColor: COLORS.primary,
-        borderWidth: 1.5,
-        backgroundColor: "#F5F5F5",
-        borderRadius: 12,
-        paddingHorizontal: 14,
-        paddingVertical: 10,
-        elevation: 2,
-        shadowColor: "#000",
-        shadowOffset: { width: 2, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        marginRight: 40,
-    },
-    inputIcon: {
-        marginRight: 12,
-        color: "#818181ff",
-    },
-    iconFocused: {
-        color: COLORS.primary,
-    },
-    input: {
-        flex: 1,
-        fontSize: 16,
-        color: COLORS.text,
+    buttonContainer: {
+        marginTop: 10,
+        shadowColor: COLORS.primary,
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 5,
     },
     resetButton: {
         alignItems: "center",
         justifyContent: "center",
-        marginRight: 45,
-        borderRadius: 12,
-        paddingVertical: 16,
+        borderRadius: 25, // Match Login button radius
+        paddingVertical: 18,
     },
     resetButtonText: {
         fontSize: 18,
@@ -232,14 +224,17 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "center",
         marginTop: 40,
+        alignItems: 'center',
     },
     footerText: {
-        fontSize: 16,
-        color: COLORS.text,
+        fontSize: 15,
+        color: COLORS.secondaryText,
     },
     footerLink: {
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: "bold",
         color: COLORS.primary,
     },
 });
+
+export default ForgotPassword;

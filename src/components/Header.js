@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Platform, SafeAreaView, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../utils/theme';
 import { useNavigation, SCREENS } from '../services/NavigationContext';
 import { useLanguage } from '../services/LanguageContext';
+import { useTheme } from '../services/ThemeContext';
 
 const Header = () => {
     const { navigate } = useNavigation();
     const { t } = useLanguage();
+    const { colors } = useTheme();
     const [placeholder, setPlaceholder] = useState('');
     const [index, setIndex] = useState(0);
     const [subIndex, setSubIndex] = useState(0);
@@ -27,19 +28,17 @@ const Header = () => {
     );
 
     useEffect(() => {
-        if (index === phrases.length) { // Loop back
+        if (index === phrases.length) {
             setIndex(0);
             return;
         }
 
         if (subIndex === phrases[index].length + 1 && !isDeleting) {
-            // Finished typing, wait before deleting
             setTimeout(() => setIsDeleting(true), 1000);
             return;
         }
 
         if (subIndex === 0 && isDeleting) {
-            // Finished deleting, move to next phrase
             setIsDeleting(false);
             setIndex((prev) => (prev + 1) % phrases.length);
             return;
@@ -47,12 +46,11 @@ const Header = () => {
 
         const timeout = setTimeout(() => {
             setSubIndex((prev) => prev + (isDeleting ? -1 : 1));
-        }, isDeleting ? 50 : 100); // Faster deleting
+        }, isDeleting ? 50 : 100);
 
         return () => clearTimeout(timeout);
     }, [subIndex, index, isDeleting, phrases]);
 
-    // Blinking cursor logic
     useEffect(() => {
         const interval = setInterval(() => {
             setShowCursor(v => !v);
@@ -65,58 +63,64 @@ const Header = () => {
     }, [subIndex, index, phrases]);
 
     return (
-        <View style={styles.container}>
-            <View style={styles.headerContainer}>
-                <View>
-                    <Text style={styles.title}>{t("header_title")}</Text>
-                    <Text style={styles.subtitle}>{t("header_subtitle")}</Text>
+        <SafeAreaView style={{ backgroundColor: colors.background }}>
+            <View style={[styles.container, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
+                <View style={styles.headerContainer}>
+                    <View>
+                        <Text style={[styles.title, { color: colors.primary }]}>{t("header_title")}</Text>
+                        <Text style={[styles.subtitle, { color: colors.secondaryText }]}>{t("header_subtitle")}</Text>
+                    </View>
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        style={[styles.notificationButton, { backgroundColor: colors.cardBg, shadowColor: colors.text }]}
+                        onPress={() => navigate(SCREENS.NOTIFICATIONS)}
+                    >
+                        <Ionicons name="notifications-outline" size={26} color={colors.text} />
+                        <View style={[styles.notificationDot, { borderColor: colors.cardBg }]} />
+                    </TouchableOpacity>
                 </View>
-                <TouchableOpacity activeOpacity={0.7} style={styles.notificationButton} onPress={() => navigate(SCREENS.NOTIFICATIONS)}>
 
-                    <Ionicons name="notifications-outline" size={26} color={COLORS.text} />
-                    <View style={styles.notificationDot} />
+                {/* Search Bar with Typing Animation */}
+                <TouchableOpacity
+                    activeOpacity={1}
+                    style={[styles.searchContainer, { backgroundColor: colors.cardBg, borderColor: colors.primary }]}
+                    onPress={() => { }} // Could focus input here
+                >
+                    <View style={styles.inputWrapper}>
+                        <TextInput
+                            style={[styles.input, { color: colors.text }]}
+                            value={searchText}
+                            onChangeText={setSearchText}
+                            onFocus={() => setIsFocused(true)}
+                            onBlur={() => setIsFocused(false)}
+                            selectionColor={colors.primary}
+                            placeholderTextColor={colors.secondaryText}
+                        />
+                        {searchText.length === 0 && !isFocused && (
+                            <View style={styles.placeholderContainer} pointerEvents="none">
+                                <Text style={styles.placeholderText}>
+                                    {placeholder}
+                                    <Text style={{ color: showCursor ? colors.primary : 'transparent' }}>|</Text>
+                                </Text>
+                            </View>
+                        )}
+                    </View>
+                    <TouchableOpacity style={[styles.filterButton, { backgroundColor: colors.cardBg }]}>
+                        <Ionicons name="search-outline" size={20} color={colors.primary} />
+                    </TouchableOpacity>
                 </TouchableOpacity>
             </View>
-
-            <TouchableOpacity activeOpacity={1} style={styles.searchContainer}>
-                {/* <Ionicons name="search-outline" size={20} color={COLORS.secondaryText} style={styles.iconLeft} /> */}
-
-                <View style={{ flex: 1, justifyContent: 'center', height: '100%' }}>
-                    <TextInput
-                        style={styles.input}
-                        value={searchText}
-                        onChangeText={setSearchText}
-                        onFocus={() => setIsFocused(true)}
-                        onBlur={() => setIsFocused(false)}
-                        selectionColor={COLORS.primary}
-                    />
-                    {searchText.length === 0 && !isFocused && (
-                        <View style={[StyleSheet.absoluteFill, { justifyContent: 'center' }]} pointerEvents="none">
-                            <Text style={styles.placeholderText}>
-                                {placeholder}
-                                <Text style={{ color: showCursor ? COLORS.primary : 'transparent' }}>|</Text>
-                            </Text>
-                        </View>
-                    )}
-                </View>
-                <TouchableOpacity style={styles.filterButton}>
-                    <Ionicons name="search-outline" size={20} color={COLORS.primary} />
-                </TouchableOpacity>
-            </TouchableOpacity>
-        </View >
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 16,
-        paddingTop: 12,
+        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 10 : 10,
         paddingBottom: 16,
-        backgroundColor: COLORS.background,
-        borderBottomColor: 'rgba(0,0,0,0.05)',
         borderBottomWidth: 1,
         elevation: 2,
-        shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 5,
@@ -130,23 +134,19 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 26,
         fontWeight: '800',
-        color: COLORS.primary,
         letterSpacing: -0.5,
     },
     subtitle: {
         fontSize: 13,
-        color: COLORS.secondaryText,
         fontWeight: '500',
         marginTop: 2,
     },
     notificationButton: {
         width: 44,
         height: 44,
-        backgroundColor: COLORS.white,
         borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
-        shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.08,
         shadowRadius: 4,
@@ -161,47 +161,44 @@ const styles = StyleSheet.create({
         backgroundColor: '#FF3B30',
         borderRadius: 5,
         borderWidth: 2,
-        borderColor: COLORS.white,
     },
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F8F9FA',
         borderRadius: 16,
         height: 52,
-        paddingHorizontal: 16,
+        paddingHorizontal: 12,
         borderWidth: 1.5,
-        borderColor: COLORS.primary, // Softer border by default
+        overflow: 'hidden',
     },
-    iconLeft: {
-        marginRight: 10,
+    inputWrapper: {
+        flex: 1,
+        justifyContent: 'center',
+        height: '100%',
     },
     input: {
         flex: 1,
         fontSize: 15,
-        color: COLORS.text,
         fontWeight: '500',
-        height: '100%', // Take full height
-        paddingVertical: 0, // Reset padding
+        height: '100%',
+        paddingVertical: 0,
+    },
+    placeholderContainer: {
+        ...StyleSheet.absoluteFillObject,
+        justifyContent: 'center',
     },
     placeholderText: {
         fontSize: 15,
-        color: '#9CA3AF',
         fontWeight: '500',
+        color: "#989898ff",
     },
     filterButton: {
         width: 36,
         height: 36,
-        backgroundColor: COLORS.white,
         borderRadius: 10,
         marginLeft: 8,
         justifyContent: 'center',
         alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 2,
-        elevation: 1,
     },
 });
 

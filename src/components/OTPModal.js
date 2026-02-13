@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Modal, ActivityIndicator, StyleSheet, Platform, KeyboardAvoidingView } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient'; // Keep using LinearGradient as per original design
-import { COLORS } from '../utils/theme';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useTheme } from '../services/ThemeContext';
 
 const OTPModal = ({ visible, onClose, onVerify, isLoading, sentTo }) => {
+    const { colors, isDarkMode } = useTheme();
     const [verificationCode, setVerificationCode] = useState("");
     const inputRef = useRef(null);
 
     // Auto-focus logic
     useEffect(() => {
         if (visible) {
-            // Reset code when modal opens
             setVerificationCode("");
             const timer = setTimeout(() => {
                 inputRef.current?.focus();
@@ -32,11 +32,11 @@ const OTPModal = ({ visible, onClose, onVerify, isLoading, sentTo }) => {
         >
             <View style={styles.modalOverlay}>
                 <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.kav}>
-                    <View style={styles.modalContent}>
-                        <Text style={styles.modalTitle}>Verification Code ✅</Text>
-                        <Text style={styles.modalSubtitle}>
+                    <View style={[styles.modalContent, { backgroundColor: colors.cardBg, shadowColor: colors.text }]}>
+                        <Text style={[styles.modalTitle, { color: colors.primary }]}>Verification Code ✅</Text>
+                        <Text style={[styles.modalSubtitle, { color: colors.secondaryText }]}>
                             You need to enter 4-digit code we send to : {"\n"}
-                            <Text style={{ fontWeight: 'bold', color: COLORS.primary }}>{sentTo}</Text>
+                            <Text style={{ fontWeight: 'bold', color: colors.primary }}>{sentTo}</Text>
                         </Text>
 
                         {/* Wrapper to ensure touches focus the input */}
@@ -64,10 +64,19 @@ const OTPModal = ({ visible, onClose, onVerify, isLoading, sentTo }) => {
                                         key={index}
                                         style={[
                                             styles.codeSlot,
-                                            (verificationCode.length === index || (index === 3 && verificationCode.length === 4)) && styles.codeSlotActive
+                                            {
+                                                backgroundColor: isDarkMode ? '#333' : '#F9F9F9',
+                                                borderColor: isDarkMode ? '#444' : '#E0E0E0'
+                                            },
+                                            (verificationCode.length === index || (index === 3 && verificationCode.length === 4)) && {
+                                                borderColor: colors.primary,
+                                                backgroundColor: isDarkMode ? '#222' : '#FFF',
+                                                shadowColor: colors.primary
+                                            },
+                                            verificationCode.length === index && styles.codeSlotActive // Apply shadow style only if active
                                         ]}
                                     >
-                                        <Text style={styles.codeSlotText}>
+                                        <Text style={[styles.codeSlotText, { color: colors.primary }]}>
                                             {verificationCode[index] || ""}
                                         </Text>
                                     </View>
@@ -97,7 +106,7 @@ const OTPModal = ({ visible, onClose, onVerify, isLoading, sentTo }) => {
 
                         {!isLoading && (
                             <TouchableOpacity onPress={onClose} style={styles.cancelButton}>
-                                <Text style={styles.cancelButtonText}>Cancel</Text>
+                                <Text style={[styles.cancelButtonText, { color: colors.secondaryText }]}>Cancel</Text>
                             </TouchableOpacity>
                         )}
                     </View>
@@ -120,13 +129,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     modalContent: {
-        backgroundColor: 'white',
         borderRadius: 20,
         padding: 30,
         width: '85%',
         alignItems: 'center',
         elevation: 5,
-        shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 4,
@@ -134,12 +141,10 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: COLORS.primary,
         marginBottom: 10,
     },
     modalSubtitle: {
         fontSize: 14,
-        color: COLORS.secondaryText,
         textAlign: 'center',
         marginBottom: 20,
     },
@@ -168,17 +173,12 @@ const styles = StyleSheet.create({
         width: 50,
         height: 55,
         borderWidth: 1.5,
-        borderColor: '#E0E0E0',
         borderRadius: 12,
-        backgroundColor: '#F9F9F9',
         justifyContent: 'center',
         alignItems: 'center',
     },
     codeSlotActive: {
-        borderColor: COLORS.primary,
-        backgroundColor: '#FFF',
         elevation: 2,
-        shadowColor: COLORS.primary,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
@@ -186,7 +186,6 @@ const styles = StyleSheet.create({
     codeSlotText: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: COLORS.primary,
     },
     modalButtonWrapper: {
         width: '100%',
@@ -208,7 +207,6 @@ const styles = StyleSheet.create({
         padding: 5,
     },
     cancelButtonText: {
-        color: COLORS.secondaryText,
         fontSize: 14,
     },
 });

@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
-import { COLORS } from '../utils/theme';
+import { useTheme } from '../services/ThemeContext';
 
 const Toast = ({ visible, message, onHide, duration = 2000 }) => {
+    const { colors, isDarkMode } = useTheme();
     const opacity = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
@@ -28,9 +29,18 @@ const Toast = ({ visible, message, onHide, duration = 2000 }) => {
     if (!visible) return null;
 
     return (
-        <Animated.View style={[styles.container, { opacity }]}>
-            <View style={styles.content}>
-                <Text style={styles.message}>{message}</Text>
+        <Animated.View style={[
+            styles.container,
+            { opacity }
+        ]} pointerEvents="none">
+            <View style={[
+                styles.content,
+                {
+                    backgroundColor: isDarkMode ? '#333' : 'rgba(0, 0, 0, 0.85)',
+                    shadowColor: colors.text
+                }
+            ]}>
+                <Text style={[styles.message, { color: '#FFF' }]}>{message}</Text>
             </View>
         </Animated.View>
     );
@@ -44,14 +54,12 @@ const styles = StyleSheet.create({
         right: 20,
         alignItems: 'center',
         zIndex: 9999,
-        pointerEvents: 'none', // Allow clicks through if needed
+        // pointerEvents handled in prop for clarity
     },
     content: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
         paddingHorizontal: 20,
         paddingVertical: 12,
         borderRadius: 25,
-        shadowColor: "#000",
         shadowOffset: {
             width: 0,
             height: 2,
@@ -61,7 +69,6 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     message: {
-        color: COLORS.white,
         fontSize: 14,
         fontWeight: '600',
         textAlign: 'center',

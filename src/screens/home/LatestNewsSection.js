@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Pressable } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { MockDataService } from '../data/mockData';
-import { useTheme } from '../services/ThemeContext';
-import { useNavigation, SCREENS } from '../services/NavigationContext';
-import { useLanguage } from '../services/LanguageContext';
+import { useNavigation, SCREENS } from '../../services/NavigationContext';
+import { useLanguage } from '../../services/LanguageContext';
+import { useTheme } from '../../services/ThemeContext';
+import { MockDataService } from '../../data/mockData';
+import { truncateText } from '../../utils/textUtils';
 
 const NewsCard = ({ item, onPress, onShowToast, toastSavedText, colors, isDarkMode }) => {
     const [bookmarked, setBookmarked] = useState(false);
@@ -31,13 +32,6 @@ const NewsCard = ({ item, onPress, onShowToast, toastSavedText, colors, isDarkMo
                     // Background active state
                     opacity: pressed ? 0.9 : 1,
                     transform: [{ scale: pressed ? 0.98 : 1 }],
-                },
-                // Border for all 4 sides in dark mode default
-                isDarkMode && {
-                    borderColor: colors.primary, // Orange border
-                    borderWidth: 1,
-                    // Override left border
-                    borderLeftWidth: 4,
                 }
             ]}
         >
@@ -53,7 +47,9 @@ const NewsCard = ({ item, onPress, onShowToast, toastSavedText, colors, isDarkMo
                         />
                     </TouchableOpacity>
                 </View>
-                <Text style={[styles.headline, { color: colors.text }]} numberOfLines={2}>{item.title}</Text>
+                <Text style={[styles.headline, { color: colors.text }]} numberOfLines={2}>
+                    {truncateText(item.title, 50)}
+                </Text>
                 <View style={styles.footerRow}>
                     <View style={styles.publisherInfo}>
                         <View style={[styles.publisherLogo, { backgroundColor: colors.text }]} />
@@ -72,10 +68,9 @@ const NewsCard = ({ item, onPress, onShowToast, toastSavedText, colors, isDarkMo
 const LatestNewsSection = ({ onShowToast }) => {
     const { language, t } = useLanguage();
     const { colors, isDarkMode } = useTheme();
-    const data = MockDataService.getLatestNews(language);
     const { navigate } = useNavigation();
 
-    const topNews = useMemo(() => MockDataService.getExploreSection("topNews", language), [language]);
+    const data = useMemo(() => MockDataService.getExploreSection("topNews", language), [language]);
 
     const handlePress = (item) => {
         navigate(SCREENS.DETAIL, { articleId: item.id, item });
@@ -88,7 +83,7 @@ const LatestNewsSection = ({ onShowToast }) => {
             subtitleKey: "explore_top_news_subtitle",
             title: t("explore_top_news_title"),
             subtitle: t("explore_top_news_subtitle"),
-            items: topNews,
+            items: data,
         });
     };
 
