@@ -1,383 +1,308 @@
-// Consolidated Mock Data & Service
-// Replaces src/services/mockData.js
+// Consolidated & Simplified Mock Data
+// Sources all articles from a single flat array
 
-// Image Helper
-export const getImageUrl = (keyword, id, width = 400, height = 300) => {
-    return `https://picsum.photos/seed/${id + keyword}/${width}/${height}`;
-};
-
-// Profile Data
 export const PROFILE_USER = {
     name: "Priya Sharma",
     email: "priya.sharma@example.com",
     phone: "+91 9876543210",
     role: "Heritage Enthusiast",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop",
-    stats: {
-        saved: 23,
-        read: 12
-    }
+    stats: { saved: 23, read: 12 }
 };
 
-const PROFILE_TRANSLATIONS = {
-    te: { name: "ప్రియా శర్మ", role: "వారసత్వ ఆసక్తిగల వ్యక్తి" },
-    ta: { name: "பிரியா சர்மா", role: "பாரம்பரிய ஆர்வலர்" },
-    kn: { name: "ಪ್ರಿಯಾ ಶರ್ಮಾ", role: "ಪರಂಪರೆ ಆಸಕ್ತ" },
-};
-
-
-// Chat Data
 export const INITIAL_CHAT_MESSAGES = [
     { id: '1', role: 'model', text: 'Namaste! I am your Heritage Guide. Ask me anything about Indian traditions, festivals, or history.' }
 ];
 
-
-
-// Explore Categories
 export const EXPLORE_CATEGORIES = [
-    { name: 'All', color: 'bg-gray-900 text-white', icon: '🌍' },
-    { name: 'Heritage', color: 'bg-orange-100 text-orange-800', icon: '🏛️' },
-    { name: 'Dance', color: 'bg-pink-100 text-pink-800', icon: '💃' },
-    { name: 'History', color: 'bg-blue-100 text-blue-800', icon: '📜' },
-    { name: 'Events', color: 'bg-red-100 text-red-800', icon: '🎭' },
-    { name: 'Culture', color: 'bg-green-100 text-green-800', icon: '🕉️' },
-    { name: 'Food', color: 'bg-yellow-100 text-yellow-800', icon: '🥘' },
+    { name: 'Heritage', key: 'heritage', icon: '🏛️', image: 'https://image.slidesharecdn.com/heritage-180505070314/75/Heritage-1-2048.jpg' },
+    { name: 'Dance', key: 'dance', icon: '💃', image: 'https://www.drishtiias.com/images/uploads/1576219602_images.jpg' },
+    { name: 'History', key: 'history', icon: '📜', image: 'https://images.unsplash.com/photo-1505664194779-8beaceb93744?q=80&w=400&auto=format&fit=crop' },
+    { name: 'Events', key: 'events', icon: '🎭', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLrU2L-pXYQzJJU9p2VdWbxpBqGSVRIcFh7A&s' },
+    { name: 'Culture', key: 'culture', icon: '🕉️', image: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?q=80&w=400&auto=format&fit=crop' },
+    { name: 'Food', key: 'food', icon: '🥘', image: 'https://static.toiimg.com/thumb/msid-123295982,imgsize-42748,width-400,height-225,resizemode-72/123295982.jpg' },
+    { name: 'Art', key: 'art', icon: '🎨', image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=400&auto=format&fit=crop' },
 ];
 
-// Rich Content Generators (localized)
-const generateContent = (title, category, language = "en") => {
-    const templates = {
-        en: [
-            [
-                { text: title, highlight: true },
-                { text: ` is a significant aspect of Indian ${String(category).toLowerCase()}. It represents the rich tapestry of our cultural history, weaving together thousands of years of tradition, art, and spirituality.` }
-            ],
-            [
-                { text: "Detailed historical records suggest that this practice dates back to ancient times, evolving through various dynastic eras and preserving its core essence while adapting to modern sensibilities." }
-            ],
-            [
-                { text: "Today, it continues to inspire artists, historians, and travelers from around the world, serving as a vibrant testament to India's enduring " },
-                { text: "legacy", highlight: true },
-                { text: "." }
-            ]
-        ],
-        te: [
-            [
-                { text: title, highlight: true },
-                { text: ` భారతీయ ${String(category).toLowerCase()}లో ఒక ముఖ్యమైన అంశం. ఇది మన సంస్కృతిక చరిత్రకు నూలుపోగు లాంటి సంపదను ప్రతిబింబిస్తుంది.` }
-            ],
-            [
-                { text: "వివరమైన చారిత్రక రికార్డులు ఈ ప్రక్రియ పురాతన కాలానికి చెందినదని సూచిస్తాయి; కాలానుగుణంగా ఇది రూపాంతరం చెందింది." }
-            ],
-            [
-                { text: "ఈరోజు కూడా ఇది కళాకారులు, చరిత్రకారులు మరియు ప్రయాణికులను ప్రేరేపిస్తూ భారతదేశపు చిరస్థాయి " },
-                { text: "విరాసత", highlight: true },
-                { text: "కు సాక్ష్యంగా నిలుస్తోంది." }
-            ]
-        ],
-        ta: [
-            [
-                { text: title, highlight: true },
-                { text: ` இந்திய ${String(category).toLowerCase()} கலாச்சாரத்தின் ஒரு முக்கிய கூறாகும். இது ஆயிரக்கணக்கான ஆண்டுகளின் பாரம்பரியத்தை பிரதிபலிக்கிறது.` }
-            ],
-            [
-                { text: "விரிவான வரலாற்றுச் சான்றுகள், இது பழங்காலத்தில் தொடங்கியதையும் காலப்போக்கில் பரிணமித்ததையும் காட்டுகிறது." }
-            ],
-            [
-                { text: "இன்றும் இது உலகம் முழுவதும் கலைஞர்கள், வரலாற்றாளர்கள் மற்றும் பயணிகளை ஊக்குவித்து இந்தியாவின் நீடித்த " },
-                { text: "பாரம்பரியத்தை", highlight: true },
-                { text: " பிரதிபலிக்கிறது." }
-            ]
-        ],
-        kn: [
-            [
-                { text: title, highlight: true },
-                { text: ` ಭಾರತದ ${String(category).toLowerCase()} ಸಂಸ್ಕೃತಿಯ ಪ್ರಮುಖ ಅಂಗವಾಗಿದೆ. ಇದು ಸಾವಿರಾರು ವರ್ಷಗಳ ಪರಂಪರೆ, ಕಲೆ ಮತ್ತು ಆತ್ಮೀಯತೆಯನ್ನು ಪ್ರತಿಬಿಂಬಿಸುತ್ತದೆ.` }
-            ],
-            [
-                { text: "ವಿವರವಾದ ಐತಿಹಾಸಿಕ ದಾಖಲೆಗಳು ಇದು ಪ್ರಾಚೀನ ಕಾಲದಿಂದ ಆರಂಭಗೊಂಡು ಕಾಲಾಂತರದಲ್ಲಿ ರೂಪಾಂತರಗೊಂಡಿತೆಂದು ಸೂಚಿಸುತ್ತವೆ." }
-            ],
-            [
-                { text: "ಇಂದಿಗೂ ಇದು ಕಲಾವಿದರು, ಇತಿಹಾಸಕಾರರು ಮತ್ತು ಪ್ರವಾಸಿಗರನ್ನು ಪ್ರೇರೇಪಿಸಿ ಭಾರತದ ಶಾಶ್ವತ " },
-                { text: "ಪರಂಪರೆಯ", highlight: true },
-                { text: " ಸಾಕ್ಷಿಯಾಗಿದೆ." }
-            ]
-        ]
-    };
-
-    const chosen = templates[language] || templates.en;
-    return chosen.map((content) => ({ type: "paragraph", content }));
-};
-
-const generateKeywords = (category) => {
-    const base = ['#India', `#${category}`, '#Culture'];
-    if (category === 'History') return [...base, '#Ancient', '#Archaeology'];
-    if (category === 'Dance') return [...base, '#Classical', '#ArtForm'];
-    if (category === 'Festivals') return [...base, '#Celebration', '#Tradition'];
-    return [...base, '#Heritage', '#Travel'];
-};
-
-// Fallback Data
-export const FALLBACK_HOME_DATA = {
-    trending: [
-        { id: "t1", title: "The Majestic Mysore Dasara", category: "Festivals", imageKeyword: "mysore palace", subtitle: "A Royal Celebration", keywords: ["#Mysore", "#Dasara", "#Royal"] },
-        { id: "t2", title: "Chola Temples: Granite Wonders", category: "History", imageKeyword: "temple", subtitle: "Living Chola Temples", keywords: ["#Chola", "#Architecture", "#History"] },
-        { id: "t3", title: "Reviving Ancient Weaves", category: "Art", imageKeyword: "loom", subtitle: "Handloom Heritage", keywords: ["#Handloom", "#Craft", "#Weaves"] },
-        { id: "t4", title: "Classical Dances of India", category: "Dance", imageKeyword: "kathakali", subtitle: "Poetry in Motion", keywords: ["#ClassicalDance", "#Kathakali", "#Art"] },
-        { id: "t5", title: "Spices of the Malabar Coast", category: "Food", imageKeyword: "spices", subtitle: "The Flavor of History", keywords: ["#Kerala", "#Spices", "#Cuisine"] },
-        { id: "t6", title: "Yoga: An Eternal Legacy", category: "Heritage", imageKeyword: "yoga", subtitle: "Ancient Wellness", keywords: ["#Yoga", "#Wellness", "#Spirituality"] },
-
-    ],
-    latest: [
-        { id: "l1", title: "New Excavations at Keezhadi", category: "History", imageKeyword: "excavation", publisher: "ASI News", timeAgo: "2h ago", subtitle: "Unearthing ancient Tamil civilization artifacts from 400 BCE", keywords: ["#Keezhadi", "#TamilNadu", "#Excavation"] },
-        { id: "l2", title: "Kumbh Mela Preparations Begin", category: "Culture", imageKeyword: "ganges", publisher: "Heritage Daily", timeAgo: "4h ago", subtitle: "Largest Human Gathering on Earth", keywords: ["#KumbhMela", "#Spiritual", "#Ganges"] },
-        { id: "l3", title: "Bharatanatyam Revival Movement", category: "Dance", imageKeyword: "bharatanatyam", publisher: "Arts Weekly", timeAgo: "6h ago", subtitle: "Classical dance sees modern renaissance with youth participation", keywords: ["#Bharatanatyam", "#ClassicalArts"] },
-        { id: "l4", title: "Ajanta Caves Get 3D Mapping", category: "Heritage", imageKeyword: "ajanta", publisher: "Tech Heritage", timeAgo: "8h ago", subtitle: "Digital preservation brings ancient art to life with cutting-edge technology", keywords: ["#AjantaCaves", "#DigitalHeritage"] },
-        { id: "l5", title: "Sanskrit Day Celebrated", category: "Language", imageKeyword: "sanskrit", publisher: "Culture Times", timeAgo: "10h ago", subtitle: "Ancient language finds new speakers in modern India through revival programs", keywords: ["#Sanskrit", "#AncientLanguage"] },
-        { id: "l6", title: "Kathakali Workshop Series", category: "Dance", imageKeyword: "kathakali", publisher: "Arts Daily", timeAgo: "12h ago", subtitle: "Kerala's ancient dance form teaches storytelling through dramatic expressions", keywords: ["#Kathakali", "#Kerala"] },
-        { id: "l7", title: "Hampi UNESCO Recognition", category: "Heritage", imageKeyword: "hampi", publisher: "World Heritage", timeAgo: "14h ago", subtitle: "Vijayanagara ruins showcase architectural grandeur of medieval empire", keywords: ["#Hampi", "#UNESCO"] },
-        { id: "l8", title: "Traditional Crafts Fair Opens", category: "Art", imageKeyword: "handicrafts", publisher: "Craft News", timeAgo: "16h ago", subtitle: "Artisans display centuries-old techniques in handloom and pottery", keywords: ["#Handicrafts", "#Artisans"] },
-        { id: "l9", title: "Ancient Yoga Manuscripts Found", category: "Heritage", imageKeyword: "yoga", publisher: "Research Journal", timeAgo: "18h ago", subtitle: "Rare texts reveal forgotten Asanas from classical yoga traditions", keywords: ["#Yoga", "#Manuscripts"] },
-        { id: "l10", title: "Temple Architecture Study", category: "History", imageKeyword: "temple", publisher: "Heritage Monthly", timeAgo: "20h ago", subtitle: "Research uncovers engineering marvels in South Indian temple construction", keywords: ["#Temples", "#Architecture"] },
-    ]
-};
-
-export const FALLBACK_EXPLORE_DATA = {
-    topNews: [
-        { id: "e1", title: "Indian Dharma", imageKeyword: "dharma", rating: "4.8", reviews: "2.6k reviews", category: "Heritage", categoryBadge: "Heritage Places", tags: ["Culture", "Philosophy"], location: "India", duration: "N/A" },
-        { id: "e2", title: "Taj Mahal", imageKeyword: "tajmahal", rating: "4.9", reviews: "15k reviews", category: "History", categoryBadge: "Heritage Places", tags: ["Monument", "Wonder"], location: "Agra, UP", duration: "2-3 hours" }
-    ],
-    culturalEvents: [
-        { id: "ev1", title: "Telangana Cultural Events", imageKeyword: "telangana", rating: "4.5", reviews: "1.2k reviews", category: "Events", categoryBadge: "Event", tags: ["Dance", "Music"], location: "Hyderabad", duration: "Evening" }
-    ],
-    museums: [
-        { id: "m1", title: "National Museum", imageKeyword: "museum", rating: "4.7", reviews: "5k reviews", category: "Culture", categoryBadge: "Museum", tags: ["History", "Art"], location: "New Delhi", duration: "3-4 hours" }
-    ]
-};
-
-const ITEM_TRANSLATIONS = {
-    te: {
-        t1: { title: "మైసూరు దసరా వైభవం", category: "పండుగలు", subtitle: "రాజసిక వేడుక", keywords: ["#మైసూరు", "#దసరా", "#రాజసం"] },
-        t2: { title: "చోళ దేవాలయాలు: గ్రానైట్ అద్భుతాలు", category: "చరిత్ర", subtitle: "జీవించే చోళ దేవాలయాలు", keywords: ["#చోళ", "#వాస్తుశిల్పం", "#చరిత్ర"] },
-        t3: { title: "పురాతన నెయ్యడాల పునరుజ్జీవనం", category: "కళ", subtitle: "హ్యాండ్‌లూమ్ వారసత్వం", keywords: ["#హ్యాండ్‌లూమ్", "#శిల్పం", "#నెయ్యడం"] },
-        t4: { title: "భారత శాస్త్రీయ నృత్యాలు", category: "నృత్యం", subtitle: "చలనంలో కావ్యం", keywords: ["#శాస్త్రీయనృత్యం", "#కథకళి", "#కళ"] },
-        t5: { title: "మలబార్ తీరపు మసాలాలు", category: "ఆహారం", subtitle: "చరిత్ర రుచి", keywords: ["#కేరళ", "#మసాలాలు", "#వంట"] },
-        t6: { title: "యోగం: శాశ్వత వారసత్వం", category: "వారసత్వం", subtitle: "పురాతన వెల్‌నెస్", keywords: ["#యోగం", "#వెల్‌నెస్", "#ఆధ్యాత్మికత"] },
-        l1: { title: "కీళాది లో కొత్త తవ్వకాలు", category: "చరిత్ర", subtitle: "గతాన్ని వెలికితీస్తూ", publisher: "ASI వార్తలు", timeAgo: "2గం క్రితం" },
-        l2: { title: "కుంభమేళా ఏర్పాట్లు ప్రారంభం", category: "సంస్కృతి", subtitle: "అత్యంత పెద్ద సమూహం", publisher: "Heritage Daily", timeAgo: "4గం క్రితం" },
-        l3: { title: "కుంభమేళా ఏర్పాట్లు ప్రారంభం", category: "సంస్కృతి", subtitle: "అత్యంత పెద్ద సమూహం", publisher: "Heritage Daily", timeAgo: "4గం క్రితం" },
-        l4: { title: "కుంభమేళా ఏర్పాట్లు ప్రారంభం", category: "సంస్కృతి", subtitle: "అత్యంత పెద్ద సమూహం", publisher: "Heritage Daily", timeAgo: "4గం క్రితం" },
-        l5: { title: "కుంభమేళా ఏర్పాట్లు ప్రారంభం", category: "సంస్కృతి", subtitle: "అత్యంత పెద్ద సమూహం", publisher: "Heritage Daily", timeAgo: "4గం క్రితం" },
-        l6: { title: "కుంభమేళా ఏర్పాట్లు ప్రారంభం", category: "సంస్కృతి", subtitle: "అత్యంత పెద్ద సమూహం", publisher: "Heritage Daily", timeAgo: "4గం క్రితం" },
-        l7: { title: "కుంభమేళా ఏర్పాట్లు ప్రారంభం", category: "సంస్కృతి", subtitle: "అత్యంత పెద్ద సమూహం", publisher: "Heritage Daily", timeAgo: "4గం క్రితం" },
-        l8: { title: "కుంభమేళా ఏర్పాట్లు ప్రారంభం", category: "సంస్కృతి", subtitle: "అత్యంత పెద్ద సమూహం", publisher: "Heritage Daily", timeAgo: "4గం క్రితం" },
-        l9: { title: "కుంభమేళా ఏర్పాట్లు ప్రారంభం", category: "సంస్కృతి", subtitle: "అత్యంత పెద్ద సమూహం", publisher: "Heritage Daily", timeAgo: "4గం క్రితం" },
-        l10: { title: "కుంభమేళా ఏర్పాట్లు ప్రారంభం", category: "సంస్కృతి", subtitle: "అత్యంత పెద్ద సమూహం", publisher: "Heritage Daily", timeAgo: "4గం క్రితం" },
-        e1: { title: "భారతీయ ధర్మం", category: "వారసత్వం", categoryBadge: "వారసత్వ స్థలాలు", tags: ["సంస్కృతి", "తత్వశాస్త్రం"], location: "భారతదేశం", duration: "లభ్యం కాదు" },
-        e2: { title: "తాజ్ మహల్", category: "చరిత్ర", categoryBadge: "వారసత్వ స్థలాలు", tags: ["స్మారకం", "అద్భుతం"], location: "ఆగ్రా, యూపీ", duration: "2-3 గంటలు" },
-        ev1: { title: "తెలంగాణ సాంస్కృతిక ఈవెంట్స్", category: "ఈవెంట్స్", categoryBadge: "ఈవెంట్", tags: ["నృత్యం", "సంగీతం"], location: "హైదరాబాద్", duration: "సాయంత్రం" },
-        m1: { title: "జాతీయ మ్యూజియం", category: "సంస్కృతి", categoryBadge: "మ్యూజియం", tags: ["చరిత్ర", "కళ"], location: "న్యూ ఢిల్లీ", duration: "3-4 గంటలు" },
-        s1: { title: "భారత వారసత్వం మరియు సాంస్కృతిక నృత్యం", category: "భారతదేశం", subtitle: "ఆత్మ యొక్క తాళం", publisher: "PIF News" },
-        s2: { title: "దక్షిణ భారత పురాతన దేవాలయాలు", category: "తమిళనాడు", subtitle: "ద్రావిడ శిల్పకళ", publisher: "Heritage Daily" },
+export const NOTIFICATIONS = [
+    {
+        id: "n1",
+        title: "Padma Shri Awards 2026",
+        location: "National",
+        source: "PIB India",
+        timeAgo: "10m ago",
+        image: require('../../assets/images/news/padma shri awards 2026.png'),
     },
-    ta: {
-        t1: { title: "மைசூர் தஸரா மகிமை", category: "திருவிழாக்கள்", subtitle: "அரசர்கால கொண்டாட்டம்", keywords: ["#மைசூர்", "#தஸரா", "#அரசர்"] },
-        t2: { title: "சோழக் கோவில்கள்: கற்சிற்ப அதிசயம்", category: "வரலாறு", subtitle: "உயிருடன் இருக்கும் சோழ கோவில்கள்", keywords: ["#சோழ", "#வெட்டுக்கலை", "#வரலாறு"] },
-        t3: { title: "பழமையான நெசவின் மீளுருவாக்கம்", category: "கலை", subtitle: "கைத்தறி பாரம்பரியம்", keywords: ["#கைத்தறி", "#கலை", "#நெசவு"] },
-        t4: { title: "இந்திய பாரம்பரிய நடனங்கள்", category: "நடனம்", subtitle: "இசைமயமான இயக்கம்", keywords: ["#நடனம்", "#கதகளி", "#கலை"] },
-        t5: { title: "மலபார் கரையின் மசாலா", category: "உணவு", subtitle: "வரலாற்றின் ருசி", keywords: ["#கேரளா", "#மசாலா", "#உணவு"] },
-        t6: { title: "யோகா: நித்திய பாரம்பரியம்", category: "பாரம்பரியம்", subtitle: "பழமையான நலன்", keywords: ["#யோகா", "#நலன்", "#ஆன்மிகம்"] },
-        l1: { title: "கீழாடியில் புதிய அகழ்வுகள்", category: "வரலாறு", subtitle: "கடந்ததை வெளிப்படுத்துதல்", publisher: "ASI செய்திகள்", timeAgo: "2 மணி முன்பு" },
-        l2: { title: "கும்பமேளா ஏற்பாடுகள் தொடங்கின", category: "பண்பாடு", subtitle: "பெரிய மனித கூடுகை", publisher: "Heritage Daily", timeAgo: "4 மணி முன்பு" },
-        l3: { title: "கும்பமேளா ஏற்பாடுகள் தொடங்கின", category: "பண்பாடு", subtitle: "பெரிய மனித கூடுகை", publisher: "Heritage Daily", timeAgo: "4 மணி முன்பு" },
-        l4: { title: "கும்பமேளா ஏற்பாடுகள் தொடங்கின", category: "பண்பாடு", subtitle: "பெரிய மனித கூடுகை", publisher: "Heritage Daily", timeAgo: "4 மணி முன்பு" },
-        l5: { title: "கும்பமேளா ஏற்பாடுகள் தொடங்கின", category: "பண்பாடு", subtitle: "பெரிய மனித கூடுகை", publisher: "Heritage Daily", timeAgo: "4 மணி முன்பு" },
-        l6: { title: "கும்பமேளா ஏற்பாடுகள் தொடங்கின", category: "பண்பாடு", subtitle: "பெரிய மனித கூடுகை", publisher: "Heritage Daily", timeAgo: "4 மணி முன்பு" },
-        l7: { title: "கும்பமேளா ஏற்பாடுகள் தொடங்கின", category: "பண்பாடு", subtitle: "பெரிய மனித கூடுகை", publisher: "Heritage Daily", timeAgo: "4 மணி முன்பு" },
-        l8: { title: "கும்பமேளா ஏற்பாடுகள் தொடங்கின", category: "பண்பாடு", subtitle: "பெரிய மனித கூடுகை", publisher: "Heritage Daily", timeAgo: "4 மணி முன்பு" },
-        l9: { title: "கும்பமேளா ஏற்பாடுகள் தொடங்கின", category: "பண்பாடு", subtitle: "பெரிய மனித கூடுகை", publisher: "Heritage Daily", timeAgo: "4 மணி முன்பு" },
-        l10: { title: "கும்பமேளா ஏற்பாடுகள் தொடங்கின", category: "பண்பாடு", subtitle: "பெரிய மனித கூடுகை", publisher: "Heritage Daily", timeAgo: "4 மணி முன்பு" },
-        e1: { title: "இந்திய தர்மம்", category: "பாரம்பரியம்", categoryBadge: "பாரம்பரிய இடங்கள்", tags: ["பண்பாடு", "தத்துவம்"], location: "இந்தியா", duration: "தகவல் இல்லை" },
-        e2: { title: "தாஜ்மஹால்", category: "வரலாறு", categoryBadge: "பாரம்பரிய இடங்கள்", tags: ["நினைவிடம்", "அற்புதம்"], location: "ஆக்ரா, உ.பி.", duration: "2-3 மணி" },
-        ev1: { title: "தெலங்கானா கலாச்சார நிகழ்வுகள்", category: "நிகழ்வுகள்", categoryBadge: "நிகழ்வு", tags: ["நடனம்", "இசை"], location: "ஹைதராபாத்", duration: "மாலை" },
-        m1: { title: "தேசிய அருங்காட்சியகம்", category: "பண்பாடு", categoryBadge: "அருங்காட்சியகம்", tags: ["வரலாறு", "கலை"], location: "நியூ டெல்லி", duration: "3-4 மணி" },
-        s1: { title: "இந்திய பாரம்பரியம் மற்றும் கலாச்சார நடனம்", category: "இந்தியா", subtitle: "ஆவியின் தாளம்", publisher: "PIF News" },
-        s2: { title: "தென் இந்தியாவின் பழங்கால கோவில்கள்", category: "தமிழ்நாடு", subtitle: "திராவிடக் சிற்பங்கள்", publisher: "Heritage Daily" },
+    {
+        id: "n2",
+        title: "UNESCO Nomination for Root Bridges",
+        location: "Meghalaya",
+        source: "Heritage Pulse",
+        timeAgo: "2h ago",
+        image: require("../../assets/images/heritage/India Nominates Meghalaya's Living Root Bridges for UNESCO.png"),
     },
-    kn: {
-        t1: { title: "ಮೈಸೂರ ದಸರಾ ವೈಭವ", category: "ಹಬ್ಬಗಳು", subtitle: "ರಾಜಸಿಕ ಆಚರಣೆ", keywords: ["#ಮೈಸೂರು", "#ದಸರಾ", "#ರಾಜಸ"] },
-        t2: { title: "ಚೋಳ ದೇವಾಲಯಗಳು: ಗ್ರಾನೈಟ್ ಅದ್ಭುತಗಳು", category: "ಇತಿಹಾಸ", subtitle: "ಬದುಕಿರುವ ಚೋಳ ದೇವಾಲಯಗಳು", keywords: ["#ಚೋಳ", "#ವಾಸ್ತು", "#ಇತಿಹಾಸ"] },
-        t3: { title: "ಪ್ರಾಚೀನ ನೇಕಾರದ ಪುನರುಜ್ಜೀವನ", category: "ಕಲೆ", subtitle: "ಕೈಮಗ್ಗ ಪರಂಪರೆ", keywords: ["#ಕೈಮಗ್ಗ", "#ಕಲೆ", "#ನೇಕಾರಿಕೆ"] },
-        t4: { title: "ಭಾರತದ ಶಾಸ್ತ್ರೀಯ ನೃತ್ಯಗಳು", category: "ನೃತ್ಯ", subtitle: "ಚಲನೆಯಲ್ಲಿ ಕಾವ್ಯ", keywords: ["#ನೃತ್ಯ", "#ಕಥಕಳಿ", "#ಕಲೆ"] },
-        t5: { title: "ಮಲಬಾರ್ ಕರಾವಳಿಯ ಮಸಾಲೆಗಳು", category: "ಆಹಾರ", subtitle: "ಇತಿಹಾಸದ ರುಚಿ", keywords: ["#ಕೇರಳ", "#ಮಸಾಲೆ", "#ಆಹಾರ"] },
-        t6: { title: "ಯೋಗ: ಶಾಶ್ವತ ಪರಂಪರೆ", category: "ಪರಂಪರೆ", subtitle: "ಪುರಾತನ ವೆಲ್‌ನೆಸ್", keywords: ["#ಯೋಗ", "#ವೆಲ್‌ನೆಸ್", "#ಆಧ್ಯಾತ್ಮ"] },
-        l1: { title: "ಕீழಾಡಿಯಲ್ಲಿ ಹೊಸ ತೋಡಿಕೆಗಳು", category: "ಇತಿಹಾಸ", subtitle: "ಭೂತಕಾಲ ಅನಾವರಣ", publisher: "ASI ಸುದ್ದಿಗಳು", timeAgo: "2 ಗಂಟೆ ಹಿಂದೆ" },
-        l2: { title: "ಕುಂಭಮೇಳಾ ತಯಾರಿಗಳು ಆರಂಭ", category: "ಸಂಸ್ಕೃತಿ", subtitle: "ಅತಿದೊಡ್ಡ ಮಾನವ ಸಮಾಗಮ", publisher: "Heritage Daily", timeAgo: "4 ಗಂಟೆ ಹಿಂದೆ" },
-        l3: { title: "ಕುಂಭಮೇಳಾ ತಯಾರಿಗಳು ಆರಂಭ", category: "ಸಂಸ್ಕೃತಿ", subtitle: "ಅತಿದೊಡ್ಡ ಮಾನವ ಸಮಾಗಮ", publisher: "Heritage Daily", timeAgo: "4 ಗಂಟೆ ಹಿಂದೆ" },
-        l4: { title: "ಕುಂಭಮೇಳಾ ತಯಾರಿಗಳು ಆರಂಭ", category: "ಸಂಸ್ಕೃತಿ", subtitle: "ಅತಿದೊಡ್ಡ ಮಾನವ ಸಮಾಗಮ", publisher: "Heritage Daily", timeAgo: "4 ಗಂಟೆ ಹಿಂದೆ" },
-        l5: { title: "ಕುಂಭಮೇಳಾ ತಯಾರಿಗಳು ಆರಂಭ", category: "ಸಂಸ್ಕೃತಿ", subtitle: "ಅತಿದೊಡ್ಡ ಮಾನವ ಸಮಾಗಮ", publisher: "Heritage Daily", timeAgo: "4 ಗಂಟೆ ಹಿಂದೆ" },
-        l6: { title: "ಕುಂಭಮೇಳಾ ತಯಾರಿಗಳು ಆರಂಭ", category: "ಸಂಸ್ಕೃತಿ", subtitle: "ಅತಿದೊಡ್ಡ ಮಾನವ ಸಮಾಗಮ", publisher: "Heritage Daily", timeAgo: "4 ಗಂಟೆ ಹಿಂದೆ" },
-        l7: { title: "ಕುಂಭಮೇಳಾ ತಯಾರಿಗಳು ಆರಂಭ", category: "ಸಂಸ್ಕೃತಿ", subtitle: "ಅತಿದೊಡ್ಡ ಮಾನವ ಸಮಾಗಮ", publisher: "Heritage Daily", timeAgo: "4 ಗಂಟೆ ಹಿಂದೆ" },
-        l8: { title: "ಕುಂಭಮೇಳಾ ತಯಾರಿಗಳು ಆರಂಭ", category: "ಸಂಸ್ಕೃತಿ", subtitle: "ಅತಿದೊಡ್ಡ ಮಾನವ ಸಮಾಗಮ", publisher: "Heritage Daily", timeAgo: "4 ಗಂಟೆ ಹಿಂದೆ" },
-        l9: { title: "ಕುಂಭಮೇಳಾ ತಯಾರಿಗಳು ಆರಂಭ", category: "ಸಂಸ್ಕೃತಿ", subtitle: "ಅತಿದೊಡ್ಡ ಮಾನವ ಸಮಾಗಮ", publisher: "Heritage Daily", timeAgo: "4 ಗಂಟೆ ಹಿಂದೆ" },
-        l10: { title: "ಕುಂಭಮೇಳಾ ತಯಾರಿಗಳು ಆರಂಭ", category: "ಸಂಸ್ಕೃತಿ", subtitle: "ಅತಿದೊಡ್ಡ ಮಾನವ ಸಮಾಗಮ", publisher: "Heritage Daily", timeAgo: "4 ಗಂಟೆ ಹಿಂದೆ" },
-        e1: { title: "ಭಾರತೀಯ ಧರ್ಮ", category: "ಪರಂಪರೆ", categoryBadge: "ಪರಂಪರೆಯ ಸ್ಥಳಗಳು", tags: ["ಸಂಸ್ಕೃತಿ", "ದರ್ಶನ"], location: "ಭಾರತ", duration: "ಲಭ್ಯವಿಲ್ಲ" },
-        e2: { title: "ತಾಜ್ ಮಹಲ್", category: "ಇತಿಹಾಸ", categoryBadge: "ಪರಂಪರೆಯ ಸ್ಥಳಗಳು", tags: ["ಸ್ಮಾರಕ", "ಅದ್ಭುತ"], location: "ಆಗ್ರಾ, ಯುಪಿ", duration: "2-3 ಗಂಟೆ" },
-        ev1: { title: "ತೆಲಂಗಾಣ ಸಾಂಸ್ಕೃತಿಕ ಕಾರ್ಯಕ್ರಮಗಳು", category: "ಕಾರ್ಯಕ್ರಮಗಳು", categoryBadge: "ಕಾರ್ಯಕ್ರಮ", tags: ["ನೃತ್ಯ", "ಸಂಗೀತ"], location: "ಹೈದರಾಬಾದ್", duration: "ಸಂಜೆ" },
-        m1: { title: "ರಾಷ್ಟ್ರೀಯ ಮ್ಯೂಸಿಯಂ", category: "ಸಂಸ್ಕೃತಿ", categoryBadge: "ಮ್ಯೂಸಿಯಂ", tags: ["ಇತಿಹಾಸ", "ಕಲೆ"], location: "ನ್ಯೂ ದೆಹಲಿ", duration: "3-4 ಗಂಟೆ" },
-        s1: { title: "ಭಾರತೀಯ ಪರಂಪರೆ ಮತ್ತು ಸಾಂಸ್ಕೃತಿಕ ನೃತ್ಯ", category: "ಭಾರತ", subtitle: "ಆತ್ಮದ ಲಯ", publisher: "PIF News" },
-        s2: { title: "ದಕ್ಷಿಣ ಭಾರತದ ಪುರಾತನ ದೇವಾಲಯಗಳು", category: "ತಮಿಳುನಾಡು", subtitle: "ದ್ರಾವಿಡ ಶಿಲ್ಪ", publisher: "Heritage Daily" },
-    },
-};
-
-export const FALLBACK_SAVED_DATA = [
-    { id: "s1", title: "Indian Heritage and Cultural Dance", category: "India", imageKeyword: "indian dance", publisher: "PIF News", timeAgo: "14m ago", subtitle: "Rhythm of the Soul", keywords: ["#Dance", "#Culture", "#Rhythm"] },
-    { id: "s2", title: "Ancient Temples of South India", category: "Tamil Nadu", imageKeyword: "temple", publisher: "Heritage Daily", timeAgo: "1h ago", subtitle: "Dravidian Masterpieces", keywords: ["#Temples", "#SouthIndia", "#Dravidian"] }
 ];
 
-// --- ADAPTER LOGIC ---
-
-const getItemTranslation = (item, language) => {
-    const map = ITEM_TRANSLATIONS[language];
-    if (!map) return {};
-    return map[item.id] || {};
-};
-
-const applyTranslation = (item, language) => {
-    const translated = getItemTranslation(item, language);
-    return {
-        ...item,
-        ...translated,
-        tags: translated.tags || item.tags,
-        keywords: translated.keywords || item.keywords,
-    };
-};
-
-// Helper to map raw items to UI-ready articles
-const mapItemToArticle = (item, language = "en") => {
-    const localized = applyTranslation(item, language);
-    return {
-        ...localized,
-        image: localized.image || getImageUrl(localized.imageKeyword || 'culture', localized.id),
-        timestamp: localized.timeAgo || (language === "en" ? 'Just now' : localized.timeAgo) || 'Just now',
-        publisher: localized.publisher || 'Heritage Pulse',
-        subtitle: localized.subtitle || localized.categoryBadge || 'Discover India',
-        content: generateContent(localized.title, localized.category || 'Culture', language), // Dynamic Rich Content
-        category: localized.category || 'General', // Ensure category exists
-        keywords: localized.keywords || generateKeywords(localized.category || 'Culture'), // Ensure keywords exist
+/**
+ * Neat and Simple Articles Format
+ * Fields: title, category, trending(bool), latest(bool), sourceLink, image, headline, content, views, likes
+ */5
+export const ARTICLES = [
+    {
+        id: "nt1",
+        title: "Heritage Fest celebrates Indian culture",
+        category: "Events",
+        isTrending: true,
+        isLatest: false,
+        sourceLink: "https://telanganatoday.com/heritage-fest-celebrates-indian-culture-at-hare-krishna-golden-temple",
+        image: "https://image.telanganatoday.com/wp-content/uploads/2025/12/02-5_V_jpg--816x480-4g.webp?sw=1536&dsz=816x480&iw=615&p=false&r=1.25",
+        headline: "Annual Heritage Fest Celebrates Indian Arts",
+        content: `The Hare Krishna Movement in Hyderabad recently organized its grand Annual Heritage & Cultural celebrations, known as the Heritage Fest, at the iconic Golden Temple in Banjara Hills. This flagship initiative, led by the cultural wing SUMEDHASA, saw enthusiastic participation from students and educators across the region. The festival serves as a vital platform for young minds to explore India’s timeless spiritual and ethical traditions through various creative arts.`,
+        views: "2.1k",
+        likes: "450"
+    },
+    {
+        id: "nt2",
+        title: "Traditions and Celebrations",
+        category: "Events",
         isTrending: false,
-        likes: generateRandomStats(localized.id, 'likes'),
-        comments: generateRandomStats(localized.id, 'comments'),
-    };
-};
-
-// Helper for consistent random stats
-const generateRandomStats = (id, type) => {
-    const seed = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    if (type === 'likes') {
-        const val = (seed * 123) % 5000;
-        return val > 1000 ? (val / 1000).toFixed(1) + 'k' : val.toString();
-    }
-    const val = (seed * 45) % 300;
-    return val.toString();
-};
-
-// Aggregate all logical articles for ID lookups
-const RAW_ITEMS = [
-    ...FALLBACK_HOME_DATA.trending,
-    ...FALLBACK_HOME_DATA.latest,
-    ...FALLBACK_EXPLORE_DATA.topNews,
-    ...FALLBACK_EXPLORE_DATA.culturalEvents,
-    ...FALLBACK_EXPLORE_DATA.museums,
-    ...FALLBACK_SAVED_DATA
+        isLatest: true,
+        sourceLink: "https://www.justdial.com/list/journey-through-traditions-and-celebrations-exploring-the-cultural-events-in-india?wkwebview=1",
+        image: "https://content.jdmagicbox.com/quickquotes/listicle/listicle_1686140315148_74ycs_1040x500.jpg?impolicy=queryparam&im=Resize=(1200,900),aspect=fit&q=75&width=1200",
+        headline: "Discovering India's Vibrant Cultural Events",
+        content: "India is globally renowned for its incredibly rich cultural heritage and diversity, which is beautifully reflected in its wide array of festive events. These celebrations serve as captivating showcases of the nation's ancient traditions, classical art forms, and spiritual practices. From the exuberant nationwide festivities of Diwali and Holi to intricate classical dance performances, these events blend age-old customs with contemporary expressions to create a unique cultural mosaic.",
+        views: "1.8k",
+        likes: "320"
+    },
+    {
+        id: "nt3",
+        title: "Padma Shri Awards 2026",
+        category: "News",
+        isTrending: true,
+        isLatest: true,
+        sourceLink: "https://www.linkedin.com/feed/update/urn:li:activity:7293796342898311168/",
+        image: require('../../assets/images/news/padma shri awards 2026.png'),
+        headline: "Padma Shri Awards 2026 Honor Local Heroes",
+        content: "The Government of India has officially announced the Padma Shri Awards for 2026, recognizing individuals for their exceptional contributions to the nation's culture. Notable awardees include Buddha Rashmi Mani, celebrated for his pioneering archaeological research, and Narayan Vyas, honored for his tireless work in heritage conservation. Both figures have played critical roles in documenting and preserving India's ancient history, ensuring that the legacy of our ancestors remains alive for future generations.",
+        views: "3.5k",
+        likes: "890",
+        region: "National"
+    },
+    {
+        id: "l2",
+        title: "India Nominates Meghalaya's Living Root Bridges for UNESCO",
+        category: "Heritage",
+        isTrending: true,
+        isLatest: false,
+        sourceLink: "https://lnkd.in/dEwvwmHJ",
+        image: require("../../assets/images/heritage/India Nominates Meghalaya's Living Root Bridges for UNESCO.png"),
+        headline: "Root Bridges Nominated for UNESCO Status",
+        content: "India has formally submitted the nomination dossier for Meghalaya’s iconic living root bridges to UNESCO for the upcoming 2026–27 World Heritage List cycle. These remarkable structures, located in the Khasi and Jaintia Hills, represent a unique harmony between nature and indigenous engineering. By seeking this global recognition, the government aims to highlight the importance of preserving traditional knowledge systems and the sustainable cultural landscapes of the North Eastern tribal communities.",
+        views: "4.2k",
+        likes: "1.5k",
+        region: "National"
+    },
+    {
+        id: "h1",
+        title: "𝗛𝗲𝗿𝗶𝘁𝗮𝗴𝗲 𝗮𝗻𝗱 𝗣𝗼𝘄𝗲𝗿",
+        category: "Heritage",
+        isTrending: false,
+        isLatest: true,
+        sourceLink: "https://lnkd.in/ghjB-DA7",
+        image: "https://media.licdn.com/dms/image/v2/D5622AQHBUO3rdac1eg/feedshare-shrink_800/B56Zpe7txQG4Ak-/0/1762529304885?e=1772668800&v=beta&t=dbZSF_tFba5IlOvY2_qFkxZ5FdzV6TZ0QqdRRTLwOmQ",
+        headline: "Deccan Heritage Session Highlights Power",
+        content: "During a recent session on Deccan heritage, Ms. Sakeena provided a captivating look at the intertwined narratives of gender and authority in regional history. By examining historical records and architectural sites, the presentation illustrated how women’s influence was deeply woven into the socio-political fabric of the Deccan sultanates. This refreshing perspective encourages us to view heritage not merely as a record of kings, but as a complex reflection of diverse voices and legacies.",
+        views: "2.8k",
+        likes: "610",
+        region: "National"
+    },
+    {
+        id: "d1",
+        title: "Graceful Rhythms of Indian Classical Dance",
+        category: "Dance",
+        isTrending: true,
+        isLatest: true,
+        publisher: "Livemint",
+        sourceLink: "https://www.livemint.com/web-stories/things-to-keep-in-mind-while-travelling-to-south-india-11670035944016.html",
+        image: require('../../assets/images/dance/Graceful Rhythms of Indian Classical Dance.jpg'),
+        headline: "Graceful Rhythms of Classic Indian Dance",
+        content: "This article explores the mesmerizing essence of Indian classical dance, focusing on the vibrant costumes and intricate movements of performers. Adorned in ornate jewelry and silk attire, dancers bring ancient stories to life through expressive mudras and rhythmic footwork. Specifically highlighting the elegance of Odissi, the narrative explains how these performances are deeply tied to temple traditions and architectural motifs, representing a spiritual journey expressed through physical grace.",
+        views: "1.2k",
+        likes: "450",
+        region: "National"
+    },
+    {
+        id: "d2",
+        title: "Kathakali Splendor: A Glimpse of Indian Heritage",
+        category: "Dance",
+        isTrending: true,
+        isLatest: false,
+        publisher: "travelandleisureasia",
+        sourceLink: "https://www.travelandleisureasia.com/in/destinations/india/where-to-experience-kochi-culture/",
+        image: require('../../assets/images/dance/Kathakali Splendor A Glimpse of Indian Heritage.jpg'),
+        headline: "Explore the Majestic Splendor of Kathakali",
+        content: "Kathakali is a world-famous dance-drama from Kerala, known for its dramatic makeup and elaborate costumes that transform performers into mythological figures. This traditional art form combines music, vocal performance, and highly stylized hand gestures to narrate epic tales from the Puranas. The visual grandeur of the towering headgear and vibrant colors serves as a tribute to South India's ceremonial artistry, making every performance a profound experience that connects the audience with the divine.",
+        views: "1.5k",
+        likes: "520",
+        region: "National"
+    },
+    {
+        id: "c1",
+        title: "Kerala’s Cultural Canvas: Dance, Nature, and Tradition",
+        category: "Culture",
+        isTrending: false,
+        isLatest: true,
+        publisher: "wikipedia",
+        sourceLink: "https://en.wikipedia.org/wiki/Culture_of_Kerala",
+        image: require('../../assets/images/culture/Kerala’s Cultural Canvas Dance, Nature, and Tradition.gif'),
+        headline: "Kerala’s Canvas: Nature and Folk Heritage",
+        content: "Kerala’s culture is a beautiful tapestry woven from classical arts, lush landscapes, and maritime history. From the stylized movements of Mohiniyattam to the peaceful sight of houseboats on the backwaters, the region embodies a deep connection to rhythm and ritual. This visual and narrative tribute celebrates the state's agrarian roots and its maritime legacy, showcasing how traditional lifestyles and ceremonial arts coexist within the natural beauty of palm-fringed channels and verdant fields.",
+        views: "3.2k",
+        likes: "890",
+        region: "National"
+    },
+    {
+        id: "c2",
+        title: "Indian Culture",
+        category: "Culture",
+        isTrending: true,
+        isLatest: true,
+        publisher: "indianetzone",
+        sourceLink: "https://indianetzone.wordpress.com/2020/04/02/indian-culture/",
+        image: "https://indianetzone.wordpress.com/wp-content/uploads/2020/04/indian-art-culture.-940x800-1.jpg",
+        headline: "Philosophy and Spirit of Indian Culture",
+        content: "Indian culture seeks a profound harmony by reconciling the spiritual realm with the material world, preserving scientific truths while keeping the spirit as its keystone. This unique heritage is celebrated globally for its incredible diversity, manifested in philosophical beliefs, intricate architecture, and fine arts. Whether expressed through ancient temple carvings or modern spiritual practices, the traditions of India continue to evolve, offering a fascinating glimpse into a civilization that values both inner peace and outward excellence.",
+        views: "2.4k",
+        likes: "560",
+        region: "National"
+    },
+    {
+        id: "hi1",
+        title: "History of India",
+        category: "History",
+        isTrending: false,
+        isLatest: true,
+        publisher: "wikipedia",
+        sourceLink: "https://en.wikipedia.org/wiki/History_of_India",
+        image: require('../../assets/images/history/cradle_of_civilization.jpg'),
+        headline: "History of India: From Ancient Arrivals",
+        content: "The history of India spans tens of thousands of years, beginning with the arrival of anatomically modern humans on the subcontinent. From the early settlements in the Neolithic period to the rise of the sophisticated Indus Valley Civilisation, the region has been a cradle of global culture. This article delves into the technological and social advancements of the Harappan people, whose urban planning and maritime trade networks set the foundation for the complex social structures that would define South Asia for millennia.",
+        views: "5.1k",
+        likes: "1.2k",
+        region: "National"
+    },
+    {
+        id: "hi2",
+        title: "India’s Journey of Heritage Preservation",
+        category: "History",
+        isTrending: true,
+        isLatest: false,
+        publisher: "pib.gov",
+        sourceLink: "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2122423&reg=3&lang=2#:~:text=India%20has%2043%20sites%20on%20the%20World,to%20help%20develop%20facilities%20at%20protected%20monuments.",
+        image: "https://static.pib.gov.in/WriteReadData/userfiles/image/image003UUR3.png",
+        headline: "Preserving India's Rich Heritage Journey",
+        content: "Heritage preservation in India is an ongoing journey that goes far beyond stones and ruins. It lives in the whispers of temple walls and the folk songs passed down through generations. World Heritage Day serves as a vital reminder to protect these treasures from disasters and conflicts. By focusing on preparedness and learning from decades of international action, we can ensure that the stories of who we were and what we stood for continue to inspire future generations and safeguard our collective cultural identity.",
+        views: "1.8k",
+        likes: "420",
+        region: "National"
+    },
+    {
+        id: "f1",
+        title: "Flavors of Odisha Cuisine",
+        category: "Food",
+        isTrending: false,
+        isLatest: true,
+        publisher: "indianculture",
+        sourceLink: "https://www.indianculture.gov.in/cuisine/odisha#",
+        image: require('../../assets/images/food/odisha-food.png'),
+        headline: "Soulful Flavors of Odisha's Food Scenes",
+        content: "Odisha’s cuisine is a soulful reflection of temple traditions, emphasizing simple ingredients and comforting textures. Centered around rice and seasonal vegetables, dishes like Dalma and Pakhala Bhata offer a unique balance of nutrition and flavor. The state is also famous for its fresh cheese sweets, such as the charred Chhena Poda and the syrupy Rasgulla. Every bite tells a story of the region’s agrarian history and its spiritual devotion, making Odia food a must-experience for anyone exploring the diverse tastes of India.",
+        views: "2.7k",
+        likes: "610",
+        region: "National"
+    },
+    {
+        id: "a1",
+        title: "Madhubani Art: A Timeless Tradition",
+        category: "Art",
+        isTrending: true,
+        isLatest: true,
+        publisher: "Pleach India",
+        sourceLink: "https://en.wikipedia.org/wiki/Madhubani_art",
+        image: "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?q=80&w=400&auto=format&fit=crop",
+        headline: "Madhubani Art: Vibrant Mithila Traditions",
+        content: "Madhubani painting, also known as Mithila art, is a traditional style practiced in the Mithila region of India and Nepal. Characterized by its eye-catching geometrical patterns and vibrant colors, this art form traditionally used natural dyes and pigments. The themes often revolve around nature, mythology, and social events. Today, Madhubani art has transitioned to canvas and paper, representing a timeless legacy of indigenous storytelling and creative folk expression.",
+        views: "3.9k",
+        likes: "1.1k",
+        region: "Pleach India"
+    },
+    {
+        id: "a2",
+        title: "Yogini and Myna in Deccani Miniature Art",
+        category: "Art",
+        isTrending: true,
+        isLatest: false,
+        publisher: "Pleach India",
+        sourceLink: "https://pleachindia.org/deccani-miniature-art/a-yogini-with-parrot/",
+        image: require('../../assets/images/art/Yogini and Myna in Deccani Miniature Art.png'),
+        headline: "Yogini and Myna: Deccani Miniature Splendor",
+        content: "The screen displays a cultural artwork titled A Yogini with Myna from the Bijapur School of Deccani miniature painting. The yogini, dressed in traditional attire, holds a myna bird while standing in a serene garden setting. The painting, dated to the 16th–17th century, is rendered in watercolor on paper and preserved by the Telangana State Museum. It perfectly encapsulates the elegance and spiritual grace of the Deccan’s artistic legacy.",
+        views: "2.1k",
+        likes: "480",
+        region: "Pleach India"
+    },
 ];
 
-let savedArticleIds = FALLBACK_SAVED_DATA.map(i => i.id);
+let savedArticleIds = ["nt1", "nt2", "l2"];
 
-// Mutable state for data
-let currentTrending = [...FALLBACK_HOME_DATA.trending];
-let currentLatest = [...FALLBACK_HOME_DATA.latest];
-
-// Simple shuffle function
-const shuffleArray = (array) => {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
+const truncate = (text, limit) => {
+    if (!text || text.length <= limit) return text;
+    return text.substring(0, limit).trim() + "...";
 };
+
+const mapArticle = (a) => ({
+    ...a,
+    headline: truncate(a.headline || a.title, 60),
+    content: truncate(a.content, 550),
+    image: (typeof a.image === 'string' && a.image) ? { uri: a.image } : a.image, // Handle remote/local images
+    publisher: a.publisher || (a.id === "l2" ? "Deccan Chronicle" : a.id === "l3" ? "New Indian Express" : "Heritage Pulse"),
+    timestamp: a.timestamp || "Just now",
+    badge: a.badge || a.category || "Heritage",
+    tags: a.tags || ["Heritage", "Culture"], // Default tags
+    rating: a.rating || "4.8",
+    reviews: a.reviews || "120",
+    location: a.location || "India",
+    time: a.time || "5 min read",
+});
 
 export const MockDataService = {
-    getTrendingArticles: (language = "en") => {
-        return currentTrending.map((item) => mapItemToArticle(item, language));
+    getTrendingArticles: (lang) => ARTICLES.filter(a => a.isTrending).map(mapArticle),
+    getLatestNews: (lang) => ARTICLES.filter(a => a.isLatest).map(mapArticle),
+    getAllArticles: (lang) => ARTICLES.map(mapArticle),
+    getExploreSection: (key, lang) => {
+        let items = [];
+        if (key === 'topNews') items = ARTICLES.filter(a => a.isLatest);
+        else if (key === 'culturalEvents') items = ARTICLES.filter(a => a.isTrending);
+        else if (key === 'museums') items = ARTICLES.filter(a => ['museums', 'art'].includes(a.category.toLowerCase()));
+        else items = ARTICLES.filter(a => a.category.toLowerCase() === key.toLowerCase());
+        return items.map(mapArticle);
     },
-
-    getLatestNews: (language = "en") => {
-        return currentLatest.map((item) => mapItemToArticle(item, language));
-    },
-
-    getAllArticles: (language = "en") => {
-        return RAW_ITEMS.map((item) => mapItemToArticle(item, language));
-    },
-
-    getExploreSection: (key, language = "en") => {
-        // Helper to get specific explore sections
-        if (FALLBACK_EXPLORE_DATA[key]) {
-            return FALLBACK_EXPLORE_DATA[key].map((item) => mapItemToArticle(item, language));
-        }
-        return [];
-    },
-
-    getArticleById: (id, language = "en") => {
-        const all = RAW_ITEMS.map((item) => mapItemToArticle(item, language));
-        return all.find(a => a.id === id) || all[0];
-    },
-
+    getArticleById: (id) => mapArticle(ARTICLES.find(a => a.id === id) || ARTICLES[0]),
     toggleBookmark: (id) => {
         if (savedArticleIds.includes(id)) {
-            savedArticleIds = savedArticleIds.filter(savedId => savedId !== id);
-            return false; // NOT saved
-        } else {
-            savedArticleIds.push(id);
-            return true; // SAVED
+            savedArticleIds = savedArticleIds.filter(sid => sid !== id);
+            return false;
         }
-    },
-
-    isBookmarked: (id) => {
-        return savedArticleIds.includes(id);
-    },
-
-    getSavedArticles: (language = "en") => {
-        // Return objects for saved IDs. 
-        // We try to find them in ALL_ITEMS, or fallback to the hardcoded SAVED_DATA items if missing.
-        const all = RAW_ITEMS.map((item) => mapItemToArticle(item, language));
-        return savedArticleIds.map(id => {
-            const found = all.find(a => a.id === id);
-            if (found) return found;
-            // If purely from fallback saved data
-            const rawSaved = FALLBACK_SAVED_DATA.find(s => s.id === id);
-            return rawSaved ? mapItemToArticle(rawSaved, language) : null;
-        }).filter(Boolean);
-    },
-
-    getUserProfile: (language = "en") => {
-        const translated = PROFILE_TRANSLATIONS[language];
-        return translated ? { ...PROFILE_USER, ...translated } : PROFILE_USER;
-    },
-
-    updateUserProfile: (updates) => {
-        // Update the PROFILE_USER object with new values
-        if (updates.avatar) PROFILE_USER.avatar = updates.avatar;
-        if (updates.name) PROFILE_USER.name = updates.name;
-        if (updates.email) PROFILE_USER.email = updates.email;
-        if (updates.phone) PROFILE_USER.phone = updates.phone;
-        return PROFILE_USER;
-    },
-
-    refreshData: () => {
-        // Shuffle the arrays to simulate new content
-        currentTrending = shuffleArray([...FALLBACK_HOME_DATA.trending]);
-        currentLatest = shuffleArray([...FALLBACK_HOME_DATA.latest]);
+        savedArticleIds.push(id);
         return true;
     },
+    isBookmarked: (id) => savedArticleIds.includes(id),
+    getSavedArticles: () => savedArticleIds.map(id => ARTICLES.find(a => a.id === id)).filter(Boolean).map(mapArticle),
+    getUserProfile: () => PROFILE_USER,
+    updateUserProfile: (updatedData) => {
+        Object.assign(PROFILE_USER, updatedData);
+        return true;
+    },
+    getExploreCategories: () => EXPLORE_CATEGORIES,
+    refreshData: () => true, // Mock refresh
 };

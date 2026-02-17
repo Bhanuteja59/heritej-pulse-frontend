@@ -29,16 +29,20 @@ const TrendingCard = ({ item, onPress, onShowToast, colors, isDarkMode }) => {
                     elevation: pressed ? 12 : 0,
                     shadowOpacity: pressed ? 0.4 : 0,
                     transform: [{ scale: pressed ? 0.97 : 1 }],
-                    // Add background color for card container if needed, though image covers it
                     backgroundColor: colors.cardBg,
-                    borderColor: isDarkMode ? colors.primary : 'transparent',
-                    borderWidth: isDarkMode ? 1 : 0
+                    // Interactive White Mode (Dark Mode) or Standard (Light Mode)
+                    borderColor: isDarkMode ? '#FFFFFF' : 'transparent',
+                    borderWidth: isDarkMode ? (pressed ? 2 : 1) : 0,
+                    shadowColor: isDarkMode && pressed ? '#FFFFFF' : '#000',
+                    shadowOpacity: isDarkMode && pressed ? 0.6 : (pressed ? 0.4 : 0),
+                    shadowRadius: isDarkMode && pressed ? 10 : 4,
+                    elevation: pressed ? 12 : 0,
                 }
             ]}
         >
             {({ pressed }) => (
                 <ImageBackground
-                    source={{ uri: item.image }}
+                    source={item.image}
                     style={styles.cardImage}
                     imageStyle={[styles.imageStyle, { borderRadius: pressed ? 20 : 10 }]}
                 >
@@ -82,7 +86,7 @@ const TrendingSection = ({ onShowToast }) => {
     const { t, language } = useLanguage();
     const { colors, isDarkMode } = useTheme();
 
-    const data = useMemo(() => MockDataService.getExploreSection("culturalEvents", language), [language]);
+    const data = useMemo(() => MockDataService.getTrendingArticles(language), [language]);
 
     const handlePress = (item) => {
         navigate(SCREENS.DETAIL, { articleId: item.id });

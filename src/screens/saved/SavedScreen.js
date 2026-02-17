@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, SafeAreaView, Dimensions, Platform, Share } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Animated, Image, Pressable, Platform, FlatList, TouchableOpacity, Dimensions, Share } from 'react-native';
 import { MockDataService } from '../../data/mockData';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, SCREENS } from '../../services/NavigationContext';
@@ -18,7 +18,7 @@ const SavedItem = ({ item, onPress, onRemove, onShare, styles, colors }) => {
             onPress={() => onPress(item)}
             activeOpacity={0.9}
         >
-            <Image source={{ uri: item.image }} style={styles.cardImage} />
+            <Image source={item.image} style={styles.cardImage} />
             <View style={styles.cardContent}>
                 <View style={styles.textContainer}>
                     <Text style={[styles.category, { color: colors.primary }]}>{item.category}</Text>
@@ -75,7 +75,7 @@ const SavedScreen = () => {
     const handleShareItem = useCallback(async (item) => {
         try {
             await Share.share({
-                message: `${item.title}\n\n${item.subtitle || ''}\n\nCheck out this article on Heritage Pulse!`,
+                message: `${item.title} \n\n${item.subtitle || ''} \n\nCheck out this article on Heritage Pulse!`,
                 url: item.image || '',
                 title: item.title,
             });
@@ -89,7 +89,7 @@ const SavedScreen = () => {
     }, [navigate]);
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <View style={styles.safeArea}>
             <View style={styles.container}>
                 <View style={styles.header}>
                     <Text style={styles.headerTitle}>Saved Articles</Text>
@@ -136,7 +136,7 @@ const SavedScreen = () => {
                     onHide={() => setToastVisible(false)}
                 />
             </View>
-        </SafeAreaView>
+        </View>
     );
 };
 
@@ -150,7 +150,7 @@ const getStyles = (colors, isDarkMode) => StyleSheet.create({
         backgroundColor: colors.background,
     },
     header: {
-        paddingTop: Platform.OS === 'android' ? 40 : 20,
+        paddingTop: 10,
         paddingBottom: 20,
         paddingHorizontal: 16,
         zIndex: 10,

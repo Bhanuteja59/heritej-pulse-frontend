@@ -1,16 +1,6 @@
 import React, { useState } from "react";
-import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    Alert,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    useWindowDimensions
-} from "react-native";
+import { View, Text, StyleSheet, Image, Pressable, TextInput, KeyboardAvoidingView, Platform, Alert, ActivityIndicator, Keyboard, TouchableWithoutFeedback, Dimensions, useWindowDimensions, ScrollView, TouchableOpacity } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from "expo-linear-gradient";
 import { COLORS } from "../../utils/theme";
 import { useNavigation, SCREENS } from "../../services/NavigationContext";

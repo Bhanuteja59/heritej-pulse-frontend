@@ -38,6 +38,7 @@ export const STRINGS = {
     cat_events: "Events",
     cat_culture: "Culture",
     cat_food: "Food",
+    cat_art: "Art",
 
     home_trending: "Trending",
     home_latest: "Latest",
@@ -121,6 +122,7 @@ export const STRINGS = {
     cat_events: "ఈవెంట్స్",
     cat_culture: "సంస్కృతి",
     cat_food: "ఆహారం",
+    cat_art: "కళ",
 
     home_trending: "ట్రెండింగ్",
     home_latest: "తాజా",
@@ -204,6 +206,7 @@ export const STRINGS = {
     cat_events: "நிகழ்வுகள்",
     cat_culture: "பண்பாடு",
     cat_food: "உணவு",
+    cat_art: "கலை",
 
     home_trending: "பிரபலமானது",
     home_latest: "புதியவை",
@@ -287,6 +290,7 @@ export const STRINGS = {
     cat_events: "ಕಾರ್ಯಕ್ರಮಗಳು",
     cat_culture: "ಸಂಸ್ಕೃತಿ",
     cat_food: "ಆಹಾರ",
+    cat_art: "ಕಲೆ",
 
     home_trending: "ಟ್ರೆಂಡಿಂಗ್",
     home_latest: "ಇತ್ತೀಚಿನದು",

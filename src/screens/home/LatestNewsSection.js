@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, SCREENS } from '../../services/NavigationContext';
 import { useLanguage } from '../../services/LanguageContext';
 import { useTheme } from '../../services/ThemeContext';
+import { PALETTE } from '../../utils/theme';
 import { MockDataService } from '../../data/mockData';
 import { truncateText } from '../../utils/textUtils';
 
@@ -25,17 +26,28 @@ const NewsCard = ({ item, onPress, onShowToast, toastSavedText, colors, isDarkMo
                 styles.cardContainer,
                 {
                     backgroundColor: colors.cardBg,
-                    shadowColor: colors.text,
-                    // Border active state
-                    borderLeftColor: pressed ? colors.primary : 'transparent',
-                    borderLeftWidth: 4,
-                    // Background active state
+                    shadowColor: isDarkMode && pressed ? '#FFFFFF' : colors.text,
+                    shadowOpacity: isDarkMode && pressed ? 0.5 : 0.1,
+                    shadowRadius: isDarkMode && pressed ? 8 : 4,
+                    elevation: isDarkMode && pressed ? 8 : 2,
+
+                    // Interactive Border
+                    borderWidth: isDarkMode ? (pressed ? 1.5 : 1) : 0,
+                    borderColor: isDarkMode ? '#FFFFFF' : 'transparent',
+                    // On Press in Dark Mode: Show thick White accent
+                    // Resting in Dark Mode: Show uniform White border
+                    borderLeftWidth: isDarkMode ? (pressed ? 4 : 1) : 4,
+                    borderLeftColor: isDarkMode
+                        ? '#FFFFFF'
+                        : (pressed ? colors.primary : 'transparent'),
+
+                    // Active State
                     opacity: pressed ? 0.9 : 1,
                     transform: [{ scale: pressed ? 0.98 : 1 }],
                 }
             ]}
         >
-            <Image source={{ uri: item.image }} style={styles.thumbnail} />
+            <Image source={item.image} style={styles.thumbnail} />
             <View style={styles.contentContainer}>
                 <View style={styles.headerRow}>
                     <Text style={[styles.category, { color: colors.secondaryText }]}>{item.category}</Text>
@@ -70,7 +82,7 @@ const LatestNewsSection = ({ onShowToast }) => {
     const { colors, isDarkMode } = useTheme();
     const { navigate } = useNavigation();
 
-    const data = useMemo(() => MockDataService.getExploreSection("topNews", language), [language]);
+    const data = useMemo(() => MockDataService.getLatestNews(language), [language]);
 
     const handlePress = (item) => {
         navigate(SCREENS.DETAIL, { articleId: item.id, item });

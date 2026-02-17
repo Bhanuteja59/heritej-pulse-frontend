@@ -1,17 +1,6 @@
 import React, { useState } from "react";
-import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    Alert,
-    SafeAreaView,
-    Dimensions,
-    Image
-} from "react-native";
+import { View, Text, StyleSheet, Image, Pressable, TextInput, KeyboardAvoidingView, Platform, Alert, ActivityIndicator, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from "expo-linear-gradient";
 import { COLORS } from "../../utils/theme";
 import { useNavigation, SCREENS } from "../../services/NavigationContext";
@@ -96,7 +85,7 @@ const Signup = () => {
     };
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <View style={styles.safeArea}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={{ flex: 1 }}
@@ -207,7 +196,7 @@ const Signup = () => {
 
                 </ScrollView>
             </KeyboardAvoidingView>
-        </SafeAreaView>
+        </View>
     );
 };
 

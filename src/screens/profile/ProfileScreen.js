@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { View, Text, StyleSheet, Switch, ScrollView, Image, TouchableOpacity, Animated, Pressable, SafeAreaView, Dimensions, Platform } from "react-native";
+import { View, Text, StyleSheet, Image, Pressable, ScrollView, Alert, Platform, Switch, TouchableOpacity, Animated, Dimensions } from 'react-native';
 import { useTheme } from "../../services/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, SCREENS } from "../../services/NavigationContext";
@@ -154,7 +154,7 @@ const ProfileScreen = () => {
   }
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+    <View style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <View style={[styles.headerActions, { zIndex: 10 }]}>
         <AnimatedButton
           style={[styles.refreshButton, { backgroundColor: colors.cardBg }]}
@@ -238,7 +238,7 @@ const ProfileScreen = () => {
       </ScrollView>
 
       <Toast visible={toastVisible} message={toastMessage} onHide={() => setToastVisible(false)} />
-    </SafeAreaView>
+    </View>
   );
 };
 

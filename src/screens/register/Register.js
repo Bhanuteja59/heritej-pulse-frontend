@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Platform, SafeAreaView, Dimensions, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, Image, Pressable, TextInput, KeyboardAvoidingView, Platform, Alert, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS } from '../../utils/theme';
@@ -22,71 +23,66 @@ const Register = () => {
                 end={{ x: 1, y: 1 }}
             />
 
-            <SafeAreaView style={styles.safeArea}>
-                <View style={styles.content}>
+            <View style={styles.content}>
 
-                    {/* Logo Section */}
-                    <View style={styles.logoContainer}>
-                        <Image
-                            source={require("../../../assets/images/heritej-pulse-logo.png")}
-                            style={styles.logo}
-                            resizeMode="contain"
-                        />
-                    </View>
-
-                    {/* Text Section */}
-                    <View style={styles.textContainer}>
-                        <Text style={styles.title}>Heritej Pulse</Text>
-                        <Text style={styles.tagline}>
-                            Capturing the heartbeat of{'\n'}Indian Heritage & Traditions
-                        </Text>
-                    </View>
-
-                    {/* Buttons Section */}
-                    <View style={styles.buttonContainer}>
-                        {/* Login Button - Gradient */}
-                        <TouchableOpacity
-                            onPress={() => navigate(SCREENS.LOGIN)}
-                            activeOpacity={0.8}
-                            style={styles.buttonShadow}
-                        >
-                            <LinearGradient
-                                colors={[COLORS.primary, COLORS.secondary]}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 0 }}
-                                style={styles.primaryButton}
-                            >
-                                <Ionicons name="log-in-outline" size={24} color={COLORS.white} style={styles.icon} />
-                                <Text style={styles.buttonTextPrimary}>Login</Text>
-                            </LinearGradient>
-                        </TouchableOpacity>
-
-                        {/* Sign Up Button - Clean Outline */}
-                        <TouchableOpacity
-                            onPress={() => navigate(SCREENS.SIGNUP)}
-                            activeOpacity={0.7}
-                            style={styles.secondaryButtonWrapper}
-                        >
-                            <View style={styles.secondaryButton}>
-                                <Ionicons name="person-add-outline" size={24} color={COLORS.primary} style={styles.iconSecondary} />
-                                <Text style={styles.buttonTextSecondary}>Create Account</Text>
-                            </View>
-                        </TouchableOpacity>
-
-                        <Text style={styles.versionText}>v1.0.0</Text>
-                    </View>
-
+                {/* Logo Section */}
+                <View style={styles.logoContainer}>
+                    <Image
+                        source={require("../../../assets/images/heritej-pulse-logo.png")}
+                        style={styles.logo}
+                        resizeMode="contain"
+                    />
                 </View>
-            </SafeAreaView>
+
+                {/* Text Section */}
+                <View style={styles.textContainer}>
+                    <Text style={styles.title}>Heritej Pulse</Text>
+                    <Text style={styles.tagline}>
+                        Capturing the heartbeat of{'\n'}Indian Heritage & Traditions
+                    </Text>
+                </View>
+
+                {/* Buttons Section */}
+                <View style={styles.buttonContainer}>
+                    {/* Login Button - Gradient */}
+                    <TouchableOpacity
+                        onPress={() => navigate(SCREENS.LOGIN)}
+                        activeOpacity={0.8}
+                        style={styles.buttonShadow}
+                    >
+                        <LinearGradient
+                            colors={[COLORS.primary, COLORS.secondary]}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={styles.primaryButton}
+                        >
+                            <Ionicons name="log-in-outline" size={24} color={COLORS.white} style={styles.icon} />
+                            <Text style={styles.buttonTextPrimary}>Login</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+
+                    {/* Sign Up Button - Clean Outline */}
+                    <TouchableOpacity
+                        onPress={() => navigate(SCREENS.SIGNUP)}
+                        activeOpacity={0.7}
+                        style={styles.secondaryButtonWrapper}
+                    >
+                        <View style={styles.secondaryButton}>
+                            <Ionicons name="person-add-outline" size={24} color={COLORS.primary} style={styles.iconSecondary} />
+                            <Text style={styles.buttonTextSecondary}>Create Account</Text>
+                        </View>
+                    </TouchableOpacity>
+
+                    <Text style={styles.versionText}>v1.0.0</Text>
+                </View>
+
+            </View>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
-    safeArea: {
         flex: 1,
     },
     content: {

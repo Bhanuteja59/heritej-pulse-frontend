@@ -5,32 +5,25 @@
  * to ensure consistency across the application.
  */
 
-import { SCREENS } from "../services/NavigationContext";
-
 export const PALETTE = {
     background: '#F9F7F2', // Warm Parchment
     primary: '#EB6A00',    // Heritage Orange
     secondary: '#FF8D28',  // Lighter Orange for gradients
     text: '#1A1A1A',       // Dark Charcoal
-    secondaryText: '#000000ff',
-    cardAnimation: '#FFFFFF',
     border: '#E0E0E0',
     success: '#4CAF50',
     error: '#F44336',
     white: '#FFFFFF',
     black: '#000000',
-    gold: '#FFD700',
     splashGradientStart: '#FFD166',
     splashGradientEnd: '#FFF9FB',
-    loading: '#ffffffff',
-    screen: "#FAF7F2",
 
-    // Dark specifics
-    darkBackground: '#121212',
-    darkSurface: '#1E1E1E',
-    darkText: '#E0E0E0',
-    darkSecondaryText: '#A0A0A0',
-    darkBorder: '#333333',
+    // Dark specifics (Pure Emerald & White)
+    darkBackground: '#003409ff',
+    darkSurface: '#266330',    // Raised Emerald for cards
+    darkText: '#FFFFFF',       // Pure White
+    darkSecondaryText: '#B2C2B5', // Silver-Mint
+    darkBorder: '#3D8246',     // Emerald Boundary
 };
 
 export const LIGHT_THEME = {
@@ -38,7 +31,7 @@ export const LIGHT_THEME = {
     primary: PALETTE.primary,
     secondary: PALETTE.secondary,
     text: PALETTE.text,
-    secondaryText: PALETTE.secondaryText,
+    secondaryText: PALETTE.black,
     cardBg: PALETTE.white,
     border: PALETTE.border,
     icon: PALETTE.text,
@@ -52,22 +45,22 @@ export const LIGHT_THEME = {
 
 export const DARK_THEME = {
     background: PALETTE.darkBackground,
-    primary: PALETTE.primary, // Orange pops on dark too
-    secondary: PALETTE.secondary,
+    primary: PALETTE.white,   // Interactive elements now White
+    secondary: '#327A3D',     // Subtler green accent
     text: PALETTE.darkText,
     secondaryText: PALETTE.darkSecondaryText,
     cardBg: PALETTE.darkSurface,
     border: PALETTE.darkBorder,
-    icon: PALETTE.darkText,
+    icon: PALETTE.white,      // Icons now White
     error: PALETTE.error,
-    white: PALETTE.darkText, // In dark mode, "white" elements might need to be off-white or mapped to text
-    black: '#000000',
-    splashGradientStart: PALETTE.splashGradientStart, // Keep Splash same
+    white: PALETTE.white,
+    black: PALETTE.black,
+    splashGradientStart: PALETTE.splashGradientStart,
     splashGradientEnd: PALETTE.splashGradientEnd,
-    success: PALETTE.success,   // Keep Splash same
+    success: PALETTE.success,
 };
 
-// Default export for backward compatibility if needed, but we should move to Context
+// Default export for backward compatibility
 export const COLORS = LIGHT_THEME;
 
 export const SPACING = {
