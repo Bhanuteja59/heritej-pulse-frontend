@@ -1,11 +1,12 @@
 import React, { useMemo, useState, useCallback } from "react";
-import { View, Text, StyleSheet, SafeAreaView, FlatList, Image, TouchableOpacity, Platform, Dimensions } from "react-native";
+import { View, Text, FlatList, StyleSheet, Pressable, Platform, Animated, Dimensions, TouchableOpacity } from "react-native";
+import { Image } from 'expo-image';
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../services/ThemeContext";
 import { useNavigation, SCREENS } from "../../services/NavigationContext";
 import { useLanguage } from "../../services/LanguageContext";
 import Toast from "../../components/Toast";
-
+import { NOTIFICATIONS } from "../../data/mockData";
 import { truncateText } from "../../utils/textUtils";
 
 const { width } = Dimensions.get('window');
@@ -17,7 +18,12 @@ const NotificationItem = ({ item, onPress, onDismiss, onSave, isSaved, styles, c
             onPress={() => onPress(item)}
             activeOpacity={0.9}
         >
-            <Image source={{ uri: item.image }} style={styles.cardImage} />
+            <Image
+                source={item.image}
+                style={styles.cardImage}
+                contentFit="cover"
+                transition={300}
+            />
             <View style={styles.cardContent}>
                 <View style={styles.textContainer}>
                     <View style={styles.topRow}>
@@ -74,27 +80,7 @@ const Notifications = () => {
 
     const styles = useMemo(() => getStyles(colors, isDarkMode), [colors, isDarkMode]);
 
-    const notifications = useMemo(
-        () => [
-            {
-                id: "n1",
-                title: t("notifications_item1_title"),
-                location: t("notifications_location_india"),
-                source: t("notifications_source_pif"),
-                timeAgo: t("notifications_time_14m"),
-                image: "https://images.unsplash.com/photo-1512412046876-f386342eddb3?q=80&w=600&auto=format&fit=crop",
-            },
-            {
-                id: "n2",
-                title: t("notifications_item2_title"),
-                location: t("notifications_location_india"),
-                source: t("notifications_source_pif"),
-                timeAgo: t("notifications_time_14m"),
-                image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=600&auto=format&fit=crop",
-            },
-        ],
-        [t]
-    );
+    const notifications = NOTIFICATIONS;
 
     const visibleNotifications = notifications.filter((n) => !dismissedIds.has(n.id));
 
@@ -123,7 +109,7 @@ const Notifications = () => {
     }, [navigate]);
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <View style={styles.safeArea}>
             <View style={styles.container}>
                 <View style={styles.header}>
                     <View style={styles.headerTitleRow}>
@@ -172,7 +158,7 @@ const Notifications = () => {
                     onHide={() => setToastVisible(false)}
                 />
             </View>
-        </SafeAreaView>
+        </View>
     );
 };
 

@@ -1,6 +1,5 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView, Dimensions } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, Dimensions } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, SCREENS } from "../../services/NavigationContext";
 import { useTheme } from "../../services/ThemeContext";
 import { useLanguage } from "../../services/LanguageContext";
@@ -20,7 +19,7 @@ const LanguageScreen = () => {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <TouchableOpacity
@@ -75,7 +74,7 @@ const LanguageScreen = () => {
           })}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

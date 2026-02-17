@@ -1,6 +1,5 @@
-import React from "react";
-import { SafeAreaView, View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Switch, Platform, Dimensions } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, SCREENS } from "../../services/NavigationContext";
 import { useLanguage } from "../../services/LanguageContext";
 import { useTheme } from "../../services/ThemeContext";
@@ -20,7 +19,7 @@ const PrivacyScreen = () => {
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <TouchableOpacity
           onPress={() => goBack ? goBack() : navigate(SCREENS.PROFILE)}
@@ -64,7 +63,7 @@ const PrivacyScreen = () => {
           <Text style={[styles.footerText, { color: colors.primary }]}>For questions, contact us at privacy@heritagepulse.com</Text>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

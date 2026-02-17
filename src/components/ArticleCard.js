@@ -91,7 +91,7 @@ const ArticleCard = ({ article, isActive }) => {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             {/* 1. Hero Image */}
             <View style={styles.imageContainer}>
-                <Image source={{ uri: article.image }} style={styles.image} resizeMode="cover" />
+                <Image source={article.image} style={styles.image} resizeMode="cover" />
                 <Animated.View style={[styles.imageOverlay, { opacity: visibilityAnim }]} />
 
                 {/* 2. Source Badge */}

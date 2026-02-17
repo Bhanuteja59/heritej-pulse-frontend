@@ -1,16 +1,6 @@
 import React, { useState } from "react";
-import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    Alert,
-    Platform,
-    KeyboardAvoidingView,
-    ScrollView,
-    SafeAreaView,
-    Dimensions
-} from "react-native";
+import { View, Text, StyleSheet, Image, Pressable, TextInput, KeyboardAvoidingView, Platform, Alert, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { COLORS } from "../../utils/theme";
@@ -74,7 +64,7 @@ const ForgotPassword = () => {
     };
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <View style={styles.safeArea}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={{ flex: 1 }}
@@ -148,7 +138,7 @@ const ForgotPassword = () => {
                 onClose={() => setAlertVisible(false)}
             />
 
-        </SafeAreaView>
+        </View>
     );
 };
 

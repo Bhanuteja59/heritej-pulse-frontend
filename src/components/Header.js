@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Platform, SafeAreaView, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, StatusBar, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, SCREENS } from '../services/NavigationContext';
 import { useLanguage } from '../services/LanguageContext';
@@ -63,67 +63,60 @@ const Header = () => {
     }, [subIndex, index, phrases]);
 
     return (
-        <SafeAreaView style={{ backgroundColor: colors.background }}>
-            <View style={[styles.container, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
-                <View style={styles.headerContainer}>
-                    <View>
-                        <Text style={[styles.title, { color: colors.primary }]}>{t("header_title")}</Text>
-                        <Text style={[styles.subtitle, { color: colors.secondaryText }]}>{t("header_subtitle")}</Text>
-                    </View>
-                    <TouchableOpacity
-                        activeOpacity={0.7}
-                        style={[styles.notificationButton, { backgroundColor: colors.cardBg, shadowColor: colors.text }]}
-                        onPress={() => navigate(SCREENS.NOTIFICATIONS)}
-                    >
-                        <Ionicons name="notifications-outline" size={26} color={colors.text} />
-                        <View style={[styles.notificationDot, { borderColor: colors.cardBg }]} />
-                    </TouchableOpacity>
+        <View style={[styles.container, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
+            <View style={styles.headerContainer}>
+                <View>
+                    <Text style={[styles.title, { color: colors.primary }]}>{t("header_title")}</Text>
+                    <Text style={[styles.subtitle, { color: colors.secondaryText }]}>{t("header_subtitle")}</Text>
                 </View>
-
-                {/* Search Bar with Typing Animation */}
                 <TouchableOpacity
-                    activeOpacity={1}
-                    style={[styles.searchContainer, { backgroundColor: colors.cardBg, borderColor: colors.primary }]}
-                    onPress={() => { }} // Could focus input here
+                    activeOpacity={0.7}
+                    style={[styles.notificationButton, { backgroundColor: colors.cardBg, shadowColor: colors.text }]}
+                    onPress={() => navigate(SCREENS.NOTIFICATIONS)}
                 >
-                    <View style={styles.inputWrapper}>
-                        <TextInput
-                            style={[styles.input, { color: colors.text }]}
-                            value={searchText}
-                            onChangeText={setSearchText}
-                            onFocus={() => setIsFocused(true)}
-                            onBlur={() => setIsFocused(false)}
-                            selectionColor={colors.primary}
-                            placeholderTextColor={colors.secondaryText}
-                        />
-                        {searchText.length === 0 && !isFocused && (
-                            <View style={styles.placeholderContainer} pointerEvents="none">
-                                <Text style={styles.placeholderText}>
-                                    {placeholder}
-                                    <Text style={{ color: showCursor ? colors.primary : 'transparent' }}>|</Text>
-                                </Text>
-                            </View>
-                        )}
-                    </View>
-                    <TouchableOpacity style={[styles.filterButton, { backgroundColor: colors.cardBg }]}>
-                        <Ionicons name="search-outline" size={20} color={colors.primary} />
-                    </TouchableOpacity>
+                    <Ionicons name="notifications-outline" size={26} color={colors.text} />
+                    <View style={[styles.notificationDot, { borderColor: colors.cardBg }]} />
                 </TouchableOpacity>
             </View>
-        </SafeAreaView>
+
+            {/* Search Bar with Typing Animation */}
+            <TouchableOpacity
+                activeOpacity={1}
+                style={[styles.searchContainer, { backgroundColor: colors.cardBg, borderColor: colors.primary }]}
+                onPress={() => { }} // Could focus input here
+            >
+                <View style={styles.inputWrapper}>
+                    <TextInput
+                        style={[styles.input, { color: colors.text }]}
+                        value={searchText}
+                        onChangeText={setSearchText}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
+                        selectionColor={colors.primary}
+                        placeholderTextColor={colors.secondaryText}
+                    />
+                    {searchText.length === 0 && !isFocused && (
+                        <View style={styles.placeholderContainer} pointerEvents="none">
+                            <Text style={styles.placeholderText}>
+                                {placeholder}
+                                <Text style={{ color: showCursor ? colors.primary : 'transparent' }}>|</Text>
+                            </Text>
+                        </View>
+                    )}
+                </View>
+                <TouchableOpacity style={[styles.filterButton, { backgroundColor: colors.cardBg }]}>
+                    <Ionicons name="search-outline" size={20} color={colors.primary} />
+                </TouchableOpacity>
+            </TouchableOpacity>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 16,
-        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 10 : 10,
         paddingBottom: 16,
         borderBottomWidth: 1,
-        elevation: 2,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 5,
     },
     headerContainer: {
         flexDirection: 'row',
@@ -147,10 +140,6 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 4,
-        elevation: 3,
     },
     notificationDot: {
         position: 'absolute',

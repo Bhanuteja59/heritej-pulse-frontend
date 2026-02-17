@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, Image, Pressable, FlatList, Dimensions, Platform, Share } from "react-native";
+import { View, Text, StyleSheet, Image, Pressable, FlatList, Dimensions, Platform, Share, Linking } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Animated, {
   useSharedValue,
@@ -13,9 +13,12 @@ import Animated, {
 import CommentsSheet from "../../components/CommentsSheet";
 import { useNavigation } from "../../services/NavigationContext";
 import { MockDataService } from "../../data/mockData";
+import { useTheme } from "../../services/ThemeContext";
 import { COLORS } from "../../utils/theme";
 import { useLanguage } from "../../services/LanguageContext";
 import { wp, hp, rf } from "../../utils/responsive";
+import { truncateText } from "../../utils/textUtils";
+import Toast from "../../components/Toast";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -25,7 +28,14 @@ export default function ArticleDetailScreen() {
   const data = useMemo(() => MockDataService.getAllArticles(language), [language]);
   const [activeArticleIndex, setActiveArticleIndex] = useState(0);
   const [showComments, setShowComments] = useState(false);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
   const flatListRef = useRef(null);
+
+  const showToast = (message) => {
+    setToastMessage(message);
+    setToastVisible(true);
+  };
 
   useEffect(() => {
     // Default to hiding the main tab bar (since we start in Engaged mode)
@@ -56,6 +66,7 @@ export default function ArticleDetailScreen() {
       activeIndex={activeArticleIndex}
       setIsTabBarVisible={setIsTabBarVisible}
       t={t}
+      showToast={showToast}
     />
   );
 
@@ -65,8 +76,10 @@ export default function ArticleDetailScreen() {
     setActiveArticleIndex(index);
   };
 
+  const { colors, isDarkMode } = useTheme();
+
   return (
-    <Animated.View style={styles.container}>
+    <Animated.View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header with back button */}
       <View style={styles.header}>
         <Pressable onPress={() => {
@@ -97,18 +110,46 @@ export default function ArticleDetailScreen() {
         })}
       />
 
+      <Toast
+        visible={toastVisible}
+        message={toastMessage}
+        onHide={() => setToastVisible(false)}
+      />
     </Animated.View>
   );
 }
 
 // Individual article page component
-function ArticlePage({ article, index, activeIndex, setIsTabBarVisible, t }) {
+function ArticlePage({ article, index, activeIndex, setIsTabBarVisible, t, showToast }) {
+  const { colors, isDarkMode } = useTheme();
   const content = Array.isArray(article?.content) ? article.content : [];
   // Default to ENGAGED state (Likes tab visible)
   const [isEngaged, setIsEngaged] = useState(true);
   const [liked, setLiked] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [showComments, setShowComments] = useState(false);
+  const [saved, setSaved] = useState(MockDataService.isBookmarked(article?.id));
+  const [likes, setLikes] = useState(article?.likes || "0");
+
+  // Sync saved state when article changes or service updates
+  useEffect(() => {
+    setSaved(MockDataService.isBookmarked(article?.id));
+  }, [article?.id]);
+
+  // Helper to format likes (e.g., 2401 -> 2.4k)
+  const formatLikes = (num) => {
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1) + "k";
+    }
+    return num.toString();
+  };
+
+  // Helper to parse likes (e.g., 2.4k -> 2400)
+  const parseLikes = (val) => {
+    if (typeof val !== 'string') return val || 0;
+    if (val.endsWith('k')) {
+      return parseFloat(val) * 1000;
+    }
+    return parseInt(val) || 0;
+  };
 
   // Animated value for engagement bar - START at 1 (Visible)
   const engagementAnim = useSharedValue(1);
@@ -119,6 +160,10 @@ function ArticlePage({ article, index, activeIndex, setIsTabBarVisible, t }) {
   const handleLike = () => {
     const newLiked = !liked;
     setLiked(newLiked);
+
+    // Update like count state
+    const currentCount = parseLikes(likes);
+    setLikes(formatLikes(newLiked ? currentCount + 1 : currentCount - 1));
 
     if (newLiked) {
       // Pop (scale up and down) the small heart button
@@ -135,18 +180,24 @@ function ArticlePage({ article, index, activeIndex, setIsTabBarVisible, t }) {
 
   // Extract text content and limit it
   const getTextContent = () => {
-    if (content.length > 0) {
-      return content.map((block) =>
+    if (typeof article?.content === 'string') {
+      return truncateText(article.content, 500);
+    }
+
+    if (Array.isArray(article?.content) && article.content.length > 0) {
+      const fullText = article.content.map((block) =>
         block?.content?.map((seg) => seg?.text).join("") || ""
       ).join(" ");
+      return truncateText(fullText, 500);
     }
-    return article?.subtitle || t("detail_fallback");
+
+    return truncateText(article?.headline || article?.subtitle || t("detail_fallback"), 500);
   };
 
   const textContent = getTextContent();
 
   // Handle content tap - toggle engagement mode
-  const handleContentTap = () => {
+  const handleToggleMode = () => {
     const newEngagedState = !isEngaged;
     setIsEngaged(newEngagedState);
 
@@ -191,67 +242,104 @@ function ArticlePage({ article, index, activeIndex, setIsTabBarVisible, t }) {
     transform: [{ translateY: interpolate(engagementAnim.value, [0, 1], [20, 0]) }]
   }));
 
-  const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
   return (
-    <View style={styles.articlePage}>
+    <View style={[styles.articlePage, { backgroundColor: colors.background }]}>
       {/* Hero Image - Fixed top half */}
-      <View style={styles.heroContainer}>
+      <Pressable onPress={handleToggleMode} style={styles.heroContainer}>
         <Image
-          source={{ uri: article?.image }}
+          source={article?.image}
           style={styles.heroImage}
           resizeMode="cover"
         />
 
-        {/* Removed Floating Heart (User Request) */}
-
         {/* Image Overlay - Category & Views */}
         <Animated.View style={[styles.imageOverlay, overlayStyle]}>
-          <View style={styles.categoryTag}>
-            <Text style={styles.categoryTagText}>{article?.category || "Heritage"}</Text>
+          <View style={[styles.categoryTag, { backgroundColor: colors.primary }]}>
+            <Text style={[styles.categoryTagText, { color: isDarkMode ? '#000000' : '#FFFFFF' }]}>{article?.category || "Heritage"}</Text>
           </View>
           <View style={styles.viewsTag}>
             <Ionicons name="eye" size={14} color="#FFF" style={{ marginRight: 4 }} />
             <Text style={styles.viewsText}>{article?.views || "22.k"}</Text>
           </View>
         </Animated.View>
-      </View>
+      </Pressable>
 
-      {/* Content Card - Fixed bottom half - Tappable */}
-      <AnimatedPressable onPress={handleContentTap} style={[styles.contentCard, contentAnimatedStyle]}>
-        {/* Title - Fixed 2 lines */}
-        <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">
-          {article?.title}
-        </Text>
+      {/* Content Card - Fixed bottom half */}
+      <Animated.View style={[
+        styles.contentCard,
+        contentAnimatedStyle,
+        { backgroundColor: colors.background } // Dynamic background
+      ]}>
+        {/* Clickable Header Area to Toggle Mode */}
+        <Pressable onPress={handleToggleMode}>
+          {/* Title/Headline - Fixed 30 chars limit */}
+          <Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
+            {truncateText(article?.headline || article?.title, 50)}
+          </Text>
 
-        {/* Meta Info */}
-        <View style={styles.metaRow}>
-          <View style={styles.publisherInfo}>
-            <View style={styles.publisherDot} />
-            <Text style={styles.publisherName}>{article?.publisher}</Text>
+          {/* Meta Info */}
+          <View style={styles.metaRow}>
+            <Pressable
+              style={styles.publisherInfo}
+              onPress={async () => {
+                if (article?.sourceLink) {
+                  try {
+                    const canOpen = await Linking.canOpenURL(article.sourceLink);
+                    if (canOpen) {
+                      await Linking.openURL(article.sourceLink);
+                    }
+                  } catch (e) {
+                    console.error("Error opening URL:", e);
+                  }
+                }
+              }}
+            >
+              <View style={[styles.publisherDot, { backgroundColor: colors.primary }]} />
+              <Text style={[styles.publisherName, { color: colors.text }]}>{article?.publisher}</Text>
+            </Pressable>
+            <Text style={[styles.timestamp, { color: colors.secondaryText }]}>{article?.timestamp}</Text>
           </View>
-          <Text style={styles.timestamp}>{article?.timestamp}</Text>
-        </View>
 
-        {/* Divider */}
-        <View style={styles.divider} />
+          {/* Divider */}
+          <View style={[styles.divider, { backgroundColor: colors.primary }]} />
+        </Pressable>
 
-        {/* Article Content - Fixed lines with ellipsis */}
-        <Text style={styles.bodyText} numberOfLines={6} ellipsizeMode="tail">
-          {textContent}
-        </Text>
+        {/* Scrollable Content */}
+        <Animated.ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: hp(15) }}
+        >
+          <Pressable onPress={handleToggleMode}>
+            <Text style={[styles.bodyText, { color: colors.text }]}>
+              {textContent}
+            </Text>
+
+            {/* Added Spacer to prevent clashing with floating engagement bar */}
+            <View style={{ height: hp(10) }} />
+          </Pressable>
+        </Animated.ScrollView>
 
         {/* Tap hint when not engaged */}
         {!isEngaged && (
           <View style={styles.tapHint}>
-            <Ionicons name="hand-left-outline" size={16} color={COLORS.secondaryText} />
-            <Text style={styles.tapHintText}>Tap to interact</Text>
+            <Ionicons name="chevron-down-outline" size={14} color={colors.secondaryText} />
+            <Text style={[styles.tapHintText, { color: colors.secondaryText }]}>scroll more to get the news</Text>
           </View>
         )}
-      </AnimatedPressable>
+      </Animated.View>
 
       {/* Fixed Bottom Engagement Bar */}
-      <Animated.View style={[styles.engagementBar, engagementStyle]} pointerEvents={isEngaged ? "auto" : "none"}>
+      <Animated.View style={[
+        styles.engagementBar,
+        engagementStyle,
+        {
+          backgroundColor: colors.cardBg,
+          shadowColor: isDarkMode ? "#FFFFFF" : "#000", // White glow in dark mode
+          shadowOpacity: isDarkMode ? 0.2 : 0.15,
+          borderWidth: isDarkMode ? 1 : 0,
+          borderColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'transparent'
+        }
+      ]} pointerEvents={isEngaged ? "auto" : "none"}>
         <Pressable
           style={styles.engageBtn}
           onPress={handleLike}
@@ -260,11 +348,15 @@ function ArticlePage({ article, index, activeIndex, setIsTabBarVisible, t }) {
             <Ionicons
               name={liked ? "heart" : "heart-outline"}
               size={28}
-              color={liked ? "#EB6A00" : COLORS.text}
+              color={liked ? COLORS.primary : (isDarkMode ? '#FFFFFF' : colors.text)} // Use white heart in dark mode
             />
           </Animated.View>
-          <Text style={[styles.engageLabel, liked && styles.engageLabelActive]}>
-            {article?.likes || "2.4k"}
+          <Text style={[
+            styles.engageLabel,
+            { color: colors.secondaryText },
+            liked && { color: COLORS.primary } // Keep orange branding for active state
+          ]}>
+            {likes}
           </Text>
         </Pressable>
 
@@ -280,19 +372,27 @@ function ArticlePage({ article, index, activeIndex, setIsTabBarVisible, t }) {
           }
         }}>
           <Ionicons name="logo-whatsapp" size={26} color={COLORS.success} />
-          <Text style={styles.engageLabel}>Share</Text>
+          <Text style={[styles.engageLabel, { color: colors.secondaryText }]}>Share</Text>
         </Pressable>
 
         <Pressable
           style={styles.engageBtn}
-          onPress={() => setSaved(!saved)}
+          onPress={() => {
+            const isNowSaved = MockDataService.toggleBookmark(article.id);
+            setSaved(isNowSaved);
+            showToast(isNowSaved ? t("toast_saved") : "Article removed from saved");
+          }}
         >
           <Ionicons
             name={saved ? "bookmark" : "bookmark-outline"}
             size={26}
-            color={saved ? COLORS.primary : COLORS.text}
+            color={saved ? COLORS.primary : (isDarkMode ? '#FFFFFF' : colors.text)}
           />
-          <Text style={[styles.engageLabel, saved && styles.engageLabelActive]}>
+          <Text style={[
+            styles.engageLabel,
+            { color: colors.secondaryText },
+            saved && { color: COLORS.primary }
+          ]}>
             {saved ? "Saved" : "Save"}
           </Text>
         </Pressable>
@@ -309,7 +409,7 @@ const styles = StyleSheet.create({
   },
   header: {
     position: "absolute",
-    top: hp(2),
+    top: 10,
     left: 0,
     right: 0,
     flexDirection: "row",
@@ -404,7 +504,7 @@ const styles = StyleSheet.create({
     marginTop: -24,
     paddingHorizontal: wp(5),
     paddingTop: hp(2),
-    paddingBottom: hp(10),
+    paddingBottom: hp(12),
   },
   title: {
     fontSize: rf(22),
@@ -453,38 +553,40 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   tapHint: {
+    position: 'absolute',
+    bottom: hp(2),
+    alignSelf: 'center',
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: wp(2),
     paddingVertical: hp(1),
     opacity: 0.5,
-    bottom: hp(2),
   },
   tapHintText: {
-    fontSize: rf(12),
-    color: COLORS.secondaryText,
+    fontSize: rf(11),
+    color: "#BBB",
+    fontWeight: '500',
   },
-  // Fixed Bottom Engagement Bar
+  // Floating Pill Engagement Bar
   engagementBar: {
     position: "absolute",
-    bottom: 20,
-    left: 0,
-    right: 0,
+    bottom: hp(2.5),
+    left: wp(5),
+    right: wp(5),
     backgroundColor: COLORS.cardBg,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderRadius: 30,
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    paddingTop: hp(1.5),
-    paddingBottom: Platform.OS === 'ios' ? hp(3.5) : hp(2), // Responsive bottom padding for safe area
+    paddingVertical: hp(1.5),
     paddingHorizontal: wp(4),
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 10,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+    zIndex: 100,
   },
   engageBtn: {
     alignItems: "center",
