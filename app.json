@@ -13,17 +13,27 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.dayaraju.heritage",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/heritej-pulse-logo.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.dayaraju.heritage"
     },
     "web": {
       "favicon": "./assets/images/heritej-pulse-logo.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "fc6f4765-2c3c-4be5-93d6-6f0a027c60d9"
+      }
     }
   }
 }
