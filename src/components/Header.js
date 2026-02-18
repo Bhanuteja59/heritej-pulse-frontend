@@ -8,7 +8,7 @@ import { useTheme } from '../services/ThemeContext';
 const Header = () => {
     const { navigate } = useNavigation();
     const { t } = useLanguage();
-    const { colors } = useTheme();
+    const { colors, isDarkMode, toggleTheme } = useTheme();
     const [placeholder, setPlaceholder] = useState('');
     const [index, setIndex] = useState(0);
     const [subIndex, setSubIndex] = useState(0);
@@ -69,14 +69,23 @@ const Header = () => {
                     <Text style={[styles.title, { color: colors.primary }]}>{t("header_title")}</Text>
                     <Text style={[styles.subtitle, { color: colors.secondaryText }]}>{t("header_subtitle")}</Text>
                 </View>
-                <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={[styles.notificationButton, { backgroundColor: colors.cardBg, shadowColor: colors.text }]}
-                    onPress={() => navigate(SCREENS.NOTIFICATIONS)}
-                >
-                    <Ionicons name="notifications-outline" size={26} color={colors.text} />
-                    <View style={[styles.notificationDot, { borderColor: colors.cardBg }]} />
-                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        style={[styles.themeToggleButton, { backgroundColor: colors.cardBg, shadowColor: colors.text }]}
+                        onPress={toggleTheme}
+                    >
+                        <Ionicons name={isDarkMode ? "sunny-outline" : "moon-outline"} size={22} color={colors.text} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        style={[styles.notificationButton, { backgroundColor: colors.cardBg, shadowColor: colors.text }]}
+                        onPress={() => navigate(SCREENS.NOTIFICATIONS)}
+                    >
+                        <Ionicons name="notifications-outline" size={26} color={colors.text} />
+                        <View style={[styles.notificationDot, { borderColor: colors.cardBg }]} />
+                    </TouchableOpacity>
+                </View>
             </View>
 
             {/* Search Bar with Typing Animation */}
@@ -117,6 +126,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingBottom: 16,
         borderBottomWidth: 1,
+        marginTop: 16,
     },
     headerContainer: {
         flexDirection: 'row',
@@ -140,6 +150,14 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    themeToggleButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 10,
     },
     notificationDot: {
         position: 'absolute',

@@ -19,10 +19,10 @@ export const PALETTE = {
     splashGradientEnd: '#FFF9FB',
 
     // Dark specifics (Pure Emerald & White)
-    darkBackground: '#003409ff',
-    darkSurface: '#266330',    // Raised Emerald for cards
+    darkBackground: '#005656',
+    darkSurface: '#019191ff',    // Raised Emerald for cards
     darkText: '#FFFFFF',       // Pure White
-    darkSecondaryText: '#B2C2B5', // Silver-Mint
+    darkSecondaryText: '#e8e8e8ff', // Silver-Mint
     darkBorder: '#3D8246',     // Emerald Boundary
 };
 
