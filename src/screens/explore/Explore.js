@@ -18,6 +18,7 @@ import { MockDataService } from "../../data/mockData";
 import { truncateText } from "../../utils/textUtils";
 import Header from "../../components/Header";
 import ExploreSection from "./ExploreSection";
+import BackgroundPattern from "../../components/BackgroundPattern";
 
 const { width, height } = Dimensions.get('window');
 
@@ -77,9 +78,10 @@ const Explore = () => {
 
     return (
         <View style={[styles.safe, { backgroundColor: colors.background }]}>
+            <BackgroundPattern color={isDarkMode ? colors.primary : '#00cdabff'} opacity={isDarkMode ? 0.1 : 0.05} />
             <Header />
             <ScrollView
-                style={[styles.screen, { backgroundColor: colors.background }]}
+                style={styles.screen}
                 contentContainerStyle={styles.content}
                 showsVerticalScrollIndicator={false}
             >
@@ -254,13 +256,11 @@ export const ExploreSectionGrid = () => {
                     </View>
                 </View>
 
-                {/* Search with Animation */}
+                {/* Search with Animation - Styled like Header Search Bar */}
                 <View style={[gridStyles.searchWrap, {
-                    backgroundColor: colors.cardBg,
+                    backgroundColor: colors.searchFill,
                     borderColor: colors.primary,
-                    shadowColor: colors.text
                 }]}>
-                    <Ionicons name="search" size={18} color={colors.secondaryText} style={{ marginRight: 10 }} />
                     <View style={{ flex: 1, justifyContent: 'center' }}>
                         <TextInput
                             value={search}
@@ -268,23 +268,24 @@ export const ExploreSectionGrid = () => {
                             onFocus={() => setIsFocused(true)}
                             onBlur={() => setIsFocused(false)}
                             style={[gridStyles.searchInput, { color: colors.text }]}
+                            selectionColor={colors.primary}
                             returnKeyType="search"
                         />
                         {search.length === 0 && !isFocused && (
                             <View style={StyleSheet.absoluteFillObject} pointerEvents="none" justifyContent="center">
-                                <Text style={{ fontSize: 14, color: colors.secondaryText }}>
+                                <Text style={{ fontSize: 15, color: colors.secondaryText, fontWeight: '500' }}>
                                     {placeholder}
                                     <Text style={{ color: showCursor ? colors.primary : 'transparent' }}>|</Text>
                                 </Text>
                             </View>
                         )}
                     </View>
-                    <Ionicons name="sparkles" size={18} color={colors.primary} />
+                    <Ionicons name="search-outline" size={24} color={colors.primary} style={{ marginRight: 8 }} />
                 </View>
 
                 {/* Title */}
                 <View style={gridStyles.sectionHead}>
-                    <Text style={[gridStyles.sectionTitle, { color: colors.text }]}>{title}</Text>
+                    <Text style={[gridStyles.sectionTitle, { color: colors.primary }]}>{title}</Text>
                     <Text style={[gridStyles.sectionSub, { color: colors.secondaryText }]}>{subtitle}</Text>
                 </View>
 
@@ -356,14 +357,6 @@ function BigCard({ item, onPress, colors }) {
                     {truncateText(item.title, 50)}
                 </Text>
 
-                <View style={gridStyles.ratingRow}>
-                    <View style={gridStyles.ratingPill}>
-                        <Ionicons name="star" size={12} color="#fff" />
-                        <Text style={gridStyles.ratingText}>{item.rating}</Text>
-                    </View>
-                    <Text style={[gridStyles.reviewsText, { color: colors.secondaryText }]}>({item.reviews})</Text>
-                </View>
-
                 <View style={gridStyles.tagsRow}>
                     {(item.tags || []).slice(0, 2).map((t) => (
                         <View key={t} style={[gridStyles.tagPill, { backgroundColor: colors.background }]}>
@@ -416,13 +409,6 @@ function GridCard({ item, onPress, colors }) {
                     {truncateText(item.title, 50)}
                 </Text>
 
-                <View style={gridStyles.ratingRow}>
-                    <View style={gridStyles.ratingPill}>
-                        <Ionicons name="star" size={12} color="#fff" />
-                        <Text style={gridStyles.ratingText}>{item.rating}</Text>
-                    </View>
-                    <Text style={[gridStyles.reviewsText, { color: colors.secondaryText }]}>({item.reviews})</Text>
-                </View>
             </View>
         </Pressable>
     );
@@ -460,16 +446,12 @@ const gridStyles = StyleSheet.create({
     backBtn: { width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },
     searchWrap: {
         marginTop: 14,
-        height: 52,
-        borderRadius: 14,
-        paddingHorizontal: 14,
+        height: 46,
+        borderRadius: 16,
+        paddingHorizontal: 12,
         flexDirection: "row",
         alignItems: "center",
-        borderWidth: 2,
-        shadowOpacity: Platform.OS === "ios" ? 0.08 : 0,
-        shadowRadius: 12,
-        shadowOffset: { width: 0, height: 6 },
-        elevation: 3,
+        borderWidth: 1.5,
     },
     searchInput: { flex: 1, fontSize: 14, paddingVertical: 0 },
     sectionHead: { marginTop: 18 },

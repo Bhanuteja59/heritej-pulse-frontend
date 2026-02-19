@@ -2,7 +2,11 @@ import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated, Easing, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
+import { useTheme } from '../../services/ThemeContext';
+
 const Loading = () => {
+    const { colors, isDarkMode } = useTheme();
+
     // Animation values
     const spinValue = useRef(new Animated.Value(0)).current;
 
@@ -104,11 +108,12 @@ const Loading = () => {
         outputRange: ['0deg', '360deg'],
     });
 
-    const BRAND_COLOR = '#FFFFFF';
+    const contentColor = isDarkMode ? '#FFFFFF' : colors.primary;
+    const ringColor = isDarkMode ? '#FFFFFF' : colors.primary;
 
     return (
         <LinearGradient
-            colors={['#FF6B35', '#FF8C42', '#FFA052']}
+            colors={[colors.splashGradientStart, colors.splashGradientEnd]}
             style={styles.container}
         >
             {/* Background Floating Icons - Immediate Visibility */}
@@ -142,19 +147,20 @@ const Loading = () => {
                         styles.rotatingRing,
                         {
                             transform: [{ rotate: spin }],
+                            borderColor: 'transparent',
                         },
                     ]}
                 >
                     <LinearGradient
-                        colors={['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 0)']}
+                        colors={[ringColor, 'rgba(255, 255, 255, 0)']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
-                        style={styles.ringGradient}
+                        style={[styles.ringGradient, { borderColor: ringColor }]}
                     />
                 </Animated.View>
 
                 {/* Inner Static Glow Ring */}
-                <View style={styles.staticRing} />
+                <View style={[styles.staticRing, { borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.3)' : 'rgba(235, 106, 0, 0.3)' }]} />
 
                 {/* Pulsing H Container */}
                 <Animated.View
@@ -169,20 +175,23 @@ const Loading = () => {
                     <Animated.View
                         style={[
                             styles.hGlow,
-                            { opacity: opacityAnim }
+                            {
+                                opacity: opacityAnim,
+                                backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.25)' : 'rgba(235, 106, 0, 0.2)'
+                            }
                         ]}
                     />
 
                     {/* The H Letter */}
                     <View style={styles.hLetter}>
-                        <View style={styles.verticalBar} />
-                        <View style={styles.crossBar} />
-                        <View style={styles.verticalBar} />
+                        <View style={[styles.verticalBar, { backgroundColor: contentColor }]} />
+                        <View style={[styles.crossBar, { backgroundColor: contentColor }]} />
+                        <View style={[styles.verticalBar, { backgroundColor: contentColor }]} />
                     </View>
                 </Animated.View>
             </View>
 
-            <Text style={styles.loadingText}>Loading...</Text>
+            <Text style={[styles.loadingText, { color: contentColor }]}>Loading...</Text>
         </LinearGradient>
     );
 };
@@ -199,7 +208,7 @@ const styles = StyleSheet.create({
     },
     floatingIcon: {
         position: 'absolute',
-        color: '#FFFFFF',
+        color: '#FFFFFF', // Keep emoji icons natural/white
     },
     loaderContainer: {
         width: 100,
@@ -221,7 +230,7 @@ const styles = StyleSheet.create({
         height: '100%',
         borderRadius: 50,
         borderWidth: 3,
-        borderColor: '#FFFFFF', // Fallback for visibility
+        borderColor: '#FFFFFF', // Fallback
         opacity: 0.9,
     },
     staticRing: {
@@ -243,7 +252,7 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 30,
-        backgroundColor: 'rgba(255, 255, 255, 0.25)', // White glow behind H
+        backgroundColor: 'rgba(255, 255, 255, 0.25)',
     },
     hLetter: {
         flexDirection: 'row',
@@ -270,7 +279,7 @@ const styles = StyleSheet.create({
         height: 8,
         backgroundColor: '#FFFFFF',
         borderRadius: 4,
-        zIndex: -1, // Behind vertical bars for cleaner look
+        zIndex: -1,
     },
     loadingText: {
         color: '#FFFFFF',

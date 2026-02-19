@@ -7,7 +7,8 @@ import { MockDataService } from "../../data/mockData";
 import { useLanguage } from "../../services/LanguageContext";
 import Loading from "../../components/loading/Loading";
 import Toast from "../../components/Toast";
-import { COLORS } from "../../utils/theme";
+import { COLORS, LIGHT_THEME } from "../../utils/theme";
+import BackgroundPattern from "../../components/BackgroundPattern";
 
 const { width } = Dimensions.get('window');
 
@@ -55,8 +56,8 @@ const SettingItem = ({ icon, label, hasSwitch, value, onValueChange, onPress, is
     disabled={!onPress && !hasSwitch}
     activeOpacity={0.7}
   >
-    <View style={[styles.iconContainer, { backgroundColor: colors.background }]}>
-      <Ionicons name={icon} size={20} color={colors.text} />
+    <View style={[styles.iconContainer, { backgroundColor: colors.primary + '15' }]}>
+      <Ionicons name={icon} size={20} color={colors.primary} />
     </View>
 
     <View style={styles.settingContent}>
@@ -80,13 +81,13 @@ const SettingItem = ({ icon, label, hasSwitch, value, onValueChange, onPress, is
 
 const SettingGroup = ({ title, children, colors, isDarkMode }) => (
   <View style={styles.groupContainer}>
-    {title && <Text style={[styles.groupTitle, { color: colors.secondaryText }]}>{title}</Text>}
+    {title && <Text style={[styles.groupTitle, { color: colors.primary }]}>{title}</Text>}
     <View style={[
       styles.groupbox,
       {
         backgroundColor: colors.cardBg,
-        borderColor: isDarkMode ? colors.primary : colors.border,
-        borderWidth: 1
+        borderColor: isDarkMode ? colors.border : colors.border,
+        borderWidth: 0.8
       }
     ]}>
       {children}
@@ -154,16 +155,17 @@ const ProfileScreen = () => {
   }
 
   return (
-    <View style={[styles.safeArea, { backgroundColor: colors.background }]}>
+    <View style={styles.safeArea}>
+      <BackgroundPattern color={isDarkMode ? colors.primary : '#00cdabff'} opacity={isDarkMode ? 0.1 : 0.05} />
       <View style={[styles.headerActions, { zIndex: 10 }]}>
         <AnimatedButton
-          style={[styles.refreshButton, { backgroundColor: colors.cardBg }]}
+          style={[styles.refreshButton, { backgroundColor: colors.cardBg, shadowColor: colors.shadow }]}
           onPress={() => {
             setIsLoading(true);
             setTimeout(() => setIsLoading(false), 2000);
           }}
         >
-          <Ionicons name="refresh" size={20} color={COLORS.primary} />
+          <Ionicons name="refresh" size={20} color={colors.primary} />
         </AnimatedButton>
       </View>
 
@@ -173,7 +175,7 @@ const ProfileScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <View style={[styles.avatarContainer, { shadowColor: colors.text }]}>
+          <View style={[styles.avatarContainer, { shadowColor: colors.shadow }]}>
             <Image source={{ uri: profile.avatar }} style={[styles.avatar, { borderColor: colors.cardBg }]} />
             <View style={[styles.onlineBadge, { backgroundColor: colors.primary, borderColor: colors.background }]}>
               <Ionicons name="camera" size={12} color={colors.white} />
@@ -190,12 +192,13 @@ const ProfileScreen = () => {
             <Text style={[styles.editButtonText, { color: colors.text }]}>{t("profile_edit")}</Text>
           </AnimatedButton>
         </View>
-
+        {/* 
         <View style={[
           styles.statsRow,
           {
             backgroundColor: colors.cardBg,
-            borderColor: isDarkMode ? colors.primary : colors.border,
+            borderColor: isDarkMode ? colors.border : colors.border,
+            borderWidth: 0.8,
             shadowColor: colors.text
           }
         ]}>
@@ -204,7 +207,7 @@ const ProfileScreen = () => {
           <StatItem value="12" label="Read" icon="book" colors={colors} />
           <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
           <StatItem value="5" label="Comments" icon="chatbubble" colors={colors} />
-        </View>
+        </View> */}
 
         <View style={styles.settingsArea}>
           <SettingGroup title={t("profile_settings")} colors={colors} isDarkMode={isDarkMode}>
@@ -220,6 +223,13 @@ const ProfileScreen = () => {
           <SettingGroup title="Security" colors={colors} isDarkMode={isDarkMode}>
             <SettingItem icon="shield-checkmark-outline" label={t("profile_privacy")} onPress={() => navigate(SCREENS.PRIVACY)} colors={colors} />
             <SettingItem icon="lock-closed-outline" label={t("profile_change_password")} isLast colors={colors} onPress={() => navigate(SCREENS.CHANGE_PASSWORD)} />
+          </SettingGroup>
+
+          <SettingGroup title="Support & Legal" colors={colors} isDarkMode={isDarkMode}>
+            <SettingItem icon="information-circle-outline" label="About Us" onPress={() => navigate(SCREENS.ABOUT_US)} colors={colors} />
+            <SettingItem icon="call-outline" label="Contact Us" onPress={() => navigate(SCREENS.CONTACT_US)} colors={colors} />
+            <SettingItem icon="chatbox-ellipses-outline" label="Feedback" onPress={() => navigate(SCREENS.FEEDBACK)} colors={colors} />
+            <SettingItem icon="document-text-outline" label="Terms & Conditions" isLast onPress={() => navigate(SCREENS.TERMS)} colors={colors} />
           </SettingGroup>
 
           {/* Logout Button - Animated & Component Size */}
@@ -405,7 +415,6 @@ const styles = StyleSheet.create({
     padding: 0,
     borderRadius: 22,
     elevation: 4,
-    shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.15,
     shadowRadius: 5,

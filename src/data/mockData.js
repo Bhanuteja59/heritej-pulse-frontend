@@ -26,7 +26,7 @@ export const EXPLORE_CATEGORIES = [
 
 export const NOTIFICATIONS = [
     {
-        id: "n1",
+        id: "news1", // Padma Shri Awards 2026 actual article ID
         title: "Padma Shri Awards 2026",
         location: "National",
         source: "PIB India",
@@ -34,7 +34,7 @@ export const NOTIFICATIONS = [
         image: require('../../assets/images/news/padma shri awards 2026.png'),
     },
     {
-        id: "n2",
+        id: "heritage1", // UNESCO Nomination for Root Bridges actual article ID
         title: "UNESCO Nomination for Root Bridges",
         location: "Meghalaya",
         source: "Heritage Pulse",
@@ -49,7 +49,7 @@ export const NOTIFICATIONS = [
  */5
 export const ARTICLES = [
     {
-        id: "nt1",
+        id: "event1",
         title: "Heritage Fest celebrates Indian culture",
         category: "Events",
         isTrending: true,
@@ -62,7 +62,7 @@ export const ARTICLES = [
         likes: "450"
     },
     {
-        id: "nt2",
+        id: "event2",
         title: "Traditions and Celebrations",
         category: "Events",
         isTrending: false,
@@ -75,7 +75,7 @@ export const ARTICLES = [
         likes: "320"
     },
     {
-        id: "nt3",
+        id: "news1",
         title: "Padma Shri Awards 2026",
         category: "News",
         isTrending: true,
@@ -89,7 +89,7 @@ export const ARTICLES = [
         region: "National"
     },
     {
-        id: "l2",
+        id: "heritage1",
         title: "India Nominates Meghalaya's Living Root Bridges for UNESCO",
         category: "Heritage",
         isTrending: true,
@@ -103,7 +103,7 @@ export const ARTICLES = [
         region: "National"
     },
     {
-        id: "h1",
+        id: "heritage2",
         title: "𝗛𝗲𝗿𝗶𝘁𝗮𝗴𝗲 𝗮𝗻𝗱 𝗣𝗼𝘄𝗲𝗿",
         category: "Heritage",
         isTrending: false,
@@ -117,7 +117,7 @@ export const ARTICLES = [
         region: "National"
     },
     {
-        id: "d1",
+        id: "dance1",
         title: "Graceful Rhythms of Indian Classical Dance",
         category: "Dance",
         isTrending: true,
@@ -132,7 +132,7 @@ export const ARTICLES = [
         region: "National"
     },
     {
-        id: "d2",
+        id: "dance2",
         title: "Kathakali Splendor: A Glimpse of Indian Heritage",
         category: "Dance",
         isTrending: true,
@@ -147,7 +147,7 @@ export const ARTICLES = [
         region: "National"
     },
     {
-        id: "c1",
+        id: "culture1",
         title: "Kerala’s Cultural Canvas: Dance, Nature, and Tradition",
         category: "Culture",
         isTrending: false,
@@ -162,7 +162,7 @@ export const ARTICLES = [
         region: "National"
     },
     {
-        id: "c2",
+        id: "culture2",
         title: "Indian Culture",
         category: "Culture",
         isTrending: true,
@@ -177,7 +177,7 @@ export const ARTICLES = [
         region: "National"
     },
     {
-        id: "hi1",
+        id: "history1",
         title: "History of India",
         category: "History",
         isTrending: false,
@@ -192,7 +192,7 @@ export const ARTICLES = [
         region: "National"
     },
     {
-        id: "hi2",
+        id: "history2",
         title: "India’s Journey of Heritage Preservation",
         category: "History",
         isTrending: true,
@@ -207,7 +207,7 @@ export const ARTICLES = [
         region: "National"
     },
     {
-        id: "f1",
+        id: "food1",
         title: "Flavors of Odisha Cuisine",
         category: "Food",
         isTrending: false,
@@ -222,7 +222,7 @@ export const ARTICLES = [
         region: "National"
     },
     {
-        id: "a1",
+        id: "art1",
         title: "Madhubani Art: A Timeless Tradition",
         category: "Art",
         isTrending: true,
@@ -237,7 +237,7 @@ export const ARTICLES = [
         region: "Pleach India"
     },
     {
-        id: "a2",
+        id: "art2",
         title: "Yogini and Myna in Deccani Miniature Art",
         category: "Art",
         isTrending: true,
@@ -251,9 +251,69 @@ export const ARTICLES = [
         likes: "480",
         region: "Pleach India"
     },
+    {
+        id: "heritage3",
+        title: "Remains of 11th Century Temple Found in Rajasthan",
+        category: "Heritage",
+        isTrending: true,
+        isLatest: true,
+        publisher: "Pleach India",
+        sourceLink: "https://www.linkedin.com/posts/pleach-india-foundation_heritageheadlines-activity-7429862298103660544-nCIY?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAF8oSEYB5hT-GHchuJz03FssYuWwnrDZuGw",
+        image: "https://pleachindia.org/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-18-at-5.51.21-PM-1.avif",
+        headline: "Medieval Temple Complex Excavated in Tyonda",
+        content: "A significant medieval discovery has emerged from excavations at “Reed Ka Tila” near Tyonda village in Rajasthan, which have revealed the remains of a temple complex dating to the 11th–12th centuries CE. Conducted by the State Department of Archaeology and Museums, the excavation has exposed structural features including stone floors, square-based pillars, brick remains, and a semi-circular architectural layout, indicating a planned medieval religious structure.",
+        views: "3.8k",
+        likes: "920",
+        region: "Rajasthan"
+    },
+    {
+        id: "heritage4",
+        title: "ASI Resumes Excavation at Sukasari Temple",
+        category: "Heritage",
+        isTrending: true,
+        isLatest: false,
+        publisher: "Pleach India",
+        sourceLink: "https://www.linkedin.com/posts/pleach-india-foundation_heritageheadlines-activity-7417173526488588289-X7-2?utm_source=share&utm_medium=member_desktop&rcm=ACoAAF8oSEYB5hT-GHchuJz03FssYuWwnrDZuGw",
+        image: "https://kevinstandagephotography.wordpress.com/wp-content/uploads/2020/04/sukasari-temple-bhubaneswar.jpg",
+        headline: "ASI Uncovers Buried Shiva Shrine in Bhubaneswar",
+        content: "The Archaeological Survey of India (ASI) has officially resumed excavation activities at the premises of Bhubaneswar’s Sukasari Temple, a medieval monument dating to the 12th–13th centuries CE. The excavation, which had been suspended for nearly three years, was formally relaunched on January 5 and has since led to the discovery of fresh sculptural remains.",
+        views: "4.2k",
+        likes: "1.1k",
+        region: "Odisha"
+    },
+    {
+        id: "event3",
+        title: "Temple Culture of TN",
+        category: "Events",
+        isTrending: true,
+        isLatest: true,
+        publisher: "Pleach India",
+        sourceLink: "https://www.linkedin.com/posts/pleach-india-foundation_we-often-marvel-at-the-grandeur-of-tamil-activity-7349709161229688832-1gwr?utm_source=share&utm_medium=member_desktop&rcm=ACoAACjs-MAB9rWsr4B8zKgwVKeAfqroBGcm0l8",
+        image: require('../../assets/images/events/Temple Culture of TN.png'),
+        headline: "The Living Ecosystem of Tamil Nadu Temples",
+        content: "We often marvel at the grandeur of Tamil Nadu’s temples, its towering gopurams, and intricate sculptures. But these structures aren’t just architectural wonders—they are living organisms, silently shaping the social, political, and spiritual life of Tamil society for over a thousand years. Historian Dr. Pradeep Chakravarthy explores how rituals, governance, and memory are deeply entwined with the temple ecosystem in the 67th Pleach Talks.",
+        views: "1.9k",
+        likes: "420",
+        region: "Tamil Nadu"
+    },
+    {
+        id: "history3",
+        title: "Smithsonian to Repatriate Tamil Nadu Bronzes",
+        category: "History",
+        isTrending: true,
+        isLatest: true,
+        publisher: "Pleach India",
+        sourceLink: "https://www.linkedin.com/posts/pleach-india-foundation_heritageheadlines-activity-7422579494126927872-qO3i?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAF8oSEYB5hT-GHchuJz03FssYuWwnrDZuGw",
+        image: "https://fl-i.thgim.com/public/incoming/casqlg/article70586318.ece/alternates/FREE_1200/somaskanda%20sculpture%20us%20india%20return.jpg",
+        headline: "Smithsonian Returns Ancient Bronzes to India",
+        content: "In a significant step toward cultural restitution, the Smithsonian’s National Museum of Asian Art has announced that it will return three historic bronze sculptures to India after provenance research confirmed they were removed from temples in Tamil Nadu in violation of heritage laws. The decision reflects a wider international reassessment of museum collections and underscores the growing global commitment to returning illicitly acquired cultural property to its countries of origin.",
+        views: "2.6k",
+        likes: "780",
+        region: "Tamil Nadu"
+    },
 ];
 
-let savedArticleIds = ["nt1", "nt2", "l2"];
+let savedArticleIds = ["event1", "event2", "heritage1"];
 
 const truncate = (text, limit) => {
     if (!text || text.length <= limit) return text;

@@ -8,6 +8,7 @@ import { useTheme } from '../../services/ThemeContext';
 import Toast from '../../components/Toast';
 
 import { truncateText } from '../../utils/textUtils';
+import BackgroundPattern from '../../components/BackgroundPattern';
 
 const { width } = Dimensions.get('window');
 
@@ -26,7 +27,9 @@ const SavedItem = ({ item, onPress, onRemove, onShare, styles, colors }) => {
                         {truncateText(item.title, 50)}
                     </Text>
                     <View style={styles.metaRow}>
-                        <Text style={[styles.publisher, { color: colors.secondaryText }]}>{item.publisher}</Text>
+                        <Text style={[styles.publisher, { color: colors.secondaryText }]}>
+                            {item.publisher}
+                        </Text>
                         <Text style={[styles.dot, { color: colors.secondaryText }]}>•</Text>
                         <Text style={[styles.time, { color: colors.secondaryText }]}>{item.timestamp}</Text>
                     </View>
@@ -90,6 +93,7 @@ const SavedScreen = () => {
 
     return (
         <View style={styles.safeArea}>
+            <BackgroundPattern color={isDarkMode ? colors.primary : '#00cdabff'} opacity={isDarkMode ? 0.1 : 0.05} />
             <View style={styles.container}>
                 <View style={styles.header}>
                     <Text style={styles.headerTitle}>Saved Articles</Text>
@@ -174,9 +178,9 @@ const getStyles = (colors, isDarkMode) => StyleSheet.create({
         borderRadius: 20,
         borderWidth: 1,
         borderColor: colors.border,
-        shadowColor: colors.text,
+        shadowColor: colors.shadow,
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
+        shadowOpacity: isDarkMode ? 0.3 : 0.05,
         shadowRadius: 4,
         elevation: 2,
     },
@@ -197,12 +201,12 @@ const getStyles = (colors, isDarkMode) => StyleSheet.create({
         flexDirection: 'row',
         overflow: 'hidden',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.08,
+        shadowOpacity: isDarkMode ? 0.4 : 0.08,
         shadowRadius: 12,
         elevation: 3,
         height: 120, // Slightly increased height
         backgroundColor: colors.cardBg,
-        shadowColor: colors.text,
+        shadowColor: colors.shadow,
         borderColor: isDarkMode ? colors.primary : 'transparent',
         borderWidth: isDarkMode ? 0.5 : 0,
     },

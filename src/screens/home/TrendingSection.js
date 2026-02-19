@@ -30,11 +30,11 @@ const TrendingCard = ({ item, onPress, onShowToast, colors, isDarkMode }) => {
                     shadowOpacity: pressed ? 0.4 : 0,
                     transform: [{ scale: pressed ? 0.97 : 1 }],
                     backgroundColor: colors.cardBg,
-                    // Interactive White Mode (Dark Mode) or Standard (Light Mode)
-                    borderColor: isDarkMode ? '#FFFFFF' : 'transparent',
-                    borderWidth: isDarkMode ? (pressed ? 2 : 1) : 0,
-                    shadowColor: isDarkMode && pressed ? '#FFFFFF' : '#000',
-                    shadowOpacity: isDarkMode && pressed ? 0.6 : (pressed ? 0.4 : 0),
+                    shadowColor: colors.shadow, // Added this line
+                    // Heritage Primary Border
+                    borderColor: colors.primary,
+                    borderWidth: 1,
+                    shadowOpacity: isDarkMode && pressed ? 0.4 : (pressed ? 0.4 : 0),
                     shadowRadius: isDarkMode && pressed ? 10 : 4,
                     elevation: pressed ? 12 : 0,
                 }
@@ -47,13 +47,13 @@ const TrendingCard = ({ item, onPress, onShowToast, colors, isDarkMode }) => {
                     imageStyle={[styles.imageStyle, { borderRadius: pressed ? 20 : 10 }]}
                 >
                     <LinearGradient
-                        colors={['transparent', 'rgba(0,0,0,0.8)']}
+                        colors={['transparent', 'rgba(0,0,0,0.85)']}
                         style={[styles.gradient, { borderRadius: pressed ? 20 : 10 }]}
                     >
                         <View style={styles.cardContent}>
                             <View style={styles.topRow}>
                                 <View style={styles.badge}>
-                                    <Text style={styles.badgeText}> 🔥 Trending</Text>
+                                    <Text style={[styles.badgeText, { color: '#e5e4e1ff' }]}> 🔥 Trending</Text>
                                 </View>
                                 <TouchableOpacity
                                     style={styles.bookmarkButton}
@@ -63,7 +63,7 @@ const TrendingCard = ({ item, onPress, onShowToast, colors, isDarkMode }) => {
                                     <Ionicons
                                         name={bookmarked ? "bookmark" : "bookmark-outline"}
                                         size={24}
-                                        color={colors.white}
+                                        color={colors.white} // Keep white for contrast on image
                                     />
                                 </TouchableOpacity>
                             </View>
@@ -108,9 +108,12 @@ const TrendingSection = ({ onShowToast }) => {
             <View style={styles.header}>
                 <View style={styles.titleContainer}>
                     <Ionicons name="trending-up" size={24} color={colors.primary} style={styles.icon} />
-                    <Text style={[styles.sectionTitle, { color: colors.text }]}>{t("home_trending")}</Text>
+                    <Text style={[styles.sectionTitle, { color: colors.primary }]}>{t("home_trending")}</Text>
                 </View>
-                <TouchableOpacity onPress={handleSeeAll}>
+                <TouchableOpacity
+                    onPress={handleSeeAll}
+                    style={[styles.seeAllContainer, { backgroundColor: colors.primary + '15' }]}
+                >
                     <Text style={[styles.seeAll, { color: colors.primary }]}>{t("home_see_all")}</Text>
                 </TouchableOpacity>
             </View>
@@ -163,8 +166,14 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
     },
+    seeAllContainer: {
+        paddingHorizontal: 12,
+        paddingVertical: 4,
+        borderRadius: 20,
+    },
     seeAll: {
-        fontSize: 14,
+        fontSize: 12,
+        fontWeight: '600',
     },
     listContainer: {
         paddingLeft: 16,
@@ -176,6 +185,12 @@ const styles = StyleSheet.create({
         marginRight: 16,
         borderRadius: 10,
         overflow: 'hidden',
+        // Added these lines for default shadow
+        shadowColor: '#000', // Default shadow color, will be overridden by dynamic style
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
     },
     cardImage: {
         flex: 1,
@@ -198,14 +213,13 @@ const styles = StyleSheet.create({
     badge: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'rgba(126, 126, 126, 0.6)', // Darker for contrast
+        backgroundColor: 'rgba(0, 0, 0, 0.7)', // Darker for better contrast
         paddingHorizontal: 10,
         paddingVertical: 6,
         borderRadius: 20,
     },
     badgeText: {
-        color: '#ffffffff', // Gold color for "Trending"
-        fontWeight: '400',
+        fontWeight: '600',
         fontSize: 12,
         textTransform: 'uppercase',
     },

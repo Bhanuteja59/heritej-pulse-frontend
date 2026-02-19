@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, TextInput, Animated, Easing, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "../../services/ThemeContext";
 import { COLORS } from "../../utils/theme";
 
 const FloatingLabelInput = ({
@@ -15,6 +16,7 @@ const FloatingLabelInput = ({
     keyboardType,
     autoCapitalize
 }) => {
+    const { colors } = useTheme();
     const [isFocused, setIsFocused] = useState(false);
     const focusAnim = useRef(new Animated.Value(value ? 1 : 0)).current;
 
@@ -40,20 +42,20 @@ const FloatingLabelInput = ({
         }),
         color: focusAnim.interpolate({
             inputRange: [0, 1],
-            outputRange: [COLORS.secondaryText, COLORS.primary],
+            outputRange: [colors.secondaryText, colors.primary],
         }),
-        backgroundColor: COLORS.background,
+        backgroundColor: colors.background,
         paddingHorizontal: 8,
         zIndex: 1,
     };
 
     const containerStyle = {
-        borderColor: COLORS.primary,
+        borderColor: colors.primary,
         borderWidth: isFocused ? 2 : 1.5,
         borderRadius: 25,
-        backgroundColor: isFocused ? '#FFF8F0' : COLORS.background,
+        backgroundColor: isFocused ? (colors.isDarkMode ? 'rgba(255,255,255,0.05)' : '#FFF8F0') : colors.background,
         elevation: 5,
-        shadowColor: isFocused ? COLORS.primary : '#000',
+        shadowColor: isFocused ? colors.primary : colors.shadow,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: isFocused ? 0.4 : 0.1,
         shadowRadius: isFocused ? 8 : 3,
@@ -69,7 +71,7 @@ const FloatingLabelInput = ({
                     <Ionicons
                         name={iconName}
                         size={22}
-                        color={isFocused ? COLORS.primary : COLORS.secondaryText}
+                        color={isFocused ? colors.primary : colors.secondaryText}
                         style={styles.leadingIcon}
                     />
                 )}
@@ -83,7 +85,7 @@ const FloatingLabelInput = ({
                     autoCapitalize={autoCapitalize || "none"}
                     keyboardType={keyboardType}
                     placeholder=""
-                    cursorColor={COLORS.primary}
+                    cursorColor={colors.primary}
                 />
 
                 {isPassword && (
@@ -94,7 +96,7 @@ const FloatingLabelInput = ({
                         <Ionicons
                             name={isPasswordVisible ? "eye-outline" : "eye-off-outline"}
                             size={20}
-                            color={isFocused ? COLORS.primary : COLORS.secondaryText}
+                            color={isFocused ? colors.primary : colors.secondaryText}
                         />
                     </TouchableOpacity>
                 )}
@@ -122,7 +124,6 @@ const styles = StyleSheet.create({
     textInput: {
         flex: 1,
         fontSize: 16,
-        color: COLORS.text,
         paddingVertical: 10,
         height: '100%',
     },

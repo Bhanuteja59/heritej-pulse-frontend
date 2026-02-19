@@ -10,11 +10,12 @@ import { useTheme } from "../../services/ThemeContext";
 import { MockDataService } from "../../data/mockData";
 import Toast from "../../components/Toast";
 import { wp, hp, rf } from "../../utils/responsive";
+import BackgroundPattern from "../../components/BackgroundPattern";
 
 const EditProfileScreen = () => {
     const { goBack, navigate } = useNavigation();
     const { t } = useLanguage();
-    const { colors } = useTheme();
+    const { colors, isDarkMode } = useTheme();
 
     const [avatar, setAvatar] = useState('');
     const [name, setName] = useState('');
@@ -98,12 +99,13 @@ const EditProfileScreen = () => {
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+            <BackgroundPattern color={isDarkMode ? colors.primary : '#00cdabff'} opacity={isDarkMode ? 0.1 : 0.05} />
             {/* Header */}
             <View style={[styles.header, { borderBottomColor: colors.border }]}>
                 <TouchableOpacity onPress={goBack} style={[styles.backBtn, { backgroundColor: colors.cardBg }]}>
                     <Ionicons name="chevron-back" size={24} color={colors.text} />
                 </TouchableOpacity>
-                <Text style={[styles.title, { color: colors.text }]}>Edit Profile</Text>
+                <Text style={[styles.title, { color: colors.primary }]}>Edit Profile</Text>
                 <View style={styles.headerSpacer} />
             </View>
 

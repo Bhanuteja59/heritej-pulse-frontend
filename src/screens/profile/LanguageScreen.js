@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, SCREENS } from "../../services/NavigationContext";
 import { useTheme } from "../../services/ThemeContext";
 import { useLanguage } from "../../services/LanguageContext";
+import BackgroundPattern from "../../components/BackgroundPattern";
 
 const { width } = Dimensions.get('window');
 
@@ -20,6 +21,7 @@ const LanguageScreen = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <BackgroundPattern color={isDarkMode ? colors.primary : '#00cdabff'} opacity={isDarkMode ? 0.1 : 0.05} />
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <TouchableOpacity
@@ -28,7 +30,7 @@ const LanguageScreen = () => {
         >
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={[styles.title, { color: colors.text }]}>{t("language_title")}</Text>
+        <Text style={[styles.title, { color: colors.primary }]}>{t("language_title")}</Text>
         <View style={styles.headerSpacer} />
       </View>
 

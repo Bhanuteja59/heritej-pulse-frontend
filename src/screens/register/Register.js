@@ -1,19 +1,26 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Image, Pressable, TextInput, KeyboardAvoidingView, Platform, Alert, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS } from '../../utils/theme';
 import { useNavigation, SCREENS } from '../../services/NavigationContext';
+import { useLanguage } from '../../services/LanguageContext';
+import { MockDataService } from '../../data/mockData';
 
 const { width, height } = Dimensions.get('window');
 
 const Register = () => {
     const { navigate } = useNavigation();
+    const { language } = useLanguage();
+
+    const skipToHome = () => {
+        navigate(SCREENS.HOME);
+    };
 
     return (
         <View style={styles.container}>
-            <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+            <StatusBar style="dark" backgroundColor="transparent" translucent />
 
             {/* Background Gradient - Subtle and Premium */}
             <LinearGradient
@@ -24,6 +31,16 @@ const Register = () => {
             />
 
             <View style={styles.content}>
+
+                {/* Skip Button - Top Right */}
+                <TouchableOpacity
+                    style={styles.skipButton}
+                    onPress={skipToHome}
+                    activeOpacity={0.6}
+                >
+                    <Text style={styles.skipText}>Skip</Text>
+                    <Ionicons name="chevron-forward" size={16} color={COLORS.primary} />
+                </TouchableOpacity>
 
                 {/* Logo Section */}
                 <View style={styles.logoContainer}>
@@ -92,6 +109,21 @@ const styles = StyleSheet.create({
         paddingHorizontal: width * 0.08,
         paddingTop: height * 0.12, // More top padding for balance
         paddingBottom: height * 0.08,
+    },
+    skipButton: {
+        position: 'absolute',
+        top: 20,
+        right: 0,
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 5,
+        zIndex: 10,
+    },
+    skipText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: COLORS.primary,
+        marginRight: 2,
     },
     logoContainer: {
         alignItems: 'center',

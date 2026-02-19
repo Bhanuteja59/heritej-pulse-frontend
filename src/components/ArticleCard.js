@@ -89,15 +89,16 @@ const ArticleCard = ({ article, isActive }) => {
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
-            {/* 1. Hero Image */}
             <View style={styles.imageContainer}>
                 <Image source={article.image} style={styles.image} resizeMode="cover" />
                 <Animated.View style={[styles.imageOverlay, { opacity: visibilityAnim }]} />
 
                 {/* 2. Source Badge */}
                 <Animated.View style={[styles.sourceBadge, { opacity: visibilityAnim }]}>
-                    <View style={styles.sourceIcon}>
-                        <Text style={styles.sourceInitial}>{article.publisher?.[0] || 'P'}</Text>
+                    <View style={[styles.sourceIcon, { backgroundColor: colors.primary }]}>
+                        <Text style={styles.sourceInitial}>
+                            {article.publisher?.split(' ').map(word => word[0]).join('').toUpperCase() || 'HP'}
+                        </Text>
                     </View>
                     <Text style={styles.sourceName}>{article.publisher}</Text>
                 </Animated.View>
@@ -109,7 +110,7 @@ const ArticleCard = ({ article, isActive }) => {
                     <Animated.View
                         style={[
                             styles.contentCard,
-                            { transform: [{ scale: contentScale }] }
+                            { transform: [{ scale: contentScale }], backgroundColor: colors.cardBg }
                         ]}
                     >
                         {/* Meta Info */}
@@ -124,13 +125,19 @@ const ArticleCard = ({ article, isActive }) => {
                         </Text>
 
                         {/* Body Preview */}
-                        <Text style={[styles.bodyPreview, { color: colors.secondaryText }]} numberOfLines={6} ellipsizeMode="tail">
+                        <Text style={[styles.bodyPreview, { color: colors.text }]} numberOfLines={6} ellipsizeMode="tail">
                             {article.subtitle} — {previewText}
                         </Text>
 
                         {/* Keywords */}
                         <View style={styles.keywordsRow}>
-                            <Text style={[styles.keyword, { color: colors.primary }]} onPress={() => console.log('Keyword clicked')}>#{article.category}</Text>
+                            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, flex: 1 }}>
+                                {article.keywords?.map((keyword, index) => (
+                                    <Text key={index} style={[styles.keyword, { color: colors.primary }]}>
+                                        #{keyword}
+                                    </Text>
+                                ))}
+                            </View>
                         </View>
                     </Animated.View>
 
@@ -147,8 +154,8 @@ const ArticleCard = ({ article, isActive }) => {
                         ]}
                     >
                         <TouchableOpacity style={styles.actionBtn} onPress={() => { }}>
-                            <Ionicons name="heart-outline" size={24} color={colors.text} />
-                            <Text style={[styles.actionText, { color: colors.text }]}>{article.likes || '2.4k'}</Text>
+                            <Ionicons name="heart" size={24} color="#FF3B30" />
+                            <Text style={[styles.actionText, { color: "#FF3B30" }]}>{article.likes || '2.4k'}</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.actionBtn} onPress={() => { }}>
@@ -170,7 +177,6 @@ const styles = StyleSheet.create({
     container: {
         width: width,
         height: height,
-        backgroundColor: COLORS.black, // Fallback
     },
     imageContainer: {
         height: '45%', // Keep relative height
@@ -200,7 +206,6 @@ const styles = StyleSheet.create({
         width: 20,
         height: 20,
         borderRadius: 10,
-        backgroundColor: COLORS.primary,
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: 8,
@@ -278,12 +283,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 10,
         paddingBottom: 10,
-        shadowColor: '#000',
         shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.15,
         shadowRadius: 16,
         elevation: 20,
-        borderTopWidth: 1,
+        borderTopWidth: 0.5,
     },
     actionBtn: {
         alignItems: 'center',

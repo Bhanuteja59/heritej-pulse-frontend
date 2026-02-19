@@ -9,6 +9,7 @@ import { useTheme } from "../../services/ThemeContext";
 import { COLORS } from "../../utils/theme";
 import AuthLoading from "../../components/loading/AuthLoading";
 import Toast from "../../components/Toast";
+import BackgroundPattern from "../../components/BackgroundPattern";
 
 const { width } = Dimensions.get('window');
 
@@ -68,6 +69,7 @@ const ChangePasswordScreen = () => {
 
     return (
         <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+            <BackgroundPattern color={isDarkMode ? colors.primary : '#00cdabff'} opacity={isDarkMode ? 0.1 : 0.05} />
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -79,7 +81,7 @@ const ChangePasswordScreen = () => {
                     >
                         <Ionicons name="chevron-back" size={24} color={colors.text} />
                     </TouchableOpacity>
-                    <Text style={[styles.headerTitle, { color: colors.text }]}>Change Password</Text>
+                    <Text style={[styles.headerTitle, { color: colors.primary }]}>Change Password</Text>
                     <View style={styles.placeholder} />
                 </View>
 

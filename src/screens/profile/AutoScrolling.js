@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Dimensions, FlatList, Image, TouchableOpacity, Platform, Alert } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, FlatList, Image, TouchableOpacity, Platform, Alert, ScrollView, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "../../services/NavigationContext";
@@ -8,11 +8,12 @@ import { useTheme } from "../../services/ThemeContext";
 import { COLORS } from "../../utils/theme";
 import Toast from "../../components/Toast";
 import { wp, hp, rf } from "../../utils/responsive";
+import BackgroundPattern from "../../components/BackgroundPattern";
 
 const AutoScrollingScreen = () => {
     const { goBack } = useNavigation();
     const { t } = useLanguage();
-    const { colors } = useTheme();
+    const { colors, isDarkMode } = useTheme();
 
     const [speed, setSpeed] = useState(1); // 0: slow, 1: normal, 2: fast
     const [autoRefresh, setAutoRefresh] = useState(false);
@@ -36,6 +37,7 @@ const AutoScrollingScreen = () => {
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+            <BackgroundPattern color={isDarkMode ? colors.primary : '#00cdabff'} opacity={isDarkMode ? 0.1 : 0.05} />
             {/* Header */}
             <View style={[styles.header, { borderBottomColor: colors.border }]}>
                 <TouchableOpacity onPress={goBack} style={[styles.backButton, { backgroundColor: colors.cardBg }]}>
@@ -48,7 +50,7 @@ const AutoScrollingScreen = () => {
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
                 {/* Description */}
                 <View style={[styles.infoCard, { backgroundColor: colors.cardBg }]}>
-                    <Ionicons name="information-circle" size={22} color={COLORS.primary} />
+                    <Ionicons name="information-circle" size={22} color={colors.primary} />
                     <Text style={[styles.description, { color: colors.secondaryText }]}>
                         Customize your auto-scrolling experience for hands-free browsing
                     </Text>
@@ -58,7 +60,7 @@ const AutoScrollingScreen = () => {
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
                         <Ionicons name="speedometer-outline" size={20} color={colors.text} />
-                        <Text style={[styles.sectionTitle, { color: colors.text }]}>Scroll Speed</Text>
+                        <Text style={[styles.sectionTitle, { color: colors.primary }]}>Scroll Speed</Text>
                     </View>
                     <View style={styles.optionsContainer}>
                         {['Slow', 'Normal', 'Fast'].map((item, index) => (
@@ -67,7 +69,7 @@ const AutoScrollingScreen = () => {
                                 style={[
                                     styles.optionButton,
                                     { backgroundColor: colors.cardBg, borderColor: colors.border },
-                                    speed === index && { backgroundColor: COLORS.primary, borderColor: COLORS.primary }
+                                    speed === index && { backgroundColor: colors.primary, borderColor: colors.primary }
                                 ]}
                                 onPress={() => setSpeed(index)}
                             >
@@ -90,14 +92,14 @@ const AutoScrollingScreen = () => {
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
                         <Ionicons name="settings-outline" size={20} color={colors.text} />
-                        <Text style={[styles.sectionTitle, { color: colors.text }]}>Behavior Settings</Text>
+                        <Text style={[styles.sectionTitle, { color: colors.primary }]}>Behavior Settings</Text>
                     </View>
 
                     <View style={[styles.settingCard, { backgroundColor: colors.cardBg }]}>
                         <View style={styles.settingItem}>
                             <View style={styles.settingLeft}>
                                 <View style={[styles.iconBox, { backgroundColor: colors.background }]}>
-                                    <Ionicons name="refresh" size={20} color={COLORS.primary} />
+                                    <Ionicons name="refresh" size={20} color={colors.primary} />
                                 </View>
                                 <View style={styles.settingTextContainer}>
                                     <Text style={[styles.settingLabel, { color: colors.text }]}>Auto Refresh</Text>
@@ -109,7 +111,7 @@ const AutoScrollingScreen = () => {
                             <Switch
                                 value={autoRefresh}
                                 onValueChange={setAutoRefresh}
-                                trackColor={{ false: colors.border, true: COLORS.primary }}
+                                trackColor={{ false: colors.border, true: colors.primary }}
                                 thumbColor="#FFF"
                             />
                         </View>
@@ -119,7 +121,7 @@ const AutoScrollingScreen = () => {
                         <View style={styles.settingItem}>
                             <View style={styles.settingLeft}>
                                 <View style={[styles.iconBox, { backgroundColor: colors.background }]}>
-                                    <Ionicons name="hand-left-outline" size={20} color={COLORS.primary} />
+                                    <Ionicons name="hand-left-outline" size={20} color={colors.primary} />
                                 </View>
                                 <View style={styles.settingTextContainer}>
                                     <Text style={[styles.settingLabel, { color: colors.text }]}>Pause on Touch</Text>
@@ -131,7 +133,7 @@ const AutoScrollingScreen = () => {
                             <Switch
                                 value={pauseOnTouch}
                                 onValueChange={setPauseOnTouch}
-                                trackColor={{ false: colors.border, true: COLORS.primary }}
+                                trackColor={{ false: colors.border, true: colors.primary }}
                                 thumbColor="#FFF"
                             />
                         </View>
@@ -140,7 +142,7 @@ const AutoScrollingScreen = () => {
 
                 {/* Buttons */}
                 <TouchableOpacity
-                    style={[styles.saveButton, { backgroundColor: COLORS.primary }]}
+                    style={[styles.saveButton, { backgroundColor: colors.primary }]}
                     onPress={handleSave}
                 >
                     <Ionicons name="checkmark-circle" size={22} color="#FFF" />

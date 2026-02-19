@@ -38,7 +38,7 @@ const ForgotPassword = () => {
             showAlert("Missing Field", "Please enter your email or mobile number.");
             return;
         }
-        console.log("Request email for:", { email });
+        // Request email simulation
         setModalVisible(true);
     };
 
@@ -53,7 +53,7 @@ const ForgotPassword = () => {
             setIsLoading(false);
             setModalVisible(false);
 
-            console.log("OTP Verified for:", { email, code });
+            // OTP Verified simulation
 
             setShowAuthLoading(true);
             setTimeout(() => {

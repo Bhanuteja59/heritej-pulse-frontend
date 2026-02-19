@@ -28,7 +28,7 @@ const ExploreCard = ({ item, onPress, colors, isDarkMode }) => (
     >
         <View style={styles.cardImageWrap}>
             <Image source={item.image} style={styles.cardImage} resizeMode="cover" />
-            <View style={[styles.badge, { backgroundColor: colors.background }]}>
+            <View style={[styles.badge, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : colors.background }]}>
                 <Ionicons name="compass" size={14} color={colors.primary} />
                 <Text style={[styles.badgeText, { color: colors.primary }]}>{item.badge}</Text>
             </View>
@@ -39,17 +39,9 @@ const ExploreCard = ({ item, onPress, colors, isDarkMode }) => (
                 {item.title}
             </Text>
 
-            <View style={styles.ratingRow}>
-                <View style={styles.ratingPill}>
-                    <Ionicons name="star" size={12} color="#fff" />
-                    <Text style={styles.ratingText}>{item.rating}</Text>
-                </View>
-                <Text style={[styles.reviewsText, { color: colors.secondaryText }]}>({item.reviews})</Text>
-            </View>
-
             <View style={styles.tagsRow}>
                 {(item.tags || []).map((t) => (
-                    <View key={t} style={[styles.tagPill, { backgroundColor: colors.background }]}>
+                    <View key={t} style={[styles.tagPill, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : colors.background }]}>
                         <Text style={[styles.tagText, { color: colors.text }]}>{t}</Text>
                     </View>
                 ))}
@@ -92,7 +84,7 @@ const SnapCarousel = ({ data, renderItem }) => {
 
 const SectionTitle = ({ title, subtitle, colors }) => (
     <View style={styles.sectionHead}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>{title}</Text>
+        <Text style={[styles.sectionTitle, { color: colors.primary }]}>{title}</Text>
         <Text style={[styles.sectionSub, { color: colors.secondaryText }]}>{subtitle}</Text>
     </View>
 );
@@ -180,18 +172,6 @@ const styles = StyleSheet.create({
     badgeText: { fontSize: 12, fontWeight: "700" },
     cardBody: { paddingHorizontal: 14, paddingTop: 12, paddingBottom: 14 },
     cardTitle: { fontSize: 16, fontWeight: "700" },
-    ratingRow: { marginTop: 10, flexDirection: "row", alignItems: "center", gap: 8 },
-    ratingPill: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 6,
-        backgroundColor: "#1FA84A",
-        borderRadius: 12,
-        paddingHorizontal: 10,
-        height: 24,
-    },
-    ratingText: { color: "#fff", fontSize: 12, fontWeight: "700" },
-    reviewsText: { fontSize: 12 },
     tagsRow: { marginTop: 10, flexDirection: "row", gap: 8 },
     tagPill: {
         borderRadius: 14,

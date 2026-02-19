@@ -40,7 +40,6 @@ const Login = () => {
             return;
         }
 
-        console.log("Login with:", { email, password });
         setIsLoading(true);
         // Simulate auth delay
         setTimeout(() => {

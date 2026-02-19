@@ -1,9 +1,84 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, StatusBar, Platform } from 'react-native';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Animated, Pressable, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, SCREENS } from '../services/NavigationContext';
 import { useLanguage } from '../services/LanguageContext';
 import { useTheme } from '../services/ThemeContext';
+
+// Reusable Animated Icon Button Component
+const AnimatedIconButton = ({ onPress, children, colors, style, size = 40 }) => {
+    const scaleAnim = useRef(new Animated.Value(1)).current;
+    const shadowAnim = useRef(new Animated.Value(2)).current;
+
+    const handlePressIn = () => {
+        Animated.parallel([
+            Animated.spring(scaleAnim, {
+                toValue: 0.94,
+                useNativeDriver: false, // Changed to false to avoid shadowOffset errors
+                speed: 40,
+                bounciness: 6,
+            }),
+            Animated.spring(shadowAnim, {
+                toValue: 6,
+                useNativeDriver: false,
+            })
+        ]).start();
+    };
+
+    const handlePressOut = () => {
+        Animated.parallel([
+            Animated.spring(scaleAnim, {
+                toValue: 1,
+                useNativeDriver: false, // Changed to false to avoid shadowOffset errors
+                speed: 40,
+                bounciness: 6,
+            }),
+            Animated.spring(shadowAnim, {
+                toValue: 2,
+                useNativeDriver: false,
+            })
+        ]).start();
+    };
+
+    return (
+        <Pressable
+            onPress={onPress}
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+            style={({ pressed }) => [{ opacity: pressed ? 0.9 : 1 }]}
+        >
+            <Animated.View
+                style={[
+                    style,
+                    {
+                        width: size,
+                        height: size,
+                        transform: [{ scale: scaleAnim }],
+                        elevation: shadowAnim,
+                        shadowOpacity: shadowAnim.interpolate({
+                            inputRange: [2, 6],
+                            outputRange: [0.1, 0.25],
+                        }),
+                        shadowRadius: shadowAnim.interpolate({
+                            inputRange: [2, 6],
+                            outputRange: [4, 10],
+                        }),
+                        shadowOffset: {
+                            width: 0,
+                            height: shadowAnim.interpolate({
+                                inputRange: [2, 6],
+                                outputRange: [2, 5],
+                            }),
+                        },
+                        borderWidth: 1.5,
+                    }
+                ]}
+            >
+                {children}
+            </Animated.View>
+        </Pressable>
+    );
+};
 
 const Header = () => {
     const { navigate } = useNavigation();
@@ -19,23 +94,22 @@ const Header = () => {
 
     const phrases = useMemo(
         () => [
-            t("header_phrase_traditions"),
-            t("header_phrase_articles"),
-            t("header_phrase_history"),
-            t("header_phrase_culture"),
+            t("header_phrase_traditions") || "Discover Traditions",
+            t("header_phrase_articles") || "Read Articles",
+            t("header_phrase_history") || "Explore History",
+            t("header_phrase_culture") || "Experience Culture",
         ],
         [t]
     );
 
     useEffect(() => {
-        if (index === phrases.length) {
-            setIndex(0);
-            return;
-        }
+        if (!phrases || phrases.length === 0) return;
 
-        if (subIndex === phrases[index].length + 1 && !isDeleting) {
-            setTimeout(() => setIsDeleting(true), 1000);
-            return;
+        const currentPhrase = phrases[index] || "";
+
+        if (subIndex === currentPhrase.length + 1 && !isDeleting) {
+            const timeout = setTimeout(() => setIsDeleting(true), 1500);
+            return () => clearTimeout(timeout);
         }
 
         if (subIndex === 0 && isDeleting) {
@@ -46,7 +120,7 @@ const Header = () => {
 
         const timeout = setTimeout(() => {
             setSubIndex((prev) => prev + (isDeleting ? -1 : 1));
-        }, isDeleting ? 50 : 100);
+        }, isDeleting ? 40 : 80);
 
         return () => clearTimeout(timeout);
     }, [subIndex, index, isDeleting, phrases]);
@@ -59,40 +133,41 @@ const Header = () => {
     }, []);
 
     useEffect(() => {
-        setPlaceholder(phrases[index].substring(0, subIndex));
+        if (phrases && phrases[index]) {
+            setPlaceholder(phrases[index].substring(0, subIndex));
+        }
     }, [subIndex, index, phrases]);
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
             <View style={styles.headerContainer}>
                 <View>
-                    <Text style={[styles.title, { color: colors.primary }]}>{t("header_title")}</Text>
+                    <Text style={[styles.title, { color: isDarkMode ? colors.white : colors.primary }]}>{t("header_title")}</Text>
                     <Text style={[styles.subtitle, { color: colors.secondaryText }]}>{t("header_subtitle")}</Text>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <TouchableOpacity
-                        activeOpacity={0.7}
-                        style={[styles.themeToggleButton, { backgroundColor: colors.cardBg, shadowColor: colors.text }]}
+                    <AnimatedIconButton
+                        colors={colors}
+                        style={[styles.themeToggleButton, { backgroundColor: colors.cardBg, borderColor: colors.border, shadowColor: colors.text }]}
                         onPress={toggleTheme}
                     >
                         <Ionicons name={isDarkMode ? "sunny-outline" : "moon-outline"} size={22} color={colors.text} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        activeOpacity={0.7}
-                        style={[styles.notificationButton, { backgroundColor: colors.cardBg, shadowColor: colors.text }]}
+                    </AnimatedIconButton>
+                    <AnimatedIconButton
+                        colors={colors}
+                        style={[styles.notificationButton, { backgroundColor: colors.cardBg, borderColor: colors.border, shadowColor: colors.text }]}
+                        size={44}
                         onPress={() => navigate(SCREENS.NOTIFICATIONS)}
                     >
                         <Ionicons name="notifications-outline" size={26} color={colors.text} />
-                        <View style={[styles.notificationDot, { borderColor: colors.cardBg }]} />
-                    </TouchableOpacity>
+                        <View style={[styles.notificationDot, { borderColor: colors.cardBg, backgroundColor: colors.error }]} />
+                    </AnimatedIconButton>
                 </View>
             </View>
 
-            {/* Search Bar with Typing Animation */}
-            <TouchableOpacity
-                activeOpacity={1}
-                style={[styles.searchContainer, { backgroundColor: colors.cardBg, borderColor: colors.primary }]}
-                onPress={() => { }} // Could focus input here
+            {/* Search Bar - Medium Size & No Icon Background */}
+            <View
+                style={[styles.searchContainer, { backgroundColor: colors.searchFill, borderColor: colors.primary }]}
             >
                 <View style={styles.inputWrapper}>
                     <TextInput
@@ -106,27 +181,27 @@ const Header = () => {
                     />
                     {searchText.length === 0 && !isFocused && (
                         <View style={styles.placeholderContainer} pointerEvents="none">
-                            <Text style={styles.placeholderText}>
+                            <Text style={[styles.placeholderText, { color: colors.secondaryText }]}>
                                 {placeholder}
                                 <Text style={{ color: showCursor ? colors.primary : 'transparent' }}>|</Text>
                             </Text>
                         </View>
                     )}
                 </View>
-                <TouchableOpacity style={[styles.filterButton, { backgroundColor: colors.cardBg }]}>
-                    <Ionicons name="search-outline" size={20} color={colors.primary} />
-                </TouchableOpacity>
-            </TouchableOpacity>
+
+                {/* Direct Icon without Button Background */}
+                <Ionicons name="search-outline" size={24} color={colors.primary} style={{ marginRight: 8 }} />
+            </View>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        paddingHorizontal: 16,
+        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0, // Minimal gap: status bar height only
         paddingBottom: 16,
+        paddingHorizontal: 10, // Padding all sides
         borderBottomWidth: 1,
-        marginTop: 16,
     },
     headerContainer: {
         flexDirection: 'row',
@@ -145,15 +220,11 @@ const styles = StyleSheet.create({
         marginTop: 2,
     },
     notificationButton: {
-        width: 44,
-        height: 44,
         borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
     },
     themeToggleButton: {
-        width: 40,
-        height: 40,
         borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
@@ -165,7 +236,6 @@ const styles = StyleSheet.create({
         right: 12,
         width: 10,
         height: 10,
-        backgroundColor: '#FF3B30',
         borderRadius: 5,
         borderWidth: 2,
     },
@@ -173,7 +243,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: 16,
-        height: 52,
+        height: 46, // Medium size
         paddingHorizontal: 12,
         borderWidth: 1.5,
         overflow: 'hidden',
@@ -182,6 +252,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         height: '100%',
+        paddingLeft: 4,
     },
     input: {
         flex: 1,
@@ -193,17 +264,14 @@ const styles = StyleSheet.create({
     placeholderContainer: {
         ...StyleSheet.absoluteFillObject,
         justifyContent: 'center',
+        paddingLeft: 4,
     },
     placeholderText: {
         fontSize: 15,
         fontWeight: '500',
-        color: "#989898ff",
     },
     filterButton: {
-        width: 36,
-        height: 36,
         borderRadius: 10,
-        marginLeft: 8,
         justifyContent: 'center',
         alignItems: 'center',
     },
