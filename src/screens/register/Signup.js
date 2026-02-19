@@ -73,7 +73,7 @@ const Signup = () => {
             setIsLoading(false);
             setModalVisible(false); // Close OTP modal
 
-            console.log("Signup Verified!", { name, email, password, code });
+            // setShowAuthLoading(true);
 
             // Show Authentication Loading Screen
             setShowAuthLoading(true);

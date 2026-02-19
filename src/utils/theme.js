@@ -6,21 +6,23 @@
  */
 
 export const PALETTE = {
-    background: '#F9F7F2', // Warm Parchment
-    primary: '#EB6A00',    // Heritage Orange
-    secondary: '#FF8D28',  // Lighter Orange for gradients
-    text: '#1A1A1A',       // Dark Charcoal
+    background: '#F5F3EF', // Ivory Beige (Heritage Off-White)
+    primary: '#1F6F5E',    // Heritage Green (Deep & Traditional)
+    secondary: '#207567',  // Sustained Green accent
+    text: '#1C2B2A',       // Dark Green-Slate (Primary Text)
+    secondaryText: '#6D7A76', // Muted Grey-Green
     border: '#E0E0E0',
+    searchFill: '#ECECEC', // Soft Neutral Grey
     success: '#4CAF50',
-    error: '#F44336',
+    error: '#E53935',      // Alert Red
     white: '#FFFFFF',
     black: '#000000',
     splashGradientStart: '#FFD166',
     splashGradientEnd: '#FFF9FB',
 
     // Dark specifics (Pure Emerald & White)
-    darkBackground: '#003409ff',
-    darkSurface: '#266330',    // Raised Emerald for cards
+    darkBackground: '#004637ff',
+    darkSurface: '#004637ff',    // Raised Emerald for cards
     darkText: '#FFFFFF',       // Pure White
     darkSecondaryText: '#B2C2B5', // Silver-Mint
     darkBorder: '#3D8246',     // Emerald Boundary
@@ -30,10 +32,12 @@ export const LIGHT_THEME = {
     background: PALETTE.background,
     primary: PALETTE.primary,
     secondary: PALETTE.secondary,
-    text: PALETTE.text,
-    secondaryText: PALETTE.black,
+    text: PALETTE.primary,
+    secondaryText: PALETTE.secondaryText,
     cardBg: PALETTE.white,
     border: PALETTE.border,
+    shadow: '#000000',
+    searchFill: PALETTE.searchFill,
     icon: PALETTE.text,
     error: PALETTE.error,
     white: PALETTE.white,
@@ -43,21 +47,23 @@ export const LIGHT_THEME = {
     success: PALETTE.success,
 };
 
+// Dark Theme - Premium "Glass Navy" Aesthetic
 export const DARK_THEME = {
-    background: PALETTE.darkBackground,
-    primary: PALETTE.white,   // Interactive elements now White
-    secondary: '#327A3D',     // Subtler green accent
-    text: PALETTE.darkText,
-    secondaryText: PALETTE.darkSecondaryText,
-    cardBg: PALETTE.darkSurface,
-    border: PALETTE.darkBorder,
-    icon: PALETTE.white,      // Icons now White
+    background: '#0a1119',      // Deep Navy Background
+    primary: '#037e76ff',         // Solid Teal/Green Accent
+    secondary: '#73b6b9',       // Light Teal Accent
+    text: '#FFFFFF',            // Pure White Content
+    secondaryText: '#B0BEC5',   // Muted Blue-Grey
+    cardBg: '#0d181e', // Glassy Dark Slate ("inside box")
+    border: 'rgba(255, 255, 255, 0.12)', // Ultra-thin translucent glass highlight
+    shadow: '#ffffff',
+    icon: '#73b6b9',            // Light Green Icons
     error: PALETTE.error,
     white: PALETTE.white,
     black: PALETTE.black,
-    splashGradientStart: PALETTE.splashGradientStart,
-    splashGradientEnd: PALETTE.splashGradientEnd,
-    success: PALETTE.success,
+    splashGradientStart: '#0a1119',
+    splashGradientEnd: '#0d181e',
+    success: '#1a968e',
 };
 
 // Default export for backward compatibility

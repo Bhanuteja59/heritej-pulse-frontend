@@ -26,6 +26,10 @@ export const SCREENS = {
     LANGUAGE: 'LANGUAGE',
     CHANGE_PASSWORD: 'CHANGE_PASSWORD',
     EDIT_PROFILE: 'EDIT_PROFILE',
+    ABOUT_US: 'ABOUT_US',
+    CONTACT_US: 'CONTACT_US',
+    FEEDBACK: 'FEEDBACK',
+    TERMS: 'TERMS',
 };
 
 export const NavigationProvider = ({ children }) => {

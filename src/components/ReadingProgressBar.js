@@ -11,11 +11,12 @@ import Animated, {
     Extrapolate,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS } from '../utils/theme';
+import { useTheme } from '../services/ThemeContext';
 
 const PROGRESS_HEIGHT = 3;
 
 export default function ReadingProgressBar({ scrollY, contentHeight, scrollViewHeight }) {
+    const { colors } = useTheme();
     // Calculate progress percentage
     const progressStyle = useAnimatedStyle(() => {
         const maxScroll = Math.max(0, contentHeight - scrollViewHeight);
@@ -46,7 +47,7 @@ export default function ReadingProgressBar({ scrollY, contentHeight, scrollViewH
         <View style={styles.container}>
             <Animated.View style={[styles.progressTrack, progressStyle]}>
                 <LinearGradient
-                    colors={[COLORS.primary, COLORS.secondary]}
+                    colors={[colors.primary, colors.secondary || colors.primary]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                     style={styles.gradient}

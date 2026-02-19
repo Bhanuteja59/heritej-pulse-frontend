@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Platform, StatusBar as RNStatusBar, Animated, Dimensions, Easing } from 'react-native';
+import { View, StyleSheet, Platform, StatusBar as RNStatusBar, Animated, Dimensions, Easing } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
 import { NavigationProvider, useNavigation, SCREENS } from './src/services/NavigationContext';
-import { LanguageProvider } from './src/services/LanguageContext';
-import { ThemeProvider } from './src/services/ThemeContext';
-import { COLORS } from './src/utils/theme';
+import { LanguageProvider, useLanguage } from './src/services/LanguageContext';
+import { ThemeProvider, useTheme } from './src/services/ThemeContext';
 
 // Screens
 import SplashScreen from './src/screens/splashScreen/SplashScreen';
@@ -27,11 +26,16 @@ import Signup from './src/screens/register/Signup';
 import AutoScrollingScreen from './src/screens/profile/AutoScrolling';
 import ChangePasswordScreen from './src/screens/profile/ChangePassword';
 import EditProfileScreen from './src/screens/profile/EditProfile';
+import AboutUs from './src/screens/profile/AboutUs';
+import ContactUs from './src/screens/profile/ContactUs';
+import Feedback from './src/screens/profile/Feedback';
+import TermsAndConditions from './src/screens/profile/TermsAndConditions';
 
 const { width } = Dimensions.get('window');
 
 const ScreenRenderer = () => {
   const { currentScreen } = useNavigation();
+  const { colors } = useTheme();
   const slideAnim = useRef(new Animated.Value(0)).current;
   const [prevScreen, setPrevScreen] = useState(SCREENS.SPLASH);
 
@@ -71,7 +75,11 @@ const ScreenRenderer = () => {
       currentScreen === SCREENS.EXPLORE_SECTION_GRID ||
       currentScreen === SCREENS.PRIVACY ||
       currentScreen === SCREENS.LANGUAGE ||
-      currentScreen === SCREENS.NOTIFICATIONS
+      currentScreen === SCREENS.NOTIFICATIONS ||
+      currentScreen === SCREENS.ABOUT_US ||
+      currentScreen === SCREENS.CONTACT_US ||
+      currentScreen === SCREENS.FEEDBACK ||
+      currentScreen === SCREENS.TERMS
     ) {
       startValue = width;
     }
@@ -80,7 +88,11 @@ const ScreenRenderer = () => {
       prevScreen === SCREENS.EXPLORE_SECTION_GRID ||
       prevScreen === SCREENS.PRIVACY ||
       prevScreen === SCREENS.LANGUAGE ||
-      prevScreen === SCREENS.NOTIFICATIONS
+      prevScreen === SCREENS.NOTIFICATIONS ||
+      prevScreen === SCREENS.ABOUT_US ||
+      prevScreen === SCREENS.CONTACT_US ||
+      prevScreen === SCREENS.FEEDBACK ||
+      prevScreen === SCREENS.TERMS
     ) {
       startValue = -width;
     }
@@ -88,10 +100,10 @@ const ScreenRenderer = () => {
     if (prevScreen !== currentScreen) {
       slideAnim.setValue(startValue);
 
-      Animated.timing(slideAnim, {
+      Animated.spring(slideAnim, {
         toValue: 0,
-        duration: 400,
-        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+        tension: 50,
+        friction: 8,
         useNativeDriver: true,
       }).start();
 
@@ -135,6 +147,14 @@ const ScreenRenderer = () => {
         return <ChangePasswordScreen />;
       case SCREENS.EDIT_PROFILE:
         return <EditProfileScreen />;
+      case SCREENS.ABOUT_US:
+        return <AboutUs />;
+      case SCREENS.CONTACT_US:
+        return <ContactUs />;
+      case SCREENS.FEEDBACK:
+        return <Feedback />;
+      case SCREENS.TERMS:
+        return <TermsAndConditions />;
       default:
         return <HomeScreen />;
     }
@@ -144,7 +164,8 @@ const ScreenRenderer = () => {
     <Animated.View
       style={{
         flex: 1,
-        transform: [{ translateX: slideAnim }]
+        transform: [{ translateX: slideAnim }],
+        backgroundColor: colors.background // Prevent transparency flashes
       }}
     >
       {renderScreen()}
@@ -153,7 +174,45 @@ const ScreenRenderer = () => {
 };
 
 const MainLayout = () => {
-  const { currentScreen, isTabBarVisible } = useNavigation();
+  const { currentScreen, isTabBarVisible, goBack, navigate } = useNavigation();
+  const { colors, isDarkMode } = useTheme();
+
+  const TAB_ORDER = [SCREENS.HOME, SCREENS.EXPLORE, SCREENS.SAVED, SCREENS.PROFILE];
+
+  const onHandlerStateChange = (event) => {
+    if (event.nativeEvent.state === State.END) {
+      const { translationX, velocityX } = event.nativeEvent;
+      const SWIPE_THRESHOLD = 80; // Slightly higher for intentionality
+      const VELOCITY_THRESHOLD = 500; // Allow fast flickers
+
+      // Handle Horizontal Swipes
+      if (Math.abs(translationX) > SWIPE_THRESHOLD || Math.abs(velocityX) > VELOCITY_THRESHOLD) {
+        // Check if current screen is a main tab
+        const currentTabIndex = TAB_ORDER.indexOf(currentScreen);
+
+        if (currentTabIndex !== -1) {
+          // It's a tab! Handle internal tab switching
+          if (translationX < 0 || velocityX < -VELOCITY_THRESHOLD) {
+            // Swipe Left -> Next Tab
+            if (currentTabIndex < TAB_ORDER.length - 1) {
+              navigate(TAB_ORDER[currentTabIndex + 1]);
+            }
+          } else if (translationX > 0 || velocityX > VELOCITY_THRESHOLD) {
+            // Swipe Right -> Previous Tab
+            if (currentTabIndex > 0) {
+              navigate(TAB_ORDER[currentTabIndex - 1]);
+            }
+          }
+        } else {
+          // It's NOT a tab (e.g., Detail, Settings, etc.)
+          // Swipe Right (positive X) to go back
+          if (translationX > 50 || velocityX > 400) {
+            goBack();
+          }
+        }
+      }
+    }
+  };
 
   // App.js (inside MainLayout)
   const shouldShowTabs = isTabBarVisible &&
@@ -164,9 +223,21 @@ const MainLayout = () => {
     currentScreen !== SCREENS.FORGOT_PASSWORD;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="dark" backgroundColor={COLORS.background} />
-      <ScreenRenderer />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar
+        style={isDarkMode ? "light" : "dark"}
+        backgroundColor={colors.background}
+        translucent={Platform.OS === 'android'}
+      />
+      <PanGestureHandler
+        onHandlerStateChange={onHandlerStateChange}
+        activeOffsetX={[-60, 60]} // High threshold to prevent "stealing" from horizontal lists
+        failOffsetY={[-20, 20]}  // Fast fail for vertical scrolling focus
+      >
+        <View style={{ flex: 1 }}>
+          <ScreenRenderer />
+        </View>
+      </PanGestureHandler>
       {shouldShowTabs && <BottomNavigation />}
     </SafeAreaView>
   );
@@ -191,6 +262,5 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
 });

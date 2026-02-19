@@ -2,20 +2,20 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, SCREENS } from '../services/NavigationContext';
-import { COLORS } from '../utils/theme';
 import { useLanguage } from '../services/LanguageContext';
+import { useTheme } from '../services/ThemeContext';
 
-const TabItem = ({ icon, label, screenName, active, onPress }) => (
+const TabItem = ({ icon, label, screenName, active, onPress, colors }) => (
     <TouchableOpacity style={styles.tabItem} onPress={() => onPress(screenName)} activeOpacity={0.7}>
         <View style={styles.iconContainer}>
-            {active && <View style={styles.activeIndicator} />}
+            {active && <View style={[styles.activeIndicator, { backgroundColor: colors.primary }]} />}
             <Ionicons
                 name={active ? icon : `${icon}-outline`}
                 size={24}
-                color={active ? COLORS.primary : COLORS.secondaryText}
+                color={active ? colors.primary : colors.secondaryText}
             />
         </View>
-        <Text style={[styles.tabLabel, active && styles.activeTabLabel]}>
+        <Text style={[styles.tabLabel, { color: active ? colors.primary : colors.secondaryText }, active && styles.activeTabLabel]}>
             {label}
         </Text>
     </TouchableOpacity>
@@ -24,6 +24,7 @@ const TabItem = ({ icon, label, screenName, active, onPress }) => (
 const BottomNavigation = () => {
     const { currentScreen, navigate } = useNavigation();
     const { t } = useLanguage();
+    const { colors } = useTheme();
 
     // Don't show bottom nav on Splash
     if (currentScreen === SCREENS.SPLASH) return null;
@@ -32,13 +33,14 @@ const BottomNavigation = () => {
     const getActive = (screen) => currentScreen === screen;
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
             <TabItem
                 icon="home"
                 label={t("tab_home")}
                 screenName={SCREENS.HOME}
                 active={getActive(SCREENS.HOME) || getActive(SCREENS.DETAIL)}
                 onPress={navigate}
+                colors={colors}
             />
             <TabItem
                 icon="compass"
@@ -46,6 +48,7 @@ const BottomNavigation = () => {
                 screenName={SCREENS.EXPLORE}
                 active={getActive(SCREENS.EXPLORE)}
                 onPress={navigate}
+                colors={colors}
             />
             <TabItem
                 icon="bookmark"
@@ -53,6 +56,7 @@ const BottomNavigation = () => {
                 screenName={SCREENS.SAVED}
                 active={getActive(SCREENS.SAVED)}
                 onPress={navigate}
+                colors={colors}
             />
             <TabItem
                 icon="person"
@@ -60,6 +64,7 @@ const BottomNavigation = () => {
                 screenName={SCREENS.PROFILE}
                 active={getActive(SCREENS.PROFILE)}
                 onPress={navigate}
+                colors={colors}
             />
         </View>
     );
@@ -70,17 +75,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center',
-        backgroundColor: COLORS.white,
         paddingVertical: 10,
         paddingBottom: Platform.OS === 'ios' ? 24 : 12, // Safe area handling
         borderTopWidth: 1,
-        borderTopColor: COLORS.border,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: -2 },
         shadowOpacity: 0.05,
         shadowRadius: 4,
         elevation: 8,
-        boxShadow: '0 -2px 5px rgba(0, 0, 0, 0.1)',
     },
     tabItem: {
         alignItems: 'center',
@@ -96,16 +98,13 @@ const styles = StyleSheet.create({
         top: -10, // Line at top of tab
         width: 20,
         height: 3,
-        backgroundColor: COLORS.primary,
         borderRadius: 2,
     },
     tabLabel: {
         fontSize: 10,
-        color: COLORS.secondaryText,
         fontWeight: '500',
     },
     activeTabLabel: {
-        color: COLORS.primary,
         fontWeight: '700',
     },
 });

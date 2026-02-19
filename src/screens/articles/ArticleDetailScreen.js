@@ -11,23 +11,119 @@ import Animated, {
   withDelay,
 } from "react-native-reanimated";
 import CommentsSheet from "../../components/CommentsSheet";
-import { useNavigation } from "../../services/NavigationContext";
+import { useNavigation, SCREENS } from "../../services/NavigationContext";
 import { MockDataService } from "../../data/mockData";
 import { useTheme } from "../../services/ThemeContext";
-import { COLORS } from "../../utils/theme";
 import { useLanguage } from "../../services/LanguageContext";
 import { wp, hp, rf } from "../../utils/responsive";
 import { truncateText } from "../../utils/textUtils";
 import Toast from "../../components/Toast";
+import BackgroundPattern from "../../components/BackgroundPattern";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
+// Reusable Animated Button
+const AnimatedButton = ({ onPress, style, children, scaleMin = 0.95 }) => {
+  const buttonScale = useSharedValue(1);
+
+  const handlePressIn = () => {
+    buttonScale.value = withSpring(scaleMin, { damping: 10, stiffness: 200 });
+  };
+
+  const handlePressOut = () => {
+    buttonScale.value = withSpring(1, { damping: 10, stiffness: 200 });
+  };
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: buttonScale.value }],
+  }));
+
+  return (
+    <Pressable onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut}>
+      <Animated.View style={[style, animatedStyle]}>
+        {children}
+      </Animated.View>
+    </Pressable>
+  );
+};
+
+// Interactive Back Button
+const InteractiveBackButton = ({ onPress, style, colors }) => {
+  const buttonScale = useSharedValue(1);
+  const translateX = useSharedValue(0);
+
+  const handlePressIn = () => {
+    buttonScale.value = withSpring(0.9, { damping: 10, stiffness: 200 });
+    translateX.value = withSpring(-4, { damping: 10, stiffness: 200 });
+  };
+
+  const handlePressOut = () => {
+    buttonScale.value = withSpring(1, { damping: 10, stiffness: 200 });
+    translateX.value = withSpring(0, { damping: 10, stiffness: 200 });
+  };
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { scale: buttonScale.value },
+      { translateX: translateX.value }
+    ],
+  }));
+
+  return (
+    <Pressable onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut}>
+      <Animated.View style={[style, animatedStyle]}>
+        <Ionicons name="arrow-back" size={24} color={colors.primary} />
+      </Animated.View>
+    </Pressable>
+  );
+};
+
+// Interactive Refresh Button
+const InteractiveRefreshButton = ({ onPress, style, colors }) => {
+  const rotation = useSharedValue(0);
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { scale: scale.value },
+      { rotate: `${rotation.value}deg` }
+    ],
+  }));
+
+  const handlePress = () => {
+    rotation.value = withTiming(rotation.value + 360, { duration: 600 });
+    scale.value = withSequence(
+      withSpring(0.8, { damping: 10, stiffness: 300 }),
+      withSpring(1, { damping: 12, stiffness: 200 })
+    );
+    onPress();
+  };
+
+  return (
+    <Pressable onPress={handlePress}>
+      <Animated.View style={[style, animatedStyle]}>
+        <Ionicons name="refresh" size={20} color={colors.primary} />
+      </Animated.View>
+    </Pressable>
+  );
+};
+
 export default function ArticleDetailScreen() {
-  const { params, goBack, setIsTabBarVisible } = useNavigation();
+  const { params, goBack, navigate, setIsTabBarVisible } = useNavigation();
   const { language, t } = useLanguage();
-  const data = useMemo(() => MockDataService.getAllArticles(language), [language]);
+  const { colors, isDarkMode } = useTheme();
+  const originalData = useMemo(() => MockDataService.getAllArticles(language), [language]);
+
+  // Create a large repeated list for infinite loop feel (virtual looping)
+  const LOOP_MULTIPLIER = 50;
+  const data = useMemo(() => {
+    let repeated = [];
+    for (let i = 0; i < LOOP_MULTIPLIER; i++) {
+      repeated = [...repeated, ...originalData];
+    }
+    return repeated;
+  }, [originalData]);
   const [activeArticleIndex, setActiveArticleIndex] = useState(0);
-  const [showComments, setShowComments] = useState(false);
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const flatListRef = useRef(null);
@@ -38,7 +134,7 @@ export default function ArticleDetailScreen() {
   };
 
   useEffect(() => {
-    // Default to hiding the main tab bar (since we start in Engaged mode)
+    // Default to hiding the main tab bar
     setIsTabBarVisible(false);
 
     return () => {
@@ -48,15 +144,17 @@ export default function ArticleDetailScreen() {
   }, []);
 
   const startIndex = useMemo(() => {
+    const offset = Math.floor(LOOP_MULTIPLIER / 2) * originalData.length;
+
     if (params?.articleId) {
-      const idx = data.findIndex((a) => a.id === params.articleId);
-      return idx >= 0 ? idx : 0;
+      const idx = originalData.findIndex((a) => a.id === params.articleId);
+      return idx >= 0 ? offset + idx : offset;
     }
     if (params?.item?.id) {
-      const idx = data.findIndex((a) => a.id === params.item.id);
-      return idx >= 0 ? idx : 0;
+      const idx = originalData.findIndex((a) => a.id === params.item.id);
+      return idx >= 0 ? offset + idx : offset;
     }
-    return 0;
+    return offset;
   }, [params, data]);
 
   const renderArticle = ({ item, index }) => (
@@ -76,25 +174,36 @@ export default function ArticleDetailScreen() {
     setActiveArticleIndex(index);
   };
 
-  const { colors, isDarkMode } = useTheme();
-
   return (
     <Animated.View style={[styles.container, { backgroundColor: colors.background }]}>
+      <BackgroundPattern color={isDarkMode ? colors.primary : '#00cdabff'} opacity={isDarkMode ? 0.1 : 0.05} />
       {/* Header with back button */}
       <View style={styles.header}>
-        <Pressable onPress={() => {
-          setIsTabBarVisible(true);
-          goBack();
-        }} style={styles.backBtn} hitSlop={10}>
-          <Ionicons name="chevron-back" size={24} color="#FFF" />
-        </Pressable>
+        <InteractiveBackButton
+          style={[styles.backButton, { backgroundColor: colors.cardBg, shadowColor: colors.shadow }]}
+          colors={colors}
+          onPress={() => {
+            setIsTabBarVisible(true);
+            navigate(SCREENS.HOME);
+          }}
+        />
+
+        <View style={styles.headerActions}>
+          <InteractiveRefreshButton
+            style={[styles.refreshButton, { backgroundColor: colors.cardBg, shadowColor: colors.shadow }]}
+            colors={colors}
+            onPress={() => {
+              showToast("Refreshing articles...");
+            }}
+          />
+        </View>
       </View>
 
       {/* Vertical swipeable articles */}
       <FlatList
         ref={flatListRef}
         data={data}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => `${item.id}-${index}`}
         renderItem={renderArticle}
         pagingEnabled
         showsVerticalScrollIndicator={false}
@@ -108,6 +217,10 @@ export default function ArticleDetailScreen() {
           offset: SCREEN_HEIGHT * index,
           index,
         })}
+        removeClippedSubviews={Platform.OS === 'android'} // Optimize memory
+        initialNumToRender={1} // Only render the first item initially to speed up mount
+        maxToRenderPerBatch={2}
+        windowSize={3}
       />
 
       <Toast
@@ -133,6 +246,17 @@ function ArticlePage({ article, index, activeIndex, setIsTabBarVisible, t, showT
   useEffect(() => {
     setSaved(MockDataService.isBookmarked(article?.id));
   }, [article?.id]);
+
+  // Helper to format publisher name
+  const formatPublisherName = (name) => {
+    return name;
+  };
+
+  // Helper to get initials (first letter of each word)
+  const getPublisherInitials = (name) => {
+    if (!name) return "HP";
+    return name.split(' ').map(word => word[0]).join('').toUpperCase();
+  };
 
   // Helper to format likes (e.g., 2401 -> 2.4k)
   const formatLikes = (num) => {
@@ -243,7 +367,7 @@ function ArticlePage({ article, index, activeIndex, setIsTabBarVisible, t, showT
   }));
 
   return (
-    <View style={[styles.articlePage, { backgroundColor: colors.background }]}>
+    <View style={styles.articlePage}>
       {/* Hero Image - Fixed top half */}
       <Pressable onPress={handleToggleMode} style={styles.heroContainer}>
         <Image
@@ -294,8 +418,10 @@ function ArticlePage({ article, index, activeIndex, setIsTabBarVisible, t, showT
                 }
               }}
             >
-              <View style={[styles.publisherDot, { backgroundColor: colors.primary }]} />
-              <Text style={[styles.publisherName, { color: colors.text }]}>{article?.publisher}</Text>
+              <View style={[styles.publisherDot, { backgroundColor: colors.primary }]}>
+                <Text style={styles.publisherInitials}>{getPublisherInitials(article?.publisher)}</Text>
+              </View>
+              <Text style={[styles.publisherName, { color: colors.text }]}>{formatPublisherName(article?.publisher)}</Text>
             </Pressable>
             <Text style={[styles.timestamp, { color: colors.secondaryText }]}>{article?.timestamp}</Text>
           </View>
@@ -334,8 +460,8 @@ function ArticlePage({ article, index, activeIndex, setIsTabBarVisible, t, showT
         engagementStyle,
         {
           backgroundColor: colors.cardBg,
-          shadowColor: isDarkMode ? "#FFFFFF" : "#000", // White glow in dark mode
-          shadowOpacity: isDarkMode ? 0.2 : 0.15,
+          shadowColor: colors.shadow,
+          shadowOpacity: isDarkMode ? 0.4 : 0.15,
           borderWidth: isDarkMode ? 1 : 0,
           borderColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'transparent'
         }
@@ -348,13 +474,13 @@ function ArticlePage({ article, index, activeIndex, setIsTabBarVisible, t, showT
             <Ionicons
               name={liked ? "heart" : "heart-outline"}
               size={28}
-              color={liked ? COLORS.primary : (isDarkMode ? '#FFFFFF' : colors.text)} // Use white heart in dark mode
+              color={liked ? "#FF3B30" : colors.text} // Crimson red for liked
             />
           </Animated.View>
           <Text style={[
             styles.engageLabel,
             { color: colors.secondaryText },
-            liked && { color: COLORS.primary } // Keep orange branding for active state
+            liked && { color: "#FF3B30" } // Red for active like
           ]}>
             {likes}
           </Text>
@@ -371,7 +497,7 @@ function ArticlePage({ article, index, activeIndex, setIsTabBarVisible, t, showT
             console.error(error.message);
           }
         }}>
-          <Ionicons name="logo-whatsapp" size={26} color={COLORS.success} />
+          <Ionicons name="logo-whatsapp" size={26} color={colors.success} />
           <Text style={[styles.engageLabel, { color: colors.secondaryText }]}>Share</Text>
         </Pressable>
 
@@ -386,12 +512,12 @@ function ArticlePage({ article, index, activeIndex, setIsTabBarVisible, t, showT
           <Ionicons
             name={saved ? "bookmark" : "bookmark-outline"}
             size={26}
-            color={saved ? COLORS.primary : (isDarkMode ? '#FFFFFF' : colors.text)}
+            color={saved ? (isDarkMode ? "#FFFFFF" : colors.text) : colors.text}
           />
           <Text style={[
             styles.engageLabel,
             { color: colors.secondaryText },
-            saved && { color: COLORS.primary }
+            saved && { color: isDarkMode ? "#FFFFFF" : colors.text }
           ]}>
             {saved ? "Saved" : "Save"}
           </Text>
@@ -405,7 +531,6 @@ function ArticlePage({ article, index, activeIndex, setIsTabBarVisible, t, showT
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   header: {
     position: "absolute",
@@ -417,26 +542,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp(4),
     zIndex: 10,
   },
-  backBtn: {
+  backButton: {
     width: wp(11),
     height: wp(11),
     borderRadius: wp(5.5),
-    backgroundColor: "rgba(0,0,0,0.5)",
     alignItems: "center",
     justifyContent: "center",
+    elevation: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
   },
-  shareBtn: {
+  refreshButton: {
     width: wp(11),
     height: wp(11),
     borderRadius: wp(5.5),
-    backgroundColor: "rgba(0,0,0,0.5)",
     alignItems: "center",
     justifyContent: "center",
+    elevation: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
   },
   articlePage: {
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
-    backgroundColor: COLORS.background,
   },
   heroContainer: {
     width: "100%",
@@ -472,7 +602,6 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   categoryTag: {
-    backgroundColor: COLORS.primary,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
@@ -498,7 +627,6 @@ const styles = StyleSheet.create({
   },
   contentCard: {
     flex: 1,
-    backgroundColor: COLORS.background,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     marginTop: -24,
@@ -509,7 +637,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: rf(22),
     fontWeight: "800",
-    color: COLORS.text,
     lineHeight: rf(28),
     marginBottom: hp(1.5),
   },
@@ -525,31 +652,33 @@ const styles = StyleSheet.create({
     gap: wp(2),
   },
   publisherDot: {
-    width: wp(5),
-    height: wp(5),
-    borderRadius: wp(2.5),
-    backgroundColor: COLORS.primary,
+    width: wp(6),
+    height: wp(6),
+    borderRadius: wp(3),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  publisherInitials: {
+    fontSize: rf(10),
+    color: '#FFF',
+    fontWeight: '800',
   },
   publisherName: {
     fontSize: rf(13),
     fontWeight: "600",
-    color: COLORS.text,
   },
   timestamp: {
     fontSize: rf(12),
-    color: COLORS.secondaryText,
   },
   divider: {
     height: 2,
     width: "100%",
-    backgroundColor: COLORS.primary,
     borderRadius: 1,
     marginBottom: hp(1.5),
   },
   bodyText: {
     fontSize: rf(15),
     lineHeight: rf(24),
-    color: COLORS.text,
     flex: 1,
   },
   tapHint: {
@@ -574,17 +703,12 @@ const styles = StyleSheet.create({
     bottom: hp(2.5),
     left: wp(5),
     right: wp(5),
-    backgroundColor: COLORS.cardBg,
     borderRadius: 30,
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
     paddingVertical: hp(1.5),
     paddingHorizontal: wp(4),
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
     elevation: 8,
     zIndex: 100,
   },
@@ -599,10 +723,8 @@ const styles = StyleSheet.create({
   engageLabel: {
     fontSize: rf(11),
     fontWeight: "600",
-    color: COLORS.secondaryText,
   },
   engageLabelActive: {
-    color: COLORS.primary,
     fontWeight: "700",
   },
 });

@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, SCREENS } from "../../services/NavigationContext";
 import { useLanguage } from "../../services/LanguageContext";
 import { useTheme } from "../../services/ThemeContext";
+import BackgroundPattern from "../../components/BackgroundPattern";
 
 const { width } = Dimensions.get('window');
 
@@ -13,13 +14,14 @@ const PrivacyScreen = () => {
 
   const renderSection = (title, content) => (
     <View style={styles.section}>
-      <Text style={[styles.sectionTitle, { color: colors.text }]}>{title}</Text>
+      <Text style={[styles.sectionTitle, { color: colors.primary }]}>{title}</Text>
       <Text style={[styles.bodyText, { color: colors.secondaryText }]}>{content}</Text>
     </View>
   );
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <BackgroundPattern color={isDarkMode ? colors.primary : '#00cdabff'} opacity={isDarkMode ? 0.1 : 0.05} />
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <TouchableOpacity
           onPress={() => goBack ? goBack() : navigate(SCREENS.PROFILE)}

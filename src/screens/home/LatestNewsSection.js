@@ -26,23 +26,19 @@ const NewsCard = ({ item, onPress, onShowToast, toastSavedText, colors, isDarkMo
                 styles.cardContainer,
                 {
                     backgroundColor: colors.cardBg,
-                    shadowColor: isDarkMode && pressed ? '#FFFFFF' : colors.text,
-                    shadowOpacity: isDarkMode && pressed ? 0.5 : 0.1,
-                    shadowRadius: isDarkMode && pressed ? 8 : 4,
-                    elevation: isDarkMode && pressed ? 8 : 2,
+                    // Heritage Primary Border
+                    borderColor: colors.primary,
+                    borderWidth: 1,
+                    borderLeftWidth: pressed ? 6 : 1, // Highlighting left side on press
 
-                    // Interactive Border
-                    borderWidth: isDarkMode ? (pressed ? 1.5 : 1) : 0,
-                    borderColor: isDarkMode ? '#FFFFFF' : 'transparent',
-                    // On Press in Dark Mode: Show thick White accent
-                    // Resting in Dark Mode: Show uniform White border
-                    borderLeftWidth: isDarkMode ? (pressed ? 4 : 1) : 4,
-                    borderLeftColor: isDarkMode
-                        ? '#FFFFFF'
-                        : (pressed ? colors.primary : 'transparent'),
+                    // Shadow & Elevation
+                    shadowColor: isDarkMode && pressed ? colors.primary : colors.shadow,
+                    shadowOpacity: isDarkMode && pressed ? 0.4 : (pressed ? 0.4 : 0),
+                    shadowRadius: isDarkMode && pressed ? 10 : 4,
+                    elevation: pressed ? 12 : 0,
 
                     // Active State
-                    opacity: pressed ? 0.9 : 1,
+                    opacity: pressed ? 0.95 : 1,
                     transform: [{ scale: pressed ? 0.98 : 1 }],
                 }
             ]}
@@ -55,7 +51,9 @@ const NewsCard = ({ item, onPress, onShowToast, toastSavedText, colors, isDarkMo
                         <Ionicons
                             name={bookmarked ? "bookmark" : "bookmark-outline"}
                             size={20}
-                            color={colors.text}
+                            // Icon color: Use Primary (Gold/Orange) or Text depending on design.
+                            // Theme says icons are colors.icon (Gold in Dark, Charcoal in Light).
+                            color={colors.icon}
                         />
                     </TouchableOpacity>
                 </View>
@@ -64,7 +62,11 @@ const NewsCard = ({ item, onPress, onShowToast, toastSavedText, colors, isDarkMo
                 </Text>
                 <View style={styles.footerRow}>
                     <View style={styles.publisherInfo}>
-                        <View style={[styles.publisherLogo, { backgroundColor: colors.text }]} />
+                        <View style={[styles.publisherLogo, { backgroundColor: colors.primary }]}>
+                            <Text style={styles.publisherInitial}>
+                                {item.publisher?.split(' ').map(word => word[0]).join('').toUpperCase() || 'P'}
+                            </Text>
+                        </View>
                         <Text style={[styles.publisherName, { color: colors.secondaryText }]}>{item.publisher}</Text>
                     </View>
                     <View style={styles.timeInfo}>
@@ -104,9 +106,12 @@ const LatestNewsSection = ({ onShowToast }) => {
             <View style={styles.header}>
                 <View style={styles.titleContainer}>
                     <Ionicons name="newspaper-outline" size={24} color={colors.primary} style={styles.icon} />
-                    <Text style={[styles.sectionTitle, { color: colors.text }]}>{t("home_latest")}</Text>
+                    <Text style={[styles.sectionTitle, { color: colors.primary }]}>{t("home_latest")}</Text>
                 </View>
-                <TouchableOpacity onPress={handleSeeAll}>
+                <TouchableOpacity
+                    onPress={handleSeeAll}
+                    style={[styles.seeAllContainer, { backgroundColor: colors.primary + '15' }]}
+                >
                     <Text style={[styles.seeAll, { color: colors.primary }]}>{t("home_see_all")}</Text>
                 </TouchableOpacity>
             </View>
@@ -149,8 +154,13 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
     },
+    seeAllContainer: {
+        paddingHorizontal: 12,
+        paddingVertical: 4,
+        borderRadius: 20,
+    },
     seeAll: {
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '600',
     },
     list: {
@@ -205,10 +215,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     publisherLogo: {
-        width: 16,
-        height: 16,
-        borderRadius: 8,
+        width: 18,
+        height: 18,
+        borderRadius: 9,
         marginRight: 6,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    publisherInitial: {
+        color: '#FFFFFF',
+        fontSize: 9,
+        fontWeight: 'bold',
     },
     publisherName: {
         fontSize: 12,

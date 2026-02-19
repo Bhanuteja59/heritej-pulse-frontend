@@ -8,6 +8,7 @@ import { useLanguage } from "../../services/LanguageContext";
 import Toast from "../../components/Toast";
 import { NOTIFICATIONS } from "../../data/mockData";
 import { truncateText } from "../../utils/textUtils";
+import BackgroundPattern from "../../components/BackgroundPattern";
 
 const { width } = Dimensions.get('window');
 
@@ -39,7 +40,9 @@ const NotificationItem = ({ item, onPress, onDismiss, onSave, isSaved, styles, c
                     </Text>
 
                     <View style={styles.metaRow}>
-                        <Text style={[styles.source, { color: colors.secondaryText }]}>{item.source}</Text>
+                        <Text style={[styles.source, { color: colors.secondaryText }]}>
+                            {item.source === "Heritage Pulse" ? "HP" : item.source}
+                        </Text>
                     </View>
                 </View>
 
@@ -110,6 +113,7 @@ const Notifications = () => {
 
     return (
         <View style={styles.safeArea}>
+            <BackgroundPattern color={isDarkMode ? colors.primary : '#00cdabff'} opacity={isDarkMode ? 0.1 : 0.05} />
             <View style={styles.container}>
                 <View style={styles.header}>
                     <View style={styles.headerTitleRow}>
@@ -117,7 +121,7 @@ const Notifications = () => {
                             <Ionicons name="notifications" size={24} color={colors.white} />
                         </View>
                         <View>
-                            <Text style={styles.headerTitle}>{t("notifications_title")}</Text>
+                            <Text style={[styles.headerTitle, { color: colors.primary }]}>{t("notifications_title")}</Text>
                             <Text style={styles.headerSubtitle}>
                                 {t("notifications_updates_count", { count: visibleNotifications.length })}
                             </Text>
@@ -169,13 +173,13 @@ const getStyles = (colors, isDarkMode) => StyleSheet.create({
     },
     container: {
         flex: 1,
-        backgroundColor: colors.background,
+        // backgroundColor: colors.background, // Removed for transparency
     },
     header: {
         paddingTop: Platform.OS === 'android' ? 20 : 10,
         paddingBottom: 20,
         paddingHorizontal: 20,
-        backgroundColor: colors.background,
+        // backgroundColor: colors.background, // Removed for transparency
     },
     headerTitleRow: {
         flexDirection: "row",
