@@ -1,60 +1,79 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, Image, Pressable, TextInput, KeyboardAvoidingView, Platform, Alert, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { View, Text, StyleSheet, Image, Platform, Dimensions, Animated, Pressable } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS } from '../../utils/theme';
+import { useTheme } from '../../services/ThemeContext';
 import { useNavigation, SCREENS } from '../../services/NavigationContext';
-import { useLanguage } from '../../services/LanguageContext';
-import { MockDataService } from '../../data/mockData';
+import SkipLoading from '../../components/loading/SkipLoading';
 
 const { width, height } = Dimensions.get('window');
 
 const Register = () => {
+    const { colors, isDarkMode } = useTheme();
     const { navigate } = useNavigation();
-    const { language } = useLanguage();
+    const [isSkipping, setIsSkipping] = useState(false);
+
+    // Animations
+    const skipScale = useRef(new Animated.Value(1)).current;
+    const loginScale = useRef(new Animated.Value(1)).current;
+    const signupScale = useRef(new Animated.Value(1)).current;
+
+    const animateIn = (anim) => {
+        Animated.spring(anim, {
+            toValue: 0.95,
+            useNativeDriver: true,
+        }).start();
+    };
+
+    const animateOut = (anim) => {
+        Animated.spring(anim, {
+            toValue: 1,
+            friction: 4,
+            tension: 40,
+            useNativeDriver: true,
+        }).start();
+    };
 
     const skipToHome = () => {
-        navigate(SCREENS.HOME);
+        setIsSkipping(true);
+        setTimeout(() => {
+            setIsSkipping(false);
+            navigate(SCREENS.HOME);
+        }, 3000); // 3 seconds to show all the teaser messages
     };
 
     return (
-        <View style={styles.container}>
-            <StatusBar style="dark" backgroundColor="transparent" translucent />
-
-            {/* Background Gradient - Subtle and Premium */}
-            <LinearGradient
-                colors={[COLORS.background, '#FFF8F0', '#FFE4C4']}
-                style={StyleSheet.absoluteFill}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-            />
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <StatusBar style={isDarkMode ? "light" : "dark"} backgroundColor="transparent" translucent />
 
             <View style={styles.content}>
-
-                {/* Skip Button - Top Right */}
-                <TouchableOpacity
-                    style={styles.skipButton}
-                    onPress={skipToHome}
-                    activeOpacity={0.6}
-                >
-                    <Text style={styles.skipText}>Skip</Text>
-                    <Ionicons name="chevron-forward" size={16} color={COLORS.primary} />
-                </TouchableOpacity>
+                {/* Skip Button - Top Right Floating Icon */}
+                <Animated.View style={[styles.skipButtonContainer, { transform: [{ scale: skipScale }] }]}>
+                    <Pressable
+                        style={[styles.skipButton, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]}
+                        onPress={skipToHome}
+                        onPressIn={() => animateIn(skipScale)}
+                        onPressOut={() => animateOut(skipScale)}
+                    >
+                        <Text style={[styles.skipText, { color: colors.secondaryText }]}>Skip</Text>
+                        <Ionicons name="chevron-forward" size={16} color={colors.secondaryText} />
+                    </Pressable>
+                </Animated.View>
 
                 {/* Logo Section */}
                 <View style={styles.logoContainer}>
                     <Image
                         source={require("../../../assets/images/heritej-pulse-logo.png")}
-                        style={styles.logo}
+                        style={[styles.logo, isDarkMode && { tintColor: colors.white }]}
                         resizeMode="contain"
                     />
                 </View>
 
                 {/* Text Section */}
                 <View style={styles.textContainer}>
-                    <Text style={styles.title}>Heritej Pulse</Text>
-                    <Text style={styles.tagline}>
+                    <Text style={[styles.title, { color: colors.primary }]}>Heritej Pulse</Text>
+                    <Text style={[styles.tagline, { color: colors.secondaryText }]}>
                         Capturing the heartbeat of{'\n'}Indian Heritage & Traditions
                     </Text>
                 </View>
@@ -62,38 +81,46 @@ const Register = () => {
                 {/* Buttons Section */}
                 <View style={styles.buttonContainer}>
                     {/* Login Button - Gradient */}
-                    <TouchableOpacity
-                        onPress={() => navigate(SCREENS.LOGIN)}
-                        activeOpacity={0.8}
-                        style={styles.buttonShadow}
-                    >
-                        <LinearGradient
-                            colors={[COLORS.primary, COLORS.secondary]}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 0 }}
-                            style={styles.primaryButton}
+                    <Animated.View style={{ width: '100%', transform: [{ scale: loginScale }] }}>
+                        <Pressable
+                            onPress={() => navigate(SCREENS.LOGIN)}
+                            onPressIn={() => animateIn(loginScale)}
+                            onPressOut={() => animateOut(loginScale)}
+                            style={[styles.buttonShadow, { shadowColor: colors.primary }]}
                         >
-                            <Ionicons name="log-in-outline" size={24} color={COLORS.white} style={styles.icon} />
-                            <Text style={styles.buttonTextPrimary}>Login</Text>
-                        </LinearGradient>
-                    </TouchableOpacity>
+                            <LinearGradient
+                                colors={[colors.primary, colors.secondary]}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                style={styles.primaryButton}
+                            >
+                                <Ionicons name="log-in-outline" size={24} color={colors.white} style={styles.icon} />
+                                <Text style={[styles.buttonTextPrimary, { color: colors.white }]}>Login</Text>
+                            </LinearGradient>
+                        </Pressable>
+                    </Animated.View>
 
                     {/* Sign Up Button - Clean Outline */}
-                    <TouchableOpacity
-                        onPress={() => navigate(SCREENS.SIGNUP)}
-                        activeOpacity={0.7}
-                        style={styles.secondaryButtonWrapper}
-                    >
-                        <View style={styles.secondaryButton}>
-                            <Ionicons name="person-add-outline" size={24} color={COLORS.primary} style={styles.iconSecondary} />
-                            <Text style={styles.buttonTextSecondary}>Create Account</Text>
-                        </View>
-                    </TouchableOpacity>
+                    <Animated.View style={{ width: '100%', transform: [{ scale: signupScale }] }}>
+                        <Pressable
+                            onPress={() => navigate(SCREENS.SIGNUP)}
+                            onPressIn={() => animateIn(signupScale)}
+                            onPressOut={() => animateOut(signupScale)}
+                            style={styles.secondaryButtonWrapper}
+                        >
+                            <View style={[styles.secondaryButton, { borderColor: colors.primary, backgroundColor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)' }]}>
+                                <Ionicons name="person-add-outline" size={24} color={colors.primary} style={styles.iconSecondary} />
+                                <Text style={[styles.buttonTextSecondary, { color: colors.primary }]}>Create Account</Text>
+                            </View>
+                        </Pressable>
+                    </Animated.View>
 
-                    <Text style={styles.versionText}>v1.0.0</Text>
+                    <Text style={[styles.versionText, { color: colors.secondaryText }]}>v1.0.0</Text>
                 </View>
 
             </View>
+
+            <SkipLoading visible={isSkipping} />
         </View>
     );
 };
@@ -104,112 +131,99 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
-        justifyContent: "space-between", // Distribute space evenly
+        justifyContent: "space-between",
         alignItems: "center",
         paddingHorizontal: width * 0.08,
-        paddingTop: height * 0.12, // More top padding for balance
+        paddingTop: Platform.OS === 'ios' ? 60 : 50,
         paddingBottom: height * 0.08,
     },
-    skipButton: {
+    skipButtonContainer: {
         position: 'absolute',
-        top: 20,
-        right: 0,
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 5,
+        top: Platform.OS === 'ios' ? 60 : 50,
+        right: width * 0.08,
         zIndex: 10,
     },
+    skipButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 20,
+    },
     skipText: {
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: '600',
-        color: COLORS.primary,
-        marginRight: 2,
+        marginRight: 4,
     },
     logoContainer: {
         alignItems: 'center',
-        // Subtle glow for logo
-        shadowColor: COLORS.primary,
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.2,
-        shadowRadius: 16,
-        elevation: 8,
+        marginTop: height * 0.05,
     },
     logo: {
-        width: width * 0.55,
-        height: width * 0.55,
+        width: width * 0.45,
+        height: width * 0.45,
     },
     textContainer: {
         alignItems: 'center',
-        marginTop: -30,
+        marginTop: -20,
     },
     title: {
-        fontSize: width * 0.095,
-        fontWeight: '800', // Extra bold
+        fontSize: width * 0.09,
+        fontWeight: '800',
         textAlign: 'center',
         marginBottom: 12,
-        color: COLORS.primary,
         letterSpacing: 0.5,
-        // Premium text shadow
-        textShadowColor: 'rgba(235, 106, 0, 0.15)',
-        textShadowOffset: { width: 0, height: 4 },
-        textShadowRadius: 8,
     },
     tagline: {
-        fontSize: width * 0.042,
+        fontSize: width * 0.04,
         fontWeight: '500',
         textAlign: 'center',
-        color: COLORS.text,
         letterSpacing: 0.3,
         lineHeight: 26,
-        opacity: 0.85,
     },
     buttonContainer: {
         width: '100%',
         gap: 16,
         alignItems: 'center',
+        marginTop: 20,
     },
     buttonShadow: {
         width: '100%',
-        shadowColor: COLORS.primary,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
         elevation: 6,
-        borderRadius: 25, // Pill shape
+        borderRadius: 25,
     },
     primaryButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 18,
-        borderRadius: 16, // Modern rounded rect
+        borderRadius: 25,
         width: '100%',
     },
     secondaryButtonWrapper: {
         width: '100%',
-        borderRadius: 16,
+        borderRadius: 25,
     },
     secondaryButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 16, // Slightly smaller than primary
-        borderRadius: 16,
+        paddingVertical: 16,
+        borderRadius: 25,
         width: '100%',
-        backgroundColor: 'rgba(255, 255, 255, 0.6)', // Semi-transparent
         borderWidth: 1.5,
-        borderColor: COLORS.primary,
     },
     buttonTextPrimary: {
         fontSize: 18,
         fontWeight: '700',
-        color: COLORS.white,
         letterSpacing: 0.8,
     },
     buttonTextSecondary: {
         fontSize: 18,
         fontWeight: '700',
-        color: COLORS.primary,
         letterSpacing: 0.8,
     },
     icon: {
@@ -220,7 +234,6 @@ const styles = StyleSheet.create({
     },
     versionText: {
         marginTop: 16,
-        color: COLORS.secondaryText,
         fontSize: 12,
         opacity: 0.5,
         fontWeight: '500',

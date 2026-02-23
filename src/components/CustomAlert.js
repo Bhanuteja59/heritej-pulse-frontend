@@ -1,14 +1,28 @@
-import React from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../services/ThemeContext';
-import { COLORS } from '../utils/theme';
 
 const { width } = Dimensions.get('window');
 
 const CustomAlert = ({ visible, title, message, type = 'error', onClose }) => {
     const { colors } = useTheme();
+    const scaleAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        if (visible) {
+            Animated.spring(scaleAnim, {
+                toValue: 1,
+                friction: 6,
+                tension: 40,
+                useNativeDriver: true,
+            }).start();
+        } else {
+            scaleAnim.setValue(0);
+        }
+    }, [visible, scaleAnim]);
+
     if (!visible) return null;
 
     let iconName = 'alert-circle';
@@ -33,9 +47,9 @@ const CustomAlert = ({ visible, title, message, type = 'error', onClose }) => {
             onRequestClose={onClose}
         >
             <View style={styles.overlay}>
-                <View style={[styles.alertContainer, { backgroundColor: colors.cardBg, shadowColor: colors.shadow }]}>
+                <Animated.View style={[styles.alertContainer, { backgroundColor: colors.cardBg, shadowColor: colors.shadow, transform: [{ scale: scaleAnim }] }]}>
                     <View style={styles.iconContainer}>
-                        <Ionicons name={iconName} size={50} color={iconColor} />
+                        <Ionicons name={iconName} size={55} color={iconColor} />
                     </View>
                     <Text style={[styles.title, { color: titleColor }]}>{title}</Text>
                     <Text style={[styles.message, { color: colors.secondaryText }]}>{message}</Text>
@@ -50,7 +64,7 @@ const CustomAlert = ({ visible, title, message, type = 'error', onClose }) => {
                             <Text style={styles.buttonText}>OK</Text>
                         </LinearGradient>
                     </TouchableOpacity>
-                </View>
+                </Animated.View>
             </View>
         </Modal>
     );
@@ -66,15 +80,18 @@ const styles = StyleSheet.create({
     alertContainer: {
         width: width * 0.85,
         borderRadius: 20,
-        padding: 20,
+        padding: 24,
         alignItems: 'center',
         elevation: 10,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
     },
     iconContainer: {
         marginBottom: 15,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        borderRadius: 40,
+        padding: 10,
     },
     title: {
         fontSize: 22,
@@ -90,7 +107,7 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         width: '100%',
-        borderRadius: 25, // Match Login button radius
+        borderRadius: 25,
         shadowOffset: {
             width: 0,
             height: 4,
@@ -100,7 +117,7 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     button: {
-        paddingVertical: 12,
+        paddingVertical: 14,
         borderRadius: 25,
         alignItems: 'center',
         justifyContent: 'center',
