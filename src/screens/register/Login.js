@@ -1,21 +1,41 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, Image, Pressable, TextInput, KeyboardAvoidingView, Platform, Alert, ActivityIndicator, Keyboard, TouchableWithoutFeedback, Dimensions, useWindowDimensions, ScrollView, TouchableOpacity } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import React, { useState, useRef } from "react";
+import { View, Text, StyleSheet, Image, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, Dimensions, Animated, Pressable } from 'react-native';
 import { LinearGradient } from "expo-linear-gradient";
-import { COLORS } from "../../utils/theme";
+import { useTheme } from "../../services/ThemeContext";
 import { useNavigation, SCREENS } from "../../services/NavigationContext";
 import AuthLoading from "../../components/loading/AuthLoading";
 import FloatingLabelInput from "../../components/inputs/FloatingLabelInput";
 import CustomAlert from "../../components/CustomAlert";
 
+const { width } = Dimensions.get('window');
+
 const Login = () => {
+    const { colors, isDarkMode } = useTheme();
     const { navigate } = useNavigation();
-    const { height } = useWindowDimensions();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+
+    // Animations
+    const buttonScale = useRef(new Animated.Value(1)).current;
+
+    const animateButtonIn = () => {
+        Animated.spring(buttonScale, {
+            toValue: 0.95,
+            useNativeDriver: true,
+        }).start();
+    };
+
+    const animateButtonOut = () => {
+        Animated.spring(buttonScale, {
+            toValue: 1,
+            friction: 4,
+            tension: 40,
+            useNativeDriver: true,
+        }).start();
+    };
 
     // Alert State
     const [alertVisible, setAlertVisible] = useState(false);
@@ -49,39 +69,39 @@ const Login = () => {
     };
 
     return (
-        <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        >
-            <View style={styles.container}>
+        <View style={[styles.safeArea, { backgroundColor: colors.background }]}>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={{ flex: 1 }}
+            >
                 <ScrollView
                     contentContainerStyle={styles.scrollContent}
                     showsVerticalScrollIndicator={false}
                     keyboardShouldPersistTaps="handled"
                 >
-                    {/* Login Illustration */}
                     <View style={styles.illustrationContainer}>
                         <Image
-                            source={require('../../../assets/images/login-pic.png')}
-                            style={styles.illustration}
+                            source={require('../../../assets/images/heritej-pulse-logo.png')}
+                            style={[styles.illustration, isDarkMode && { tintColor: colors.white }]}
                             resizeMode="contain"
                         />
                     </View>
 
                     <View style={styles.header}>
-                        <Text style={styles.title}>Welcome Back👋</Text>
-                        <Text style={styles.subtitle}>
+                        <Text style={[styles.title, { color: colors.primary }]}>Welcome Back</Text>
+                        <Text style={[styles.subtitle, { color: colors.secondaryText }]}>
                             Sign in to continue exploring your heritage.
                         </Text>
                     </View>
 
                     <View style={styles.form}>
-
                         <FloatingLabelInput
                             label="Email or Mobile Number"
                             value={email}
                             onChangeText={setEmail}
                             iconName="mail-outline"
+                            keyboardType="email-address"
+                            autoCapitalize="none"
                         />
 
                         <FloatingLabelInput
@@ -96,25 +116,32 @@ const Login = () => {
                         />
 
                         <TouchableOpacity style={styles.forgotPassword} onPress={() => navigate(SCREENS.FORGOT_PASSWORD)}>
-                            <Text style={styles.forgotPasswordText}>Recover Password</Text>
+                            <Text style={[styles.forgotPasswordText, { color: colors.secondaryText }]}>Recover Password</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity onPress={handleLogin} activeOpacity={0.8} style={styles.buttonContainer}>
-                            <LinearGradient
-                                colors={[COLORS.primary, COLORS.secondary]}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 0 }}
-                                style={styles.loginButton}
+                        <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+                            <Pressable
+                                onPress={handleLogin}
+                                onPressIn={animateButtonIn}
+                                onPressOut={animateButtonOut}
+                                style={[styles.buttonContainer, { shadowColor: colors.primary }]}
                             >
-                                <Text style={styles.loginButtonText}> Sign In </Text>
-                            </LinearGradient>
-                        </TouchableOpacity>
+                                <LinearGradient
+                                    colors={[colors.primary, colors.secondary]}
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                    style={styles.loginButton}
+                                >
+                                    <Text style={[styles.loginButtonText, { color: colors.white }]}>Sign In</Text>
+                                </LinearGradient>
+                            </Pressable>
+                        </Animated.View>
                     </View>
 
                     <View style={styles.footer}>
-                        <Text style={styles.footerText}> New here? </Text>
+                        <Text style={[styles.footerText, { color: colors.secondaryText }]}>New here? </Text>
                         <TouchableOpacity onPress={() => navigate(SCREENS.SIGNUP)}>
-                            <Text style={styles.footerLink}> Create Account </Text>
+                            <Text style={[styles.footerLink, { color: colors.primary }]}>Create Account</Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
@@ -126,67 +153,62 @@ const Login = () => {
                     type={alertType}
                     onClose={() => setAlertVisible(false)}
                 />
-            </View>
-        </KeyboardAvoidingView>
+            </KeyboardAvoidingView>
+        </View>
     );
 };
 
-export default Login;
-
 const styles = StyleSheet.create({
-    container: {
+    safeArea: {
         flex: 1,
-        backgroundColor: COLORS.background, // Using safe warm white from theme
     },
     scrollContent: {
         flexGrow: 1,
+        justifyContent: "center",
+        paddingHorizontal: width * 0.05,
         paddingBottom: 40,
-        justifyContent: 'center',
     },
     illustrationContainer: {
         alignItems: 'center',
         marginBottom: 20,
     },
     illustration: {
-        width: 120,
-        height: 120,
+        width: 150,
+        height: 150,
     },
     header: {
         alignItems: "center",
         marginBottom: 30,
-        paddingHorizontal: 20,
         width: "100%",
+        paddingTop: 10,
     },
     title: {
-        fontSize: 28,
-        fontWeight: "bold",
-        color: COLORS.primary,
+        fontSize: width * 0.075,
+        fontWeight: "800",
         marginBottom: 8,
+        letterSpacing: 0.5,
+        textAlign: "center",
     },
     subtitle: {
-        fontSize: 16,
-        color: COLORS.secondaryText,
-        textAlign: 'center',
-        maxWidth: '80%',
-        lineHeight: 22,
+        fontSize: width * 0.04,
+        letterSpacing: 0.5,
+        lineHeight: 24,
+        textAlign: "center",
     },
     form: {
         width: "100%",
         gap: 20,
-        paddingHorizontal: 24,
     },
     forgotPassword: {
         alignSelf: "flex-end",
-        marginTop: 4,
+        marginTop: -5,
     },
     forgotPasswordText: {
-        color: COLORS.secondaryText,
-        fontWeight: "500",
+        fontWeight: "600",
         fontSize: 14,
     },
     buttonContainer: {
-        marginTop: 10,
-        shadowColor: COLORS.primary,
+        marginTop: 15,
         shadowOffset: {
             width: 0,
             height: 4,
@@ -204,21 +226,20 @@ const styles = StyleSheet.create({
     loginButtonText: {
         fontSize: 18,
         fontWeight: "bold",
-        color: COLORS.white,
     },
     footer: {
         flexDirection: "row",
         justifyContent: "center",
-        marginTop: 30,
+        marginTop: 40,
         alignItems: 'center',
     },
     footerText: {
-        color: COLORS.secondaryText,
         fontSize: 15,
     },
     footerLink: {
         fontSize: 15,
         fontWeight: "bold",
-        color: COLORS.primary,
     },
 });
+
+export default Login;

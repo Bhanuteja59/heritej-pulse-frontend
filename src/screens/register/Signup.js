@@ -1,8 +1,7 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, Image, Pressable, TextInput, KeyboardAvoidingView, Platform, Alert, ActivityIndicator, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import React, { useState, useRef } from "react";
+import { View, Text, StyleSheet, Image, KeyboardAvoidingView, Platform, Alert, ScrollView, Dimensions, TouchableOpacity, Animated, Pressable } from 'react-native';
 import { LinearGradient } from "expo-linear-gradient";
-import { COLORS } from "../../utils/theme";
+import { useTheme } from "../../services/ThemeContext";
 import { useNavigation, SCREENS } from "../../services/NavigationContext";
 import AuthLoading from "../../components/loading/AuthLoading";
 import OTPModal from "../../components/OTPModal";
@@ -12,6 +11,7 @@ import CustomAlert from "../../components/CustomAlert";
 const { width } = Dimensions.get('window');
 
 const Signup = () => {
+    const { colors, isDarkMode } = useTheme();
     const { navigate } = useNavigation();
 
     const [name, setName] = useState("");
@@ -27,6 +27,25 @@ const Signup = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [showAuthLoading, setShowAuthLoading] = useState(false);
+
+    // Animations
+    const buttonScale = useRef(new Animated.Value(1)).current;
+
+    const animateButtonIn = () => {
+        Animated.spring(buttonScale, {
+            toValue: 0.95,
+            useNativeDriver: true,
+        }).start();
+    };
+
+    const animateButtonOut = () => {
+        Animated.spring(buttonScale, {
+            toValue: 1,
+            friction: 4,
+            tension: 40,
+            useNativeDriver: true,
+        }).start();
+    };
 
     // Alert State
     const [alertVisible, setAlertVisible] = useState(false);
@@ -73,8 +92,6 @@ const Signup = () => {
             setIsLoading(false);
             setModalVisible(false); // Close OTP modal
 
-            // setShowAuthLoading(true);
-
             // Show Authentication Loading Screen
             setShowAuthLoading(true);
             setTimeout(() => {
@@ -85,7 +102,7 @@ const Signup = () => {
     };
 
     return (
-        <View style={styles.safeArea}>
+        <View style={[styles.safeArea, { backgroundColor: colors.background }]}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={{ flex: 1 }}
@@ -98,15 +115,15 @@ const Signup = () => {
                     {/* Signup Illustration */}
                     <View style={styles.illustrationContainer}>
                         <Image
-                            source={require('../../../assets/images/signup-pic.png')}
-                            style={styles.illustration}
+                            source={require('../../../assets/images/heritej-pulse-logo.png')}
+                            style={[styles.illustration, isDarkMode && { tintColor: colors.white }]}
                             resizeMode="contain"
                         />
                     </View>
 
                     <View style={styles.header}>
-                        <Text style={styles.title}> Welcome To Heritej Pulse👋 </Text>
-                        <Text style={styles.subtitle}>
+                        <Text style={[styles.title, { color: colors.primary }]}>Welcome To Heritej Pulse</Text>
+                        <Text style={[styles.subtitle, { color: colors.secondaryText }]}>
                             Hello, I guess you are new around here. You can start using the application after sign up.
                         </Text>
                     </View>
@@ -139,7 +156,7 @@ const Signup = () => {
                             secureTextEntry={!isPasswordVisible}
                             isPasswordVisible={isPasswordVisible}
                             togglePasswordVisibility={() => setIsPasswordVisible(!isPasswordVisible)}
-                            iconName="lock-closed"
+                            iconName="lock-closed-outline"
                         />
 
                         {/* Confirm Password Input */}
@@ -151,25 +168,32 @@ const Signup = () => {
                             secureTextEntry={!isConfirmPasswordVisible}
                             isPasswordVisible={isConfirmPasswordVisible}
                             togglePasswordVisibility={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}
-                            iconName="lock-closed"
+                            iconName="lock-closed-outline"
                         />
 
-                        <TouchableOpacity onPress={handleSignup} activeOpacity={0.8} style={styles.buttonContainer}>
-                            <LinearGradient
-                                colors={[COLORS.primary, COLORS.secondary]}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 0 }}
-                                style={styles.signupButton}
+                        <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+                            <Pressable
+                                onPress={handleSignup}
+                                onPressIn={animateButtonIn}
+                                onPressOut={animateButtonOut}
+                                style={[styles.buttonContainer, { shadowColor: colors.primary }]}
                             >
-                                <Text style={styles.signupButtonText}> Sign Up </Text>
-                            </LinearGradient>
-                        </TouchableOpacity>
+                                <LinearGradient
+                                    colors={[colors.primary, colors.secondary]}
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                    style={styles.signupButton}
+                                >
+                                    <Text style={[styles.signupButtonText, { color: colors.white }]}>Sign Up</Text>
+                                </LinearGradient>
+                            </Pressable>
+                        </Animated.View>
                     </View>
 
                     <View style={styles.footer}>
-                        <Text style={styles.footerText}> Already have an account? </Text>
+                        <Text style={[styles.footerText, { color: colors.secondaryText }]}>Already have an account? </Text>
                         <TouchableOpacity onPress={() => navigate(SCREENS.LOGIN)}>
-                            <Text style={styles.footerLink}> Login </Text>
+                            <Text style={[styles.footerLink, { color: colors.primary }]}>Login</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -203,7 +227,6 @@ const Signup = () => {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: COLORS.background,
     },
     scrollContent: {
         flexGrow: 1,
@@ -216,34 +239,34 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     illustration: {
-        width: 200,
-        height: 200,
+        width: 150,
+        height: 150,
     },
     header: {
+        alignItems: "center",
         marginBottom: 30,
         width: "100%",
         paddingTop: 10,
     },
     title: {
-        fontSize: width * 0.065,
+        fontSize: width * 0.075,
         fontWeight: "800",
-        color: COLORS.primary,
-        marginBottom: 10,
+        marginBottom: 8,
         letterSpacing: 0.5,
+        textAlign: "center",
     },
     subtitle: {
         fontSize: width * 0.04,
         letterSpacing: 0.5,
-        color: COLORS.secondaryText,
         lineHeight: 24,
+        textAlign: "center",
     },
     form: {
         width: "100%",
         gap: 20,
     },
     buttonContainer: {
-        marginTop: 10,
-        shadowColor: COLORS.primary,
+        marginTop: 15,
         shadowOffset: {
             width: 0,
             height: 4,
@@ -255,13 +278,12 @@ const styles = StyleSheet.create({
     signupButton: {
         alignItems: "center",
         justifyContent: "center",
-        borderRadius: 25, // Match Login button radius
+        borderRadius: 25,
         paddingVertical: 18,
     },
     signupButtonText: {
         fontSize: 18,
         fontWeight: "bold",
-        color: COLORS.white,
     },
     footer: {
         flexDirection: "row",
@@ -271,12 +293,10 @@ const styles = StyleSheet.create({
     },
     footerText: {
         fontSize: 15,
-        color: COLORS.secondaryText,
     },
     footerLink: {
         fontSize: 15,
         fontWeight: "bold",
-        color: COLORS.primary,
     },
 });
 
